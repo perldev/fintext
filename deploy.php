@@ -11,6 +11,7 @@
                 'git submodule sync',
                 'git submodule update',
                 'git submodule status',
+                "/home/fintex/ENV/bin/python ./manage.py migrate",
                 'killall uwsgi'
 
         );
