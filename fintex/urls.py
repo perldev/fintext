@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from exchange import  views
 urlpatterns = [
-    path("^", views.main, name="main"),
+    path("", views.main, name="main"),
     path("^api/get_rate/<str:currency_from>/<str:currency_to>", views.get_rate, name="api_rate"),
     path('admin/', admin.site.urls),
 ]
