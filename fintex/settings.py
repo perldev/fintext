@@ -26,7 +26,7 @@ AUTH_USER_MODEL = "auth.User"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["162.55.95.183", "162.55.95.183:9001"]
 
 
 # Application definition
