@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from exchange import  views
+from exchange import views
 urlpatterns = [
-    path("^", views.main, name="main"),
-    path("^api/get_rate/<str:currency_from>/<str:currency_to>", views.get_rate, name="api_rate"),
+    path("", views.main, name="main"),
+    path("api/get_rate/<str:currency_from>/<str:currency_to>", views.get_rate, name="api_rate"),
+    # path("api/get_rate2", views.get_rate2, name="api_rate2"),
     path('admin/', admin.site.urls),
 ]

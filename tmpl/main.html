@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    
+    <section class="converter-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-12 col-12">
+                    <h1 class="text-center">Онлайн обменник криптовалют</h1>
+
+                    <div class="row converter-info">
+                        <div class="col-lg-4 col-4 text-center">
+                            <span>Размер транзакции</span><br>
+                            <span><strong>от 2 000 до 25 000 грн</strong></span>
+                        </div>
+                        <div class="col-lg-4 col-4 text-center">
+                            <span>Месячный лимит</span><br>
+                            <span><strong>150 000 грн</strong></span>
+                        </div>
+                        <div class="col-lg-4 col-4 text-center">
+                            <span>Без регистрации</span><br>
+                            <span><strong>KYC не требуется</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="converter-form-wrapper">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-lg-5 col-12 converter-currency-wrapper">
+                                            <span>Вы отдаете:</span>
+                                            <div class="row">
+                                                <div class="col-5">
+                                                    <select class="form-select" aria-label="Default select example">
+                                                        <option selected value="1">Bitcoin</option>
+                                                        <option value="2">Etherium</option>
+                                                        <option value="3">USDT</option>
+                                                        </select>
+                                                </div>
+                                                <div class="col-7"><input type="text" class="form-control"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-12 text-center arrow-icon-wrapper">
+                                            <i class="bu bi-arrow-left-right"></i>
+                                        </div>
+                                        <div class="col-lg-5 col-12 converter-currency-wrapper">
+                                            <span>Вы получаете:</span>
+                                            <div class="row">
+                                                <div class="col-5">
+                                                    <select class="form-select" aria-label="Default select example">
+                                                        <option selected value="1">Bitcoin</option>
+                                                        <option value="2">Etherium</option>
+                                                        <option value="3">USDT</option>
+                                                        </select>
+                                                </div>
+                                                <div class="col-7"><input type="text" class="form-control"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 converter-btn-wrapper">
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-6 col-12 text-lg-start text-center">
+                                                <span><i class="bi bi-info-circle-fill"></i>  Все комиссии уже учтены. <a href="#">Детальнее</a></span>
+                                            </div>
+                                            <div class="col-lg-6 col-12 text-lg-end text-center">
+                                                <button type="submit" class="btn btn-exchange">Обменять валюту <i class="bi bi-arrow-right"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
