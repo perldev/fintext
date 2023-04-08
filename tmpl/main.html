@@ -33,13 +33,13 @@
                                             <span>Вы отдаете:</span>
                                             <div class="row">
                                                 <div class="col-5">
-                                                    <select class="form-select" aria-label="Default select example">
-                                                        <option selected value="1">Bitcoin</option>
-                                                        <option value="2">Etherium</option>
-                                                        <option value="3">USDT</option>
+                                                    <select class="form-select" onchange="ckeckCurrencyPair()" id="given-cur-select" aria-label="Default select example">
+                                                        <option value="btc">Bitcoin</option>
+                                                        <option value="eth">Etherium</option>
+                                                        <option value="usdt">USDT</option>
                                                         </select>
                                                 </div>
-                                                <div class="col-7"><input type="text" class="form-control"></div>
+                                                <div class="col-7"><input type="text" id="given-cur-input" class="form-control" oninput="setTakenCur()"></div>
                                             </div>
                                         </div>
                                         <div class="col-lg-2 col-12 text-center arrow-icon-wrapper">
@@ -49,19 +49,20 @@
                                             <span>Вы получаете:</span>
                                             <div class="row">
                                                 <div class="col-5">
-                                                    <select class="form-select" aria-label="Default select example">
-                                                        <option selected value="1">Bitcoin</option>
-                                                        <option value="2">Etherium</option>
-                                                        <option value="3">USDT</option>
+                                                    <select class="form-select" onchange="ckeckCurrencyPair()" id="taken-cur-select" aria-label="Default select example">
+                                                        <option value="uah">UAH</option>
+                                                        <option value="eth">Etherium</option>
+                                                        <option value="usdt">USDT</option>
                                                         </select>
                                                 </div>
-                                                <div class="col-7"><input type="text" class="form-control"></div>
+                                                <div class="col-7"><input type="text" id="taken-cur-input" class="form-control" oninput="setGivenCur()"></div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-12 converter-btn-wrapper">
                                         <div class="row align-items-center">
                                             <div class="col-lg-6 col-12 text-lg-start text-center">
+                                                <span id="rate-message">Курс</span>
                                                 <span><i class="bi bi-info-circle-fill"></i>  Все комиссии уже учтены. <a href="#">Детальнее</a></span>
                                             </div>
                                             <div class="col-lg-6 col-12 text-lg-end text-center">
@@ -72,6 +73,80 @@
                                     
                                 </form>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section style="margin:40px 0px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 col-12">
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
+                        </div>
+                        <div class="col-6">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder w-75"></span>
+                            <span class="placeholder" style="width: 25%;"></span>
                         </div>
                     </div>
                 </div>
