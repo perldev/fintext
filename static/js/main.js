@@ -10,6 +10,18 @@ rate_message.innerHTML = `Загрузка курса...`;
 let given_cur_input = document.getElementById("given-cur-input");
 let taken_cur_input = document.getElementById("taken-cur-input");
 
+const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9\.]+/;
+given_cur_input.addEventListener("keypress", event => {
+  if (!NUMBER_ALLOWED_CHARS_REGEXP.test(event.key)) {
+    event.preventDefault();
+  }
+});
+taken_cur_input.addEventListener("keypress", event => {
+    if (!NUMBER_ALLOWED_CHARS_REGEXP.test(event.key)) {
+      event.preventDefault();
+    }
+  });
+
 fetch(`http://127.0.0.1:8000/api/get_rate/btc/uah`)
 .then(response => response.json())
 .then(json => {
@@ -30,7 +42,7 @@ function ckeckCurrencyPair() {
         given_cur_input.disabled = false;
         taken_cur_input.disabled = false;  
         rate_message.innerHTML = `Загрузка курса...`;
-        fetch(`http://127.0.0.1:8000/api/get_rate/${given_cur}/${taken_cur}`)
+        fetch(`/api/get_rate/${given_cur}/${taken_cur}`)
             .then(response => response.json())
             .then(json => {
                 main_rate = json['result']['rate'];
@@ -47,12 +59,18 @@ function ckeckCurrencyPair() {
     }
 }
 
-function setTakenCur() {
+function setTakenCurQnty() {
     taken_cur_value = given_cur_input.value * main_rate;
     taken_cur_input.value = taken_cur_value;
 }
-function setGivenCur() {
+function setGivenCurQnty() {
     given_cur_value = taken_cur_input.value / main_rate;
     given_cur_input.value = given_cur_value;
 }
 
+function onlyNumberKey(evt) {
+    var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+    if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
+        return false;
+    return true;
+}
