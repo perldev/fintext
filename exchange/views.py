@@ -11,6 +11,7 @@ from .models import rate, Orders
 
 from datetime import datetime
 from datetime import timedelta
+import json 
 
 
 def main(req):
@@ -32,3 +33,34 @@ def get_rate(req, currency_from, currency_to):
     except:
         traceback.print_exc()
         return json_500false(req, {"description": "not avaliable"})
+    
+
+def get_currency_list(req):
+    availiable_currencies = {
+        'btc': 'Bitcoin',
+        'usdt': 'Usdt',
+        'eth': 'Etherium',
+        'uah': 'UAH'
+        }
+    return json_true(req, {'currencies': availiable_currencies})
+
+
+def create_exchange_request(req):
+    if req.method == 'POST':
+        body_unicode = req.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        given_cur = body['given_cur']
+        taken_cur = body['taken_cur']
+        amount = int(float(body['amount']))
+        rate = int(float(body['rate']))
+        taken_amount = amount * rate
+        respone_data = {
+            'given_cur': given_cur,
+            'taken_cur': taken_cur,
+            'amount': amount,
+            'taken_amount': taken_amount
+        }
+        return json_true(req, {'response': respone_data})
+    else:
+        return json_true(req, {'message': 'nothing to return'})
+    

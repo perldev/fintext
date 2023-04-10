@@ -28,16 +28,14 @@
                         <div class="col-12">
                             <div class="converter-form-wrapper">
                                 <form>
+                                    {% csrf_token %}
                                     <div class="row">
                                         <div class="col-lg-5 col-12 converter-currency-wrapper">
                                             <span>Вы отдаете:</span>
                                             <div class="row">
                                                 <div class="col-5">
                                                     <select class="form-select" onchange="ckeckCurrencyPair()" id="given-cur-select" aria-label="Default select example">
-                                                        <option value="btc">Bitcoin</option>
-                                                        <option value="eth">Etherium</option>
-                                                        <option value="usdt">USDT</option>
-                                                        </select>
+                                                    </select>
                                                 </div>
                                                 <div class="col-7"><input type="text" id="given-cur-input" class="form-control" oninput="setTakenCurQnty()"></div>
                                             </div>
@@ -50,10 +48,7 @@
                                             <div class="row">
                                                 <div class="col-5">
                                                     <select class="form-select" onchange="ckeckCurrencyPair()" id="taken-cur-select" aria-label="Default select example">
-                                                        <option value="uah">UAH</option>
-                                                        <option value="eth">Etherium</option>
-                                                        <option value="usdt">USDT</option>
-                                                        </select>
+                                                    </select>
                                                 </div>
                                                 <div class="col-7"><input type="text" id="taken-cur-input" class="form-control" oninput="setGivenCurQnty()"></div>
                                             </div>
@@ -66,7 +61,7 @@
                                                 <span><i class="bi bi-info-circle-fill"></i>  Все комиссии уже учтены. <a href="#">Детальнее</a></span>
                                             </div>
                                             <div class="col-lg-6 col-12 text-lg-end text-center">
-                                                <button type="submit" class="btn btn-exchange">Обменять валюту <i class="bi bi-arrow-right"></i></button>
+                                                <button type="submit" id="btn-exchange" class="btn btn-exchange">Обменять валюту <i class="bi bi-arrow-right"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -153,5 +148,17 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="exchange-modal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="exchange-modal-body">
+            </div>
+          </div>
+        </div>
+      </div>
 
 {% endblock %}
