@@ -22,7 +22,7 @@ taken_cur_input.addEventListener("keypress", event => {
     }
   });
 
-fetch(`http://127.0.0.1:8000/api/get_rate/btc/uah`)
+fetch(`/api/get_rate/btc/uah`)
 .then(response => response.json())
 .then(json => {
     main_rate = json['result']['rate'];
