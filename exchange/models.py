@@ -70,7 +70,6 @@ class rate(models.Model):
                              blank=True)
 
     raw_data = models.TextField(blank=True, default="{}", editable=True)
-
     rate = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="rate", max_length=255, editable=True)
 
 
