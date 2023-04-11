@@ -57,6 +57,7 @@ def gather_bitstamp(t1,t2):
     r.save()
 
 def gather_chanel_data(signum):
+    print("gather information from stock")
     gather_bitstamp("btc", "usd")
     gather_bitstamp("eth", "usd")
     gather_kuna("btc", "uah")
