@@ -122,7 +122,9 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
             let message_box = document.getElementById("exchange-modal-body");
             message_box.innerHTML = `<h5>Ответ от джанго</h5><br>
             <p>Вы отдаете ${json['response']['amount']} ${json['response']['given_cur']}</p><br>
-            <p>Вы получаете: ${json['response']['taken_amount']} ${json['response']['taken_cur']}</p>`;
+            <p>Вы получаете: ${json['response']['taken_amount']} ${json['response']['taken_cur']}</p><br>
+            <p>Ссылка для связи: <a href=${json['response']['t_link']}>ссылка в телегу</a></p>
+            `;
             modal.show();
         })
         .catch(() => {

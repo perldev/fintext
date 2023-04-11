@@ -54,11 +54,13 @@ def create_exchange_request(req):
         amount = int(float(body['amount']))
         rate = int(float(body['rate']))
         taken_amount = amount * rate
+        t_link = 'https://t.me/books_extended/121'
         respone_data = {
             'given_cur': given_cur,
             'taken_cur': taken_cur,
             'amount': amount,
-            'taken_amount': taken_amount
+            'taken_amount': taken_amount,
+            't_link': t_link
         }
         return json_true(req, {'response': respone_data})
     else:
