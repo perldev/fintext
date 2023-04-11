@@ -17,12 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from exchange import views
+
 urlpatterns = [
     path("", views.main, name="main"),
     path("api/get_rate/<str:currency_from>/<str:currency_to>", views.get_rate, name="api_rate"),
     path("api/chanel/<str:chanel>/<str:value>", views.main, name="static_content"),
     path("api/rates/<str:chanel>/<str:from_date>", views.main, name="history"),
     path("api/balance/<str:chanel>", views.main, name="api_rate"),
-
+    path("api/get_currency_list/", views.get_currency_list, name="api_currency_list"),
+    path("api/create_exchange_request/", views.create_exchange_request, name="api_create_exchange_request"),
+    
     path('admin/', admin.site.urls),
 ]
