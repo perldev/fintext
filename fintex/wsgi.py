@@ -13,7 +13,6 @@ from django.core.wsgi import get_wsgi_application
 import traceback
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fintex.settings')
 import bitstamp.client
-from exchange.models import rate, Currency
 import json
 import requests
 
@@ -57,6 +56,8 @@ def gather_bitstamp(t1,t2):
     r.save()
 
 def gather_chanel_data(signum):
+    from exchange.models import rate, Currency
+
     print("gather information from stock")
     gather_bitstamp("btc", "usd")
     gather_bitstamp("eth", "usd")
