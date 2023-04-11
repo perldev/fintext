@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
-import traceback()
+import traceback
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fintex.settings')
 import bitstamp.client
 from exchange.models import rate, Currency
