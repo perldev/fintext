@@ -20,6 +20,9 @@ from exchange import views
 urlpatterns = [
     path("", views.main, name="main"),
     path("api/get_rate/<str:currency_from>/<str:currency_to>", views.get_rate, name="api_rate"),
-    # path("api/get_rate2", views.get_rate2, name="api_rate2"),
+    path("api/chanel/<str:chanel>/<str:value>", views.page_content, name="static_content"),
+    path("api/rates/<str:chanel>/<str:from_date>", views.rates, name="history"),
+    path("api/balance/<str:chanel>", views.balance, name="api_rate"),
+
     path('admin/', admin.site.urls),
 ]
