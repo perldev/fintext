@@ -29,10 +29,9 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "162.55.95.183", "162.55.95.183:9001"]
 
 
-# Application definition
-
 INSTALLED_APPS = [
     "exchange.apps.ExchangeConfig",
+    "oper.apps.OperConfig",
     "django.contrib.admin",
     'django.contrib.auth',
     'django.contrib.contenttypes',
