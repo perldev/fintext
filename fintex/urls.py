@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from exchange import views
 
 urlpatterns = [
@@ -26,6 +26,6 @@ urlpatterns = [
     path("api/balance/<str:chanel>", views.main, name="api_rate"),
     path("api/get_currency_list/", views.get_currency_list, name="api_currency_list"),
     path("api/create_exchange_request/", views.create_exchange_request, name="api_create_exchange_request"),
-    
+    path('oper/', include('oper.urls')), #new
     path('admin/', admin.site.urls),
 ]

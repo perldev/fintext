@@ -12,10 +12,6 @@ import os
 from django.core.wsgi import get_wsgi_application
 import traceback
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fintex.settings')
-import bitstamp.client
-import json
-import requests
-
 
 
 def gather_kuna(t1, t2):
@@ -38,6 +34,7 @@ def gather_kuna(t1, t2):
     r.rate = result[9]
     r.save()
 
+
 def gather_bitstamp(t1,t2):
     p = bitstamp.client.Public()
     give_currency = Currency.objects.get(title=t1)
@@ -55,6 +52,7 @@ def gather_bitstamp(t1,t2):
     r.rate = res["high"]
     r.save()
 
+
 def gather_chanel_data(signum):
     from exchange.models import rate, Currency
 
@@ -69,6 +67,9 @@ def gather_chanel_data(signum):
 
 try:
     import uwsgi
+    import bitstamp.client
+    import json
+    import requests
     uwsgi.register_signal(97, "worker1", gather_chanel_data)
     uwsgi.add_timer(97, 120)
 except:
