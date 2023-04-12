@@ -97,3 +97,14 @@ class Currency(models.Model):
 
     def __unicode__(o):
         return str(o.id) + " " + str(o.title)
+    
+
+class CashPointLocation(models.Model):
+    title = models.CharField(max_length=255, verbose_name="Сash point location")
+
+    class Meta:
+        verbose_name = u'Локация выдачи наличных'
+        verbose_name_plural = u'Локации выдачи наличных'
+
+    def __unicode__(o):
+        return str(o.id) + " " + str(o.title)

@@ -7,7 +7,7 @@ import requests
 from fintex.common import json_true, json_500false
 import traceback
 
-from .models import rate, Orders
+from .models import rate, Orders, CashPointLocation
 
 from datetime import datetime
 from datetime import timedelta
@@ -55,12 +55,17 @@ def create_exchange_request(req):
         rate = int(float(body['rate']))
         taken_amount = amount * rate
         t_link = 'https://t.me/books_extended/121'
+        cashPoints = CashPointLocation.objects.all()
+        cashPointsDict = {}
+        for i in cashPoints:
+            cashPointsDict[i.id] = i.title
         respone_data = {
             'given_cur': given_cur,
             'taken_cur': taken_cur,
             'amount': amount,
             'taken_amount': taken_amount,
-            't_link': t_link
+            't_link': t_link,
+            'cash_points': cashPointsDict,
         }
         return json_true(req, {'response': respone_data})
     else:
