@@ -121,17 +121,24 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
         .then(response => response.json())
         .then(json => {
             let message_box = document.getElementById("exchange-modal-body");
-            message_box.innerHTML = `<h5>Ответ от сервера</h5><br>
-            <p>Вы отдаете ${json['response']['amount']} ${json['response']['given_cur']}</p><br>
-            <p>Вы получаете: ${json['response']['taken_amount']} ${json['response']['taken_cur']}</p><br>
-            <p>Ссылка для связи: <a href=${json['response']['t_link']}>ссылка в телегу</a></p><br>
-            <h6>Пункты выдачи наличных:</h6>
-            `;
-            let cash_points = json['response']['cash_points'];
-            Object.entries(cash_points).forEach(([key, val]) => {
-                message_box.innerHTML += `<p>${key} - ${val}</p>`
-            })
-            modal.show();
+            if(json['response']['is_expired'] == 'true') {
+                message_box.innerHTML = `<p>${json['response']['message_to_user']}</p>`;
+                ckeckCurrencyPair();
+                modal.show();
+            } else {
+                message_box.innerHTML = `<h5>${json['response']['message_to_user']}</h5><br>
+                <p>Вы отдаете ${json['response']['amount']} ${json['response']['given_cur']}</p><br>
+                <p>Вы получаете: ${json['response']['taken_amount']} ${json['response']['taken_cur']}</p><br>
+                <p>Ссылка для связи: <a href=${json['response']['t_link']}>ссылка в телегу</a></p><br>
+                <h6>Пункты выдачи наличных:</h6>
+                `;
+                let cash_points = json['response']['cash_points'];
+                Object.entries(cash_points).forEach(([key, val]) => {
+                    message_box.innerHTML += `<p>${key} - ${val}</p>`
+                })
+                ckeckCurrencyPair();
+                modal.show();
+            }
         })
         .catch(() => {
             let message_box = document.getElementById("exchange-modal-body");
