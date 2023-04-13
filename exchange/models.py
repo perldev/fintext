@@ -35,11 +35,10 @@ class Orders(models.Model):
                                                    on_delete=models.PROTECT,)
 
     pub_date = models.DateTimeField(default=datetime.now, verbose_name="Дата публикации")
-    expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True,
-                                       blank=True)
+    expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True, blank=True)
     amnt_give = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="amnt give", max_length=255, editable=True)
     amnt_take = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="amnt take", max_length=255, editable=True)
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Опертор",
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Оператор",
                                 related_name="user_open",
                                 editable=False, on_delete=models.PROTECT,
                                 null=True,
