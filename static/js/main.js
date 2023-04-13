@@ -1,3 +1,4 @@
+
 let avaliable_pairs = [
     'btc_uah',
     'eth_uah',

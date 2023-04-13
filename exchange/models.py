@@ -108,3 +108,4 @@ class CashPointLocation(models.Model):
 
     def __unicode__(o):
         return str(o.id) + " " + str(o.title)
+
