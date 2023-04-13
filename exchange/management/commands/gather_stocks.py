@@ -33,7 +33,7 @@ def gather_btctradeua(t1, t2):
 
     give_currency = Currency.objects.get(title=t1)
     take_currency = Currency.objects.get(title=t1)
-    result = resp.json()[0]
+    result = resp.json()["%s_%s" % (t1, t2)]
 
     r = rate(source="btctradeua", edit_user_id=1,
              raw_data=json.dumps(resp.text),

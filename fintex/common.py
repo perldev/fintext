@@ -16,6 +16,18 @@ def put2cache(k, q, t=300):
     cache.set(k, q, t)
 
 
+def to_time(t):
+    return t.strftime("%H:%M:%S")
+
+
+def to_date(t):
+    return t.strftime("%d/%m/%Y")
+
+
+def date_to_str(t):
+    return t.strftime("%d/%m/%Y, %H:%M:%S")
+
+
 def json_true(req, dictt=None):
     d = {"status": True}
     resp = None

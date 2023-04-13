@@ -38,11 +38,12 @@ class Orders(models.Model):
     expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True, blank=True)
     amnt_give = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="amnt give", max_length=255, editable=True)
     amnt_take = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="amnt take", max_length=255, editable=True)
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Оператор",
-                                related_name="user_open",
-                                editable=False, on_delete=models.PROTECT,
-                                null=True,
-                                blank=True)
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                 verbose_name="Оператор",
+                                 related_name="user_open",
+                                 editable=False, on_delete=models.PROTECT,
+                                 null=True,
+                                 blank=True)
 
     rate = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="exchange rate", max_length=255, editable=True)
 
@@ -67,7 +68,7 @@ class rate(models.Model):
                              editable=False, on_delete=models.PROTECT,
                              null=True,
                              blank=True)
-
+    pub_date = models.DateTimeField(default=datetime.now, verbose_name="date of gathering")
     raw_data = models.TextField(blank=True, default="{}", editable=True)
     rate = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="rate", max_length=255, editable=True)
 

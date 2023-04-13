@@ -19,7 +19,6 @@ def add_names(apps, scheme_editor):
     c.save()
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
