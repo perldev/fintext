@@ -48,5 +48,31 @@ class chat(models.Model):
                              on_delete=models.PROTECT,
                              null=True,
                              blank=True)
-
     history = models.TextField(default="{}")
+
+
+class context_vars(models.Model):
+    name = models.CharField(verbose_name="Name", unique=True, max_length=255)
+    value = models.CharField(verbose_name="Value", blank=False, max_length=255)
+
+    class Meta:
+        verbose_name = 'контекстная перменная'
+        verbose_name_plural = 'контекстные переменные'
+
+
+class rates_direction(models.Model):
+
+        give_currency = models.ForeignKey("exchange.Currency", verbose_name="Give Currency",
+                                          related_name="currency_give_wizzard",
+                                          on_delete=models.PROTECT, )
+
+        take_currency = models.ForeignKey("exchange.Currency", verbose_name="Take currency",
+                                          related_name="currency_take_wizzard",
+                                          on_delete=models.PROTECT, )
+
+        raw_data = models.TextField(blank=True, default="0", editable=True)
+
+        class Meta:
+            verbose_name = 'направление обмена'
+            verbose_name_plural = 'направления обменов'
+

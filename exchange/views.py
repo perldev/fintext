@@ -27,10 +27,12 @@ def stock_24_hour_rate_history(req, chanel, ticker):
     take_currency = Currency.objects.get(title=currency2)
     from_date = datetime.now() - dt(hours=24)
     res = []
-    for i in rate.objects.filter(source=chanel,
-                                 give_currency=give_currency,
-                                 take_currency=take_currency,
-                                 pub_date__gte=from_date):
+    q = rate.objects.filter(source=chanel,
+                            give_currency=give_currency,
+                            take_currency=take_currency,
+                            pub_date__gte=from_date)
+    print(q.query)
+    for i in q:
         res.append({"name": to_time(i.pub_date),
                     "value": i.rate})
 

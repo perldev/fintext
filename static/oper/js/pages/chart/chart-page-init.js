@@ -1,10 +1,88 @@
+  let Calculator = {"current":null};
+
   $(function() {
 
-    var updateInterval = 5000;
-    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $("#calc_rate").val("");
+    //TODO update crf token
+    let csrftoken = $("[name=csrfmiddlewaretoken]").val();
     $.ajaxSetup({
         headers: { "X-CSRFToken": csrftoken }
     });
+    $( document ).ajaxComplete(function( event, xhr, settings ) {
+         let cookies = xhr.getResponseHeader('Set-Cookie');
+         //csrftoken = xhr
+    });
+
+
+    Calculator.exchange_change = function(from, to){
+        //save the state of current
+        Calculator.current = [from, to];
+        var request = $.ajax({
+                   url: "/oper/api/get_direction/" + from + "/" + to,
+                   method: "GET",
+                   dataType: "json"
+                });
+
+                request.done(function( msg ) {
+                  var data  = msg["raw_data"];
+                  $("#calc_rate").val(data);
+                });
+
+                request.fail(function( jqXHR, textStatus ) {
+                  alert("не могу получить данные по курсу " + from +" на " + to );
+                });
+
+
+
+
+    };
+    Calculator.test_change = function(){
+               from  = Calculator.current[0];
+               to  = Calculator.current[1];
+               var code = $("#calc_rate").val();
+
+               var request = $.ajax({
+                   'url': "/oper/api/test_rate",
+                   'data': code, //{action:'x',params:['a','b','c']}
+                   'type': 'POST',
+                   'processData': false,
+                   'contentType': 'application/json'
+                });
+                request.done(function( msg ) {
+                  var data  = msg["result"];
+                  alert("результат выполнения  " + from +" на " + to + ": " + data  );
+                });
+
+                request.fail(function( jqXHR, textStatus ) {
+                  alert("не могу получить данные по курсу " + from +" на " + to );
+                });
+
+
+    };
+    Calculator.save_change = function(){
+               from  = Calculator.current[0];
+               to  = Calculator.current[1];
+               var code = $("#calc_rate").val();
+               var request = $.ajax({
+                   'url': "/oper/api/save_rate/"+from+"/" + to,
+                   'data': code,
+                   'type': 'POST',
+                   'processData': false,
+                   'contentType': 'application/json'
+                });
+                request.done(function( msg ) {
+                  var data  = msg["result"];
+                  alert("Сохраненны данные по направлению  " + from +" на " + to  );
+                });
+
+                request.fail(function( jqXHR, textStatus ) {
+                  alert("не могу сохранить данные по курсу " + from +" на " + to );
+                });
+
+    };
+
+    var updateInterval = 5000;
+
 
 
     // we use an inline data source in the example, usually data would
@@ -13,7 +91,10 @@
     // Real Time Visits
     // ==============================================================
     function create_plot(name, value){
-        var plot_id = "#real-time" + name + "_" + val;
+
+
+
+        var plot_id = "#real-time" + name + "_" + value;
         var plot = $.plot(plot_id, [[]], {
         series: {
             shadowSize: 1, // Drawing is faster without shadows
@@ -21,7 +102,7 @@
         },
         yaxis: {
             min: 0,
-            max: 100,
+            max: 100000,
             show: true
         },
         xaxis: {
@@ -51,8 +132,9 @@
     };
 
     function update(){
-        getDataRates(name, val, data_handler)
+        getDataRates(name, value, data_handler)
     };
+
     window.onresize = function(event) {
         $.plot($(plot_id), [[]]);
         update();
@@ -67,20 +149,23 @@
 
     function getDataRates(chanelName, rate_name, callback_handler){
                var request = $.ajax({
-                   url: "/api/oper/getDataRate/" + Name + "/" + rate_name,
+                   url: "/api/oper/getDataRate/" + chanelName + "/" + rate_name,
                    method: "GET",
                    dataType: "json"
                 });
 
                 request.done(function( msg ) {
-
+                  var data  = msg["result"]
                   var res = [];
+                  var last="";
                     for (var i = 0; i < data.length; ++i) {
                         var item = data[i];
                         var k = item["name"];
                         var val = item["value"];
+                        last = val;
                         res.push([k, val]);
                     }
+                    $("#context_"+chanelName+"_"+rate_name).html(last);
                     callback_handler(res);
                 });
 
@@ -91,7 +176,7 @@
 
     }
     //setup plots from different stocks
-     var plots = [{"name":"bitstamp", "val":"btc_usd"},
+    var plots = [{"name":"bitstamp", "val":"btc_usd"},
                   {"name":"bitstamp", "val":"eth_usd"},
                   {"name":"kuna", "val":"btc_uah"},
                   {"name":"btctradeua", "val": "btc_uah"}];
@@ -101,26 +186,6 @@
             create_plot(item["name"], item["val"])
     }
 
-    function getRandomData() {
-        if (data.length > 0) data = data.slice(1);
-        // Do a random walk
-        while (data.length < totalPoints) {
-            var prev = data.length > 0 ? data[data.length - 1] : 10,
-                y = prev + Math.random() * 10 - 5;
-            if (y < 0) {
-                y = 0;
-            } else if (y > 100) {
-                y = 100;
-            }
-            data.push(y);
-        }
-        // Zip the generated y values with the x values
-        var res = [];
-        for (var i = 0; i < data.length; ++i) {
-            res.push([i, data[i]])
-        }
-        return res;
-    }
     // Set up the control widget
     $("#updateInterval").val(updateInterval).change(function() {
         var v = $(this).val();
@@ -134,44 +199,6 @@
             $(this).val("" + updateInterval);
         }
     });
-    var plot = $.plot("#real-time", [getRandomData()], {
-        series: {
-            shadowSize: 1, // Drawing is faster without shadows
-            lines: { fill: true, fillColor: 'transparent' },
-        },
-        yaxis: {
-            min: 0,
-            max: 100,
-            show: true
-        },
-        xaxis: {
-            show: false
-        },
-        colors: ["#488c13"],
-        grid: {
-            color: "#AFAFAF",
-            hoverable: true,
-            borderWidth: 0,
-            backgroundColor: 'transparent'
-        },
-        tooltip: true,
-        tooltipOpts: {
-            content: "Visits: %x",
-            defaultTheme: false
-        }
-    });
-    window.onresize = function(event) {
-        $.plot($("#real-time"), [getRandomData()]);
-    }
-
-    function update() {
-
-        plot.setData([getRandomData()]);
-        // Since the axes don't change, we don't need to call plot.setupGrid()
-        plot.draw();
-        setTimeout(update, updateInterval);
-    }
-    update();
 
         console.log("document ready");
         var offset = 0;
