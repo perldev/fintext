@@ -60,6 +60,19 @@ class context_vars(models.Model):
         verbose_name_plural = 'контекстные переменные'
 
 
+def get_rate(from_currency, to_currency):
+    cur1 = Currency.objects.get(title=from_currency)
+    cur2 = Currency.objects.get(title=to_currency)
+    direction = rates_direction.objects.get(give_currency=cur1, take_currency=cur2)
+    code4execute = direction.raw_data
+    d = {}
+    for i in context_vars.objects.all():
+        d[i.name] = float(i.value)
+
+    d = eval(code4execute, {'__builtins__': None}, d)
+    return d
+
+
 class rates_direction(models.Model):
 
         give_currency = models.ForeignKey("exchange.Currency", verbose_name="Give Currency",

@@ -7,14 +7,14 @@ import requests
 from fintex.common import json_true, json_500false, to_time
 import traceback
 
-from .models import rate, Orders, CashPointLocation
 
 from datetime import datetime, timedelta as dt
 from datetime import timedelta
 import json 
-
-from .models import Orders, CurrencyProvider, Currency, rate
-
+from oper.models import rates_direction
+from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation
+from oper.models import  get_rate
+from fintex.common import  date_to_str
 
 def main(req):
     return render(req, "main.html", {})
@@ -45,16 +45,10 @@ def get_rate(req, currency_from, currency_to):
         current_time = datetime.now()
         expire_time = current_time + timedelta(minutes=15)
         req.session['expire_deal_time'] = datetime.timestamp(expire_time)
-        
         currency_pair = currency_from.lower() + '_' + currency_to.lower()
-        #TODO get this value from custom formula function
-        res = requests.get("https://btc-trade.com.ua/api/ticker/%s_%s" % (currency_from.lower(), currency_to.lower()), )
-        if res.status_code != 200:
-            raise Exception("not avaliable")
-
-        resj = res.json()
-        req.session['exchange_rate'] = resj[currency_pair]["sell"]
-        return json_true(req, {"result": {"rate": resj[currency_pair]["sell"]}})
+        exchange_rate = get_rate(currency_from.lower(), currency_to.lower())
+        req.session['exchange_rate'] = rate
+        return json_true(req, {"result": {"rate": rate, "expire_time": date_to_str(expire_time)}})
     except:
         traceback.print_exc()
         return json_500false(req, {"description": "not avaliable"})
