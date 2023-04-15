@@ -13,8 +13,9 @@ from datetime import timedelta
 import json 
 from oper.models import rates_direction
 from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation
-from oper.models import  get_rate
-from fintex.common import  date_to_str
+from oper.models import get_rate as exchange_get_rate
+from fintex.common import date_to_str
+
 
 def main(req):
     return render(req, "main.html", {})
@@ -46,9 +47,11 @@ def get_rate(req, currency_from, currency_to):
         expire_time = current_time + timedelta(minutes=15)
         req.session['expire_deal_time'] = datetime.timestamp(expire_time)
         currency_pair = currency_from.lower() + '_' + currency_to.lower()
-        exchange_rate = get_rate(currency_from.lower(), currency_to.lower())
-        req.session['exchange_rate'] = rate
-        return json_true(req, {"result": {"rate": rate, "expire_time": date_to_str(expire_time)}})
+
+        exchange_rate = exchange_get_rate(currency_from.lower(), currency_to.lower())
+        req.session['exchange_rate'] = exchange_rate
+        print(exchange_rate)
+        return json_true(req, {"result": {"rate": exchange_rate, "expire_time": date_to_str(expire_time)}})
     except:
         traceback.print_exc()
         return json_500false(req, {"description": "not avaliable"})
