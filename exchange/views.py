@@ -10,7 +10,7 @@ import traceback
 
 from datetime import datetime, timedelta as dt
 from datetime import timedelta
-import json 
+import json
 from oper.models import rates_direction
 from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation
 from oper.models import get_rate as exchange_get_rate
@@ -85,11 +85,33 @@ def create_exchange_request(req):
             expire_deal_time = req.session['expire_deal_time']
             current_time = datetime.now()
             if datetime.timestamp(current_time) > expire_deal_time:
+                
                 new_rate_request = get_rate(req, given_cur, taken_cur)
                 data = json.loads(new_rate_request.content.decode('utf-8'))
                 new_rate = float(data['result']['rate'])
                 if new_rate == rate:
                     taken_amount = amount * rate
+
+                    # providers are cash of crypto
+                    if (given_cur != 'uah'):
+                        provider_give = CurrencyProvider.objects.get(id=1)
+                        provider_take = CurrencyProvider.objects.get(id=2)
+                    else:
+                        provider_give = CurrencyProvider.objects.get(id=2)
+                        provider_take = CurrencyProvider.objects.get(id=1)
+
+                    give_currency = Currency.objects.get(title=given_cur)
+                    take_currency = Currency.objects.get(title=taken_cur)
+                    
+                    order = Orders.objects.create(amnt_give=amount, amnt_take=taken_amount,
+                                          rate=rate,
+                                          provider_give=provider_give,
+                                          provider_take=provider_take,
+                                          give_currency=give_currency,
+                                          take_currency=take_currency)
+                    
+                    invoice = order.invoice_order
+                    
                     respone_data = {
                         'given_cur': given_cur,
                         'taken_cur': taken_cur,
@@ -97,22 +119,9 @@ def create_exchange_request(req):
                         'taken_amount': taken_amount,
                         't_link': t_link,
                         'cash_points': cashPointsDict,
+                        'invoice_wallet': invoice.wallet,
                         'message_to_user': 'You exchange request is created'
                     }
-                    if (given_cur != 'uah'):
-                        provider_give = CurrencyProvider.objects.get(id=1)
-                        provider_take = CurrencyProvider.objects.get(id=2)
-                    else:
-                        provider_give = CurrencyProvider.objects.get(id=2)
-                        provider_take = CurrencyProvider.objects.get(id=1)
-                    
-                    # give_currency and take_currency are NOW HARDCODED
-                    Orders.objects.create(amnt_give=amount, amnt_take=taken_amount,
-                                          rate=rate,
-                                          provider_give=provider_give,
-                                          provider_take=provider_take,
-                                          give_currency_id=1,
-                                          take_currency_id=2)
                     return json_true(req, {'response': respone_data})
                 else:
                     respone_data = {
@@ -122,6 +131,26 @@ def create_exchange_request(req):
                     return json_true(req, {'response': respone_data})  
             else:
                 taken_amount = amount * rate
+
+                if (given_cur != 'uah'):
+                    provider_give = CurrencyProvider.objects.get(id=1)
+                    provider_take = CurrencyProvider.objects.get(id=2)
+                else:
+                    provider_give = CurrencyProvider.objects.get(id=2)
+                    provider_take = CurrencyProvider.objects.get(id=1)
+
+                give_currency = Currency.objects.get(title=given_cur)
+                take_currency = Currency.objects.get(title=taken_cur)
+
+                order = Orders.objects.create(amnt_give=amount, amnt_take=taken_amount,
+                                        rate=rate,
+                                        provider_give=provider_give,
+                                        provider_take=provider_take,
+                                        give_currency=give_currency,
+                                        take_currency=take_currency)
+                
+                invoice = order.invoice_order
+                
                 respone_data = {
                     'given_cur': given_cur,
                     'taken_cur': taken_cur,
@@ -129,17 +158,10 @@ def create_exchange_request(req):
                     'taken_amount': taken_amount,
                     't_link': t_link,
                     'cash_points': cashPointsDict,
+                    'invoice_wallet': invoice.wallet,
                     'message_to_user': 'You exchange request is created'
                 }
-                if (given_cur != 'uah'):
-                    provider_give = CurrencyProvider.objects.get(id=1)
-                    provider_take = CurrencyProvider.objects.get(id=2)
-                else:
-                    provider_give = CurrencyProvider.objects.get(id=2)
-                    provider_take = CurrencyProvider.objects.get(id=1)
-                
-                # give_currency and take_currency are NOW HARDCODED
-                Orders.objects.create(amnt_give=amount, amnt_take=taken_amount, rate=rate, provider_give=provider_give, provider_take=provider_take, give_currency_id=1, take_currency_id=2)
+
                 return json_true(req, {'response': respone_data})
 
     else:
