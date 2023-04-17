@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CashPointLocation, Orders, CurrencyProvider, Currency
+from .models import CashPointLocation, Orders, CurrencyProvider, Currency, Invoice
 
 
 class CashPointLocationAdmin(admin.ModelAdmin):
@@ -19,7 +19,14 @@ class CurrencyProviderAdmin(admin.ModelAdmin):
 
 admin.site.register(CurrencyProvider, CurrencyProviderAdmin)
 
+
 class CurrencyAdmin(admin.ModelAdmin):
     list_display = ["id", "title"]
 
 admin.site.register(Currency, CurrencyAdmin)
+
+
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ["id"]
+
+admin.site.register(Invoice, InvoiceAdmin)
