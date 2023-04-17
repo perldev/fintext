@@ -13,7 +13,7 @@ from datetime import timedelta
 import json 
 from oper.models import rates_direction
 from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation
-from oper.models import get_rate as exchange_get_rate
+from oper.models import get_rate as exchange_get_rate, chat, get_telechat_link
 from fintex.common import date_to_str
 
 
@@ -83,9 +83,11 @@ def create_exchange_request(req):
             expire_deal_time = req.session['expire_deal_time']
             current_time = datetime.now()
             if datetime.timestamp(current_time) > expire_deal_time:
+
                 new_rate_request = get_rate(req, given_cur, taken_cur)
                 data = json.loads(new_rate_request.content.decode('utf-8'))
                 new_rate = float(data['result']['rate'])
+
                 if new_rate == rate:
                     taken_amount = amount * rate
                     respone_data = {
@@ -105,12 +107,18 @@ def create_exchange_request(req):
                         provider_take = CurrencyProvider.objects.get(id=1)
                     
                     # give_currency and take_currency are NOW HARDCODED
-                    Orders.objects.create(amnt_give=amount, amnt_take=taken_amount,
-                                          rate=rate,
-                                          provider_give=provider_give,
-                                          provider_take=provider_take,
-                                          give_currency_id=1,
-                                          take_currency_id=2)
+                     o = Orders.objects.create(amnt_give=amount,
+                                               amnt_take=taken_amount,
+                                               rate=rate,
+                                               provider_give=provider_give,
+                                               provider_take=provider_take,
+                                               give_currency_id=1,
+                                               take_currency_id=2)
+
+                    c = chat.objects.create(deal=o)
+                    tele_link = get_telechat_link(c)
+                    respone_data["t_link"] = tele_link
+
                     return json_true(req, {'response': respone_data})
                 else:
                     respone_data = {
@@ -137,7 +145,16 @@ def create_exchange_request(req):
                     provider_take = CurrencyProvider.objects.get(id=1)
                 
                 # give_currency and take_currency are NOW HARDCODED
-                Orders.objects.create(amnt_give=amount, amnt_take=taken_amount, rate=rate, provider_give=provider_give, provider_take=provider_take, give_currency_id=1, take_currency_id=2)
+                 o = Orders.objects.create(amnt_give=amount,
+                                           amnt_take=taken_amount,
+                                           rate=rate,
+                                           provider_give=provider_give,
+                                           provider_take=provider_take,
+                                           give_currency_id=1, take_currency_id=2)
+
+                c = chat.objects.create(deal=o)
+                tele_link = get_telechat_link(c)
+                respone_data["t_link"] = tele_link
                 return json_true(req, {'response': respone_data})
 
     else:
