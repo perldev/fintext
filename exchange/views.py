@@ -32,7 +32,6 @@ def stock_24_hour_rate_history(req, chanel, ticker):
                             give_currency=give_currency,
                             take_currency=take_currency,
                             pub_date__gte=from_date)
-    print(q.query)
     for i in q:
         res.append({"name": to_time(i.pub_date),
                     "value": i.rate})
@@ -50,7 +49,6 @@ def get_rate(req, currency_from, currency_to):
 
         exchange_rate = exchange_get_rate(currency_from.lower(), currency_to.lower())
         req.session['exchange_rate'] = exchange_rate
-        print(exchange_rate)
         return json_true(req, {"result": {"rate": exchange_rate, "expire_time": date_to_str(expire_time)}})
     except:
         traceback.print_exc()

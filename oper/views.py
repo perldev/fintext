@@ -11,8 +11,13 @@ from decimal import Decimal
 # Create your views here.
 
 
+
 @login_required(login_url="/oper/login/")
-def index(request):
+def oper_home(request):
+    pass
+
+@login_required(login_url="/oper/login/")
+def rates_settings(request):
     directions = []
     curs = list(Currency.objects.all())
     for i in curs:

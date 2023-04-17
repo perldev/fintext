@@ -252,11 +252,12 @@
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav" class="pt-4">
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                                href="index.html" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span
-                                    class="hide-menu">Dashboard</span></a></li>
+                                href="{% url 'oper_home' %}" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span
+                                    class="hide-menu">Рабочая панель</span></a></li>
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                                href="charts.html" aria-expanded="false"><i class="mdi mdi-chart-bar"></i><span
-                                    class="hide-menu">Charts</span></a></li>
+                                href="{% url 'oper_rate_settings' %}" aria-expanded="false"><i class="mdi mdi-chart-bar"></i><span
+                                    class="hide-menu">Курсы</span></a></li>
+                        <!--
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
                                 href="widgets.html" aria-expanded="false"><i class="mdi mdi-chart-bubble"></i><span
                                     class="hide-menu">Widgets</span></a></li>
@@ -346,7 +347,7 @@
                                             class="mdi mdi-alert-octagon"></i><span class="hide-menu"> Error 500
                                         </span></a></li>
                             </ul>
-                        </li>
+                        </li>-->
                     </ul>
                 </nav>
                 <!-- End Sidebar navigation -->
@@ -650,7 +651,9 @@
         <!-- End Page wrapper  -->
         <!-- ============================================================== -->
     </div>
+
     <!-- ============================================================== -->
+    </div>
     <!-- End Wrapper -->
     <!-- ============================================================== -->
     <!-- ============================================================== -->
@@ -682,6 +685,7 @@
     <script src="/static/oper/assets/libs/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
     <script src="/static/oper/assets/libs/chart/turning-series.js"></script>
     <script src="/static/oper/js/pages/chart/chart-page-init.js?js_version={{js_version}}5"></script>
+
 </body>
 
 </html>
