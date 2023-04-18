@@ -19,7 +19,7 @@ class Orders(models.Model):
                              related_name="user_p2p_suggester",
                              editable=False, on_delete=models.PROTECT,
                              null=True,
-                             blank=True)
+                             blank=True,)
     status = models.CharField(max_length=40, choices=STATUS_ORDER, default='created', verbose_name="Статус")
     give_currency = models.ForeignKey("Currency", verbose_name="Give Currency",
                                       on_delete=models.PROTECT,
@@ -54,8 +54,7 @@ class Orders(models.Model):
     def __unicode__(o):
         return str(o.id) + " " + str(o.pub_date) + " " + o.give_currency.title + " " + o.take_currency.title
 
-
-#rates
+# rates
 class rate(models.Model):
     source = models.CharField(max_length=255, verbose_name="source of rate")
     give_currency = models.ForeignKey("Currency", verbose_name="Give Currency", related_name="currency_provided1",
@@ -71,8 +70,6 @@ class rate(models.Model):
     pub_date = models.DateTimeField(default=datetime.now, verbose_name="date of gathering")
     raw_data = models.TextField(blank=True, default="{}", editable=True)
     rate = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="rate", max_length=255, editable=True)
-
-
 
 
 # for cryptocurrency is native or in another networks for example binance

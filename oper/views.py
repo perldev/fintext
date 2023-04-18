@@ -3,18 +3,81 @@ from django.shortcuts import render, reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-from oper.models import rates_direction, context_vars
-from exchange.models import Currency
-from fintex.common import json_500false, json_true
+from oper.models import rates_direction, context_vars, chat, get_telechat_link
+from exchange.models import Currency, Orders
+from fintex.common import json_500false, json_true, date_to_str
+from django.template.loader import render_to_string
 
 from decimal import Decimal
 # Create your views here.
 
 
+def order_status(req, status, order):
+    pass
+
+def to_history(req, order):
+    pass
+
+def get_history(req, order):
+    pass
+
+
+def process_item(i):
+    #    {
+    #        "data": [
+    #            {
+    #                "id": "1",
+    #                "name": "Tiger Nixon",
+    #                "position": "System Architect",
+    #                "salary": "$320,800",
+    #                "start_date": "2011/04/25",
+    #                "office": "Edinburgh",
+    #                "extn": "5421"
+    # rewrite this
+    connected = True
+    d = None
+    d = chat.objects.get(deal=i)
+    if d.telegram_id is None:
+        connected = False
+    connected = True
+
+    return {"id": i.id,
+            "buy": i.amnt_give + " " + i.give_currency.title,
+            "sell": i.amnt_take + " " + i.give_take.title,
+            "pub_date": date_to_str(i.pub_date),
+            "operator": i.operator.username,
+            "client_info": "Ukraine",
+            # TODO add invoice of payment
+            "client_payed": "not created",
+            "client_get": "not_created",
+            "client_telegram_connected": connected,
+            "status": i.status,
+            "actions": render_to_string("deals_menu.html", context={"item": i,
+                                                                    "connected": connected,
+                                                                    "chat_link": get_telechat_link(d) })
+            }
+
+
+@login_required(login_url="/oper/login/")
+def oper_orders(request):
+
+    res = []
+    for i in Orders.objects.all().order_by("id"):
+        result_dict = process_item(i)
+        res.append(res)
+
+    return json_true(request, {"data": res})
+
 
 @login_required(login_url="/oper/login/")
 def oper_home(request):
-    pass
+
+    return render(request, "oper/tables.html",
+                  context={"title": "Exchange Operator Cabinet"},
+                  content_type=None,
+                  status=None,
+                  using=None)
+
 
 @login_required(login_url="/oper/login/")
 def rates_settings(request):

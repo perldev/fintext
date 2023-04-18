@@ -7,18 +7,21 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="keywords"
-        content="">
+        content="wrappixel, admin dashboard, html css dashboard, web dashboard, bootstrap 5 admin, bootstrap 5, css3 dashboard, bootstrap 5 dashboard, Matrix lite admin bootstrap 5 dashboard, frontend, responsive bootstrap 5 admin template, Matrix admin lite design, Matrix admin lite dashboard bootstrap 5 dashboard template">
     <meta name="description"
-        content="">
+        content="Matrix Admin Lite Free Version is powerful and clean admin dashboard template, inpired from Bootstrap Framework">
     <meta name="robots" content="noindex,nofollow">
-    <title>{{title}}</title>
+    <title>{{ title }}</title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="/static/oper/assets/images/favicon.png">
     <!-- Custom CSS -->
-    <link href="/static/oper/assets/libs/flot/css/float-chart.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/oper/assets/extra-libs/multicheck/multicheck.css">
+    <link href="/static/oper/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet">
     <link href="/static/oper/css/style.min.css" rel="stylesheet">
+    <link href="/static/oper/css/ext_style.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:/ -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
@@ -55,23 +58,25 @@
                     <a class="navbar-brand" href="index.html">
                         <!-- Logo icon -->
                         <b class="logo-icon ps-2">
-                            <!--You can put here icon as well / <i class="wi wi-sunset"></i> /-->
+                            <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
                             <!-- Dark Logo icon -->
-                            <!--<img src="/static/oper/assets/images/logo-icon.png" alt="homepage" class="light-logo" />-->
+                            <img src="/static/oper/assets/images/logo-icon.png" alt="homepage" class="light-logo" />
 
                         </b>
                         <!--End Logo icon -->
                         <!-- Logo text -->
                         <span class="logo-text">
                             <!-- dark Logo text -->
-                            <!--<img src="/static/oper/assets/images/logo-text.png" alt="homepage" class="light-logo" />-->
+<!--
+                           <img src="../../assets/images/logo-text.png" alt="homepage" class="light-logo" />
+                      -->
 
                         </span>
                         <!-- Logo icon -->
                         <!-- <b class="logo-icon"> -->
-                        <!--You can put here icon as well / <i class="wi wi-sunset"></i> /-->
+                        <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
                         <!-- Dark Logo icon -->
-                        <!-- <img src="/static/oper/assets/images/logo-text.png" alt="homepage" class="light-logo" /> -->
+                        <!-- <img src="../../assets/images/logo-text.png" alt="homepage" class="light-logo" /> -->
 
                         <!-- </b> -->
                         <!--End Logo icon -->
@@ -212,7 +217,7 @@
                         <!-- ============================================================== -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="/static/oper/assets/images/users/1.jpg" alt="user" class="rounded-circle" width="31">
+                                <img src="../../assets/images/users/1.jpg" alt="user" class="rounded-circle" width="31">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end user-dd animated" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="javascript:void(0)"><i class="ti-user me-1 ms-1"></i>
@@ -246,6 +251,7 @@
         <!-- Left Sidebar - style you can find in sidebar.scss  -->
         <!-- ============================================================== -->
         {% include "side_bar.html" %}
+
         <!-- ============================================================== -->
         <!-- End Left Sidebar - style you can find in sidebar.scss  -->
         <!-- ============================================================== -->
@@ -256,21 +262,6 @@
             <!-- ============================================================== -->
             <!-- Bread crumb and right sidebar toggle -->
             <!-- ============================================================== -->
-            <div class="page-breadcrumb">
-                <div class="row">
-                    <div class="col-12 d-flex no-block align-items-center">
-                        <h4 class="page-title">Графики</h4>
-                        <div class="ms-auto text-end">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Library</li>
-                                </ol>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <!-- ============================================================== -->
             <!-- End Bread crumb and right sidebar toggle -->
             <!-- ============================================================== -->
@@ -281,240 +272,50 @@
                 <!-- ============================================================== -->
                 <!-- Start Page Content -->
                 <!-- ============================================================== -->
-                <!-- Chart-1 -->
-
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Real Time BitStamp BTC/USD</h5>
-                                <div id="real-timebitstamp_btc_usd" style="height:100px;"></div>
-                                <p>Time between updates:
-                                    <input id="updateInterval_bitstamp_btc_usd" type="text" value=""
-                                        style="text-align: right; width:5em"> milliseconds
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                                <h5 class="card-title">Сделки</h5>
+                                <div class="table-responsive">
+                                    <table id="zero_config" class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Покупка</th>
+                                                <th>Продажа</th>
+                                                <th>Курс</th>
+                                                <th>Дата заявки</th>
+                                                <th>Оператор</th>
+                                                <th>Информация о клиенте</th>
+                                                <th>Оплата клиента</th>
+                                                <th>Выдача клиенту</th>
+                                                <th>Общий статус</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                        <tfoot>
+                                             <tr>
+                                                <th>Покупка</th>
+                                                <th>Продажа</th>
+                                                <th>Курс</th>
+                                                <th>Дата заявки</th>
+                                                <th>Оператор</th>
+                                                <th>Информация о клиенте</th>
+                                                <th>Оплата клиента</th>
+                                                <th>Выдача клиенту</th>
+                                                <th>Общий статус</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
 
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Real Time BitStamp ETH/USD</h5>
-                                <div id="real-timebitstamp_eth_usd" style="height:100px;"></div>
-                                <p>Time between updates:
-                                    <input id="updateInterval_bitstamp_eth_usd" type="text" value=""
-                                        style="text-align: right; width:5em"> milliseconds
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Real Time BTC Trade UA BTC/UAH</h5>
-                                <div id="real-timebtctradeua_btc_uah" style="height:100px;"></div>
-                                <p>Time between updates:
-                                    <input id="updateInterval_btctradeua_btc_uah" type="text" value=""
-                                        style="text-align: right; width:5em"> milliseconds
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                      <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Real Time Kuna BTC/UAH</h5>
-                                <div id="real-timekuna_btc_uah" style="height:100px;"></div>
-                                <p>Time between updates:
-                                    <input id="updateInterval_kuna_btc_uah" type="text" value=""
-                                        style="text-align: right; width:5em"> milliseconds
-                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-                 <div class="row">
-                    <div class="col-12 d-flex no-block align-items-center">
-                        <h4 class="page-title">Контекстные переменные</h4>
-                    </div>
-                 </div>
-                <div class="row">
-                    {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_bitstamp_btc_usd" %}
-                    {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_bitstamp_eth_usd" %}
-                    {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_kuna_btc_uah" %}
-                    {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_btctradeua_btc_uah" %}
-
-                </div>
-                 <div class="row">
-                    <div class="col-12 d-flex no-block align-items-center">
-                        <h4 class="page-title">Калькулятор курсов</h4>
-                    </div>
-                 </div>
-                <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title mb-0"> Выберите из какой в какую валюту, чтобы смотреть и редактировать формулу расчета курса для направления обмена</h4>
-                            </div>
-                            <div class="comment-widgets scrollable ps-container ps-theme-default" data-ps-id="2b414a83-9d49-ee38-bd62-aabbea003a57">
-                                <!-- Comment Row -->
-                                <div class="d-flex flex-row comment-row mt-0">
-                                    <div class="comment-text w-100">
-                                        <h6 class="font-medium">Направления:</h6>
-                                        {% for i in directions %}
-                                            <button
-                                                    type="button"
-                                                    class="btn btn-outline-info"
-                                                    onclick="Calculator.exchange_change('{{i.from}}', '{{i.to}}')">
-                                                {{i.from}} -> {{i.to}}
-                                            </button>
-
-                                        {% endfor %}
-                                        <textarea class="mb-3 d-block" cols="50" rows="20" id="calc_rate"></textarea>
-                                        <div class="comment-footer">
-                                            <button type="button" class="btn btn-cyan btn-sm text-white" onclick="Calculator.save_change()">Save</button>
-                                            <button type="button" class="btn btn-success btn-sm text-white" onclick="Calculator.test_change()">Test</button>
-                                            <button type="button" class="btn btn-danger btn-sm text-white" onclick="Calculator.delete_change()">Delete</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Comment Row -->
-
-                        </div>
-
-                    </div>
-
-
-
-<!--
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="card mt-0">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="peity_line_neutral left text-center mt-2"><span><span
-                                                style="display: none;">10,15,8,14,13,10,10</span>
-                                            <canvas width="50" height="24"></canvas>
-                                        </span>
-                                        <h6>10%</h6>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 border-left text-center pt-2">
-                                    <h3 class="mb-0 fw-bold">150</h3>
-                                    <span class="text-muted">New Users</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card mt-0">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="peity_bar_bad left text-center mt-2"><span><span
-                                                style="display: none;">3,5,6,16,8,10,6</span>
-                                            <canvas width="50" height="24"></canvas>
-                                        </span>
-                                        <h6>-40%</h6>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 border-left text-center pt-2">
-                                    <h3 class="mb-0 fw-bold">4560</h3>
-                                    <span class="text-muted">Orders</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card mt-0">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="peity_line_good left text-center mt-2"><span><span
-                                                style="display: none;">12,6,9,23,14,10,17</span>
-                                            <canvas width="50" height="24"></canvas>
-                                        </span>
-                                        <h6>+60%</h6>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 border-left text-center pt-2">
-                                    <h3 class="mb-0 ">5672</h3>
-                                    <span class="text-muted">Active Users</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card mt-0">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="peity_bar_good left text-center mt-2"><span>12,6,9,23,14,10,13</span>
-                                        <h6>+30%</h6>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 border-left text-center pt-2">
-                                    <h3 class="mb-0 fw-bold">2560</h3>
-                                    <span class="text-muted">Register</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                -->
-
-
-                <!-- ENd chart-1 -->
-                <!-- Chart-2 -->
-                <!--
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Turning-series chart</h5>
-                                <div id="placeholder" style="height: 400px;"></div>
-                                <p id="choices" class="mt-3"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
-                <!-- End Chart-2 -->
-                <!-- Cards -->
-
-
-                <!-- End cards -->
-                <!-- Chart-3 -->
-                <!--<div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Bar Chart</h5>
-                                <div class="flot-chart">
-                                    <div class="flot-chart-content" id="flot-line-chart"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
-                <!-- End chart-3 -->
-                <!-- Charts -->
-                <!--<div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Pie Chart</h5>
-                                <div class="pie" style="height: 400px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Line Chart</h5>
-                                <div class="bars" style="height: 400px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>!-->
-                <!-- End Charts -->
                 <!-- ============================================================== -->
                 <!-- End PAge Content -->
                 <!-- ============================================================== -->
@@ -533,7 +334,7 @@
             <!-- footer -->
             <!-- ============================================================== -->
             <footer class="footer text-center">
-
+                All Rights Reserved by
             </footer>
             <!-- ============================================================== -->
             <!-- End footer -->
@@ -543,15 +344,13 @@
         <!-- End Page wrapper  -->
         <!-- ============================================================== -->
     </div>
-
     <!-- ============================================================== -->
-    </div>
     <!-- End Wrapper -->
     <!-- ============================================================== -->
     <!-- ============================================================== -->
     <!-- All Jquery -->
     <!-- ============================================================== -->
-    <script src="/static/oper/assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="/static/oper/assets/libs/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap tether Core JavaScript -->
     <script src="/static/oper/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!-- slimscrollbar scrollbar JavaScript -->
@@ -564,20 +363,44 @@
     <!--Custom JavaScript -->
     <script src="/static/oper/js/custom.min.js"></script>
     <!-- this page js -->
-    <script src="/static/oper/assets/libs/chart/matrix.interface.js"></script>
-    <script src="/static/oper/assets/libs/chart/excanvas.min.js"></script>
-    <script src="/static/oper/assets/libs/flot/jquery.flot.js"></script>
-    <script src="/static/oper/assets/libs/flot/jquery.flot.pie.js"></script>
-    <script src="/static/oper/assets/libs/flot/jquery.flot.time.js"></script>
-    <script src="/static/oper/assets/libs/flot/jquery.flot.stack.js"></script>
-    <script src="/static/oper/assets/libs/flot/jquery.flot.crosshair.js"></script>
-    <script src="/static/oper/assets/libs/chart/jquery.peity.min.js"></script>
-    <script src="/static/oper/assets/libs/chart/matrix.charts.js"></script>
-    <script src="/static/oper/assets/libs/chart/jquery.flot.pie.min.js"></script>
-    <script src="/static/oper/assets/libs/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
-    <script src="/static/oper/assets/libs/chart/turning-series.js"></script>
-    <script src="/static/oper/js/pages/chart/chart-page-init.js?js_version={{js_version}}5"></script>
+    <script src="/static/oper/assets/extra-libs/multicheck/datatable-checkbox-init.js"></script>
+    <script src="/static/oper/assets/extra-libs/multicheck/jquery.multicheck.js"></script>
+    <script src="/static/oper/assets/extra-libs/DataTables/datatables.min.js"></script>
+    <script>
+        /****************************************
+         *       Basic Table                   *
+         ****************************************/
+       let csrftoken = $("[name=csrfmiddlewaretoken]").val();
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": csrftoken }
+        });
+        $( document ).ajaxComplete(function( event, xhr, settings ) {
+             let cookies = xhr.getResponseHeader('Set-Cookie');
+             //csrftoken = xhr
+        });
 
+        $('#zero_config').DataTable({
+                               ajax: '/oper/api/orders',
+                               columns: [
+                                { data: 'buy' },
+                                { data: 'sell' },
+                                { data: 'rate' },
+                                { data: 'pub_date' },
+                                { data: 'operator' },
+                                { data: 'client_info' },
+                                { data: 'client_payed' },
+                                { data: 'client_get' },
+                                { data: 'status' },
+                                { data: 'actions' },
+                            ]
+        });
+         $('#zero_config tbody').on('mouseenter', 'td', function () {
+            var colIdx = table.cell(this).index().column;
+
+            $(table.cells().nodes()).removeClass('odd');
+            $(table.column(colIdx).nodes()).addClass('odd');
+        });
+    </script>
 </body>
 
 </html>

@@ -107,7 +107,7 @@ def create_exchange_request(req):
                         provider_take = CurrencyProvider.objects.get(id=1)
                     
                     # give_currency and take_currency are NOW HARDCODED
-                     o = Orders.objects.create(amnt_give=amount,
+                    o = Orders.objects.create(amnt_give=amount,
                                                amnt_take=taken_amount,
                                                rate=rate,
                                                provider_give=provider_give,
@@ -145,7 +145,7 @@ def create_exchange_request(req):
                     provider_take = CurrencyProvider.objects.get(id=1)
                 
                 # give_currency and take_currency are NOW HARDCODED
-                 o = Orders.objects.create(amnt_give=amount,
+                o = Orders.objects.create(amnt_give=amount,
                                            amnt_take=taken_amount,
                                            rate=rate,
                                            provider_give=provider_give,

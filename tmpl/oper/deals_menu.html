@@ -1,0 +1,7 @@
+<button type="button" onclick="Main.make_payment4order('item.id')" class="btn btn-primary btn-sm">Выплатить</button>
+<button type="button" onclick="Main.make_cancel4order('item.id')" class="btn btn-secondary btn-sm">Отменить</button>
+<button type="button" onclick="Main.make_process4order('item.id')"  class="btn btn-success btn-sm">Завершить</button>
+{% if connected %}
+    <a target="_blank" href="{{chat_link}}"  class="btn btn-link btn-sm text-decoration-none">To chat</a>
+{% endif %}
+
