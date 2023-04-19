@@ -26,6 +26,7 @@ urlpatterns = [
     path("api/oper/getDataRate/<str:chanel>/<str:ticker>", views.stock_24_hour_rate_history, name="history_stock"),
     path("api/balance/<str:chanel>", views.main, name="api_rate"),
     path("api/get_currency_list/", views.get_currency_list, name="api_currency_list"),
+    path("api/check/", views.check_invoices, name="api_check_invoices"),
     path("api/create_exchange_request/", views.create_exchange_request, name="api_create_exchange_request"),
     path('oper/', include('oper.urls')), #new
     path('admin/', admin.site.urls),
