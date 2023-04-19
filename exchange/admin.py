@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import CashPointLocation, Orders, CurrencyProvider, Currency, Invoice
+from .models import (
+    CashPointLocation, 
+    Orders, 
+    CurrencyProvider, 
+    Currency, 
+    Invoice,
+    PoolAccounts,
+    FiatAccounts
+)  
 
 
 class CashPointLocationAdmin(admin.ModelAdmin):
@@ -27,6 +35,18 @@ admin.site.register(Currency, CurrencyAdmin)
 
 
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ["id"]
+    list_display = ["id", "currency"]
 
 admin.site.register(Invoice, InvoiceAdmin)
+
+
+class PoolAccountsAdmin(admin.ModelAdmin):
+    list_display = ["currency", "address", "pub_date"]
+
+admin.site.register(PoolAccounts, PoolAccountsAdmin)
+
+
+class FiatAccountsAdmin(admin.ModelAdmin):
+    list_display = ["id", "card_number"]
+
+admin.site.register(FiatAccounts, FiatAccountsAdmin)

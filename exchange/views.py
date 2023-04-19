@@ -12,9 +12,12 @@ from datetime import datetime, timedelta as dt
 from datetime import timedelta
 import json
 from oper.models import rates_direction
-from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation
+from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice
 from oper.models import get_rate as exchange_get_rate
 from fintex.common import date_to_str
+
+import time
+from sdk.btc import get_in_trans_from, get_sum_from
 
 
 def main(req):
@@ -117,7 +120,6 @@ def create_exchange_request(req):
                         'taken_amount': taken_amount,
                         't_link': t_link,
                         'cash_points': cashPointsDict,
-                        'invoice_wallet': invoice.wallet,
                         'message_to_user': 'You exchange request is created'
                     }
                     return json_true(req, {'response': respone_data})
@@ -156,7 +158,6 @@ def create_exchange_request(req):
                     'taken_amount': taken_amount,
                     't_link': t_link,
                     'cash_points': cashPointsDict,
-                    'invoice_wallet': invoice.wallet,
                     'message_to_user': 'You exchange request is created'
                 }
 
@@ -165,3 +166,13 @@ def create_exchange_request(req):
     else:
         return json_true(req, {'message': 'nothing to return'})
     
+
+def check_invoices(req):
+    active_invoices = Invoice.objects.filter(status='created')
+    for i in active_invoices:
+        if i.currency_id == 3:
+            data_from_api = get_in_trans_from(i.crypto_payments_details, i.block_height)
+            # make futher logic with reponse from blockchain api
+            print(data_from_api)
+    return json_true(req, {'status': 'OK'})
+
