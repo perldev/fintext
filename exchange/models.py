@@ -2,6 +2,15 @@ from django.db import models
 import fintex.settings as settings
 from datetime import datetime
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+STATUS_INVOICE = (
+    ("created", u"выставлен"),
+    ("paid", u"оплачен"),
+    ("canceled", u"отменен"),
+);
+
 STATUS_ORDER = (
     ("created", u"создана"),
     ("processing", u"в процессе"),
@@ -10,6 +19,12 @@ STATUS_ORDER = (
     ("canceled", u"отменена оператором"),
     ("processed", u"проведена"),
     ("failed", u"неуспешна"),
+);
+
+# tuple for example purposes. it will be deleted
+CRYPTO_WALLETS = (
+    ("1231290o3dqwjlsanq0n", u"btc_wallet"),
+    ("mgklf9304jhmvlfg8jmrtm", u"eth_wallet"),
 );
 
 
@@ -54,7 +69,11 @@ class Orders(models.Model):
     def __unicode__(o):
         return str(o.id) + " " + str(o.pub_date) + " " + o.give_currency.title + " " + o.take_currency.title
 
-# rates
+    def __str__(self):
+        return str(self.id)
+    
+
+#rates
 class rate(models.Model):
     source = models.CharField(max_length=255, verbose_name="source of rate")
     give_currency = models.ForeignKey("Currency", verbose_name="Give Currency", related_name="currency_provided1",
@@ -83,6 +102,9 @@ class CurrencyProvider(models.Model):
 
     def __unicode__(o):
         return o.title
+    
+    def __str__(self):
+        return self.title
 
 
 class Currency(models.Model):
@@ -95,6 +117,9 @@ class Currency(models.Model):
     def __unicode__(o):
         return str(o.id) + " " + str(o.title)
     
+    def __str__(self):
+        return self.title
+    
 
 class CashPointLocation(models.Model):
     title = models.CharField(max_length=255, verbose_name="Сash point location")
@@ -106,3 +131,36 @@ class CashPointLocation(models.Model):
     def __unicode__(o):
         return str(o.id) + " " + str(o.title)
 
+
+class Invoice(models.Model):
+    currency = models.ForeignKey("Currency", verbose_name="Invoice Currency",
+                                      on_delete=models.PROTECT,
+                                      related_name="invoice_currency", )
+    status = models.CharField(max_length=40, 
+                              choices=STATUS_INVOICE, 
+                              default='created', 
+                              verbose_name="Статус")
+    order = models.OneToOneField("Orders", verbose_name="Order ID",
+                                    on_delete=models.PROTECT,
+                                    related_name="invoice_order", )
+    wallet = models.CharField(max_length=300, 
+                              choices=CRYPTO_WALLETS, 
+                              default='1231290o3dqwjlsanq0n',
+                              verbose_name="номер кошелька")
+
+    class Meta:
+        verbose_name = u'инвойс'
+        verbose_name_plural = u'инвойсы'
+
+    def __unicode__(o):
+        return str(o.id)
+    
+    def __str__(self):
+        return str(self.id)
+    
+
+@receiver(post_save, sender=Orders)
+def create_invoice(sender, instance, created, **kwargs):
+    if created:
+        new_invoice = Invoice(order=instance, currency_id=3)
+        new_invoice.save()
