@@ -6,7 +6,8 @@ from .models import (
     Currency, 
     Invoice,
     PoolAccounts,
-    FiatAccounts
+    FiatAccounts,
+    Trans
 )  
 
 
@@ -50,3 +51,9 @@ class FiatAccountsAdmin(admin.ModelAdmin):
     list_display = ["id", "card_number"]
 
 admin.site.register(FiatAccounts, FiatAccountsAdmin)
+
+
+class TransAdmin(admin.ModelAdmin):
+    list_display = ["id", "currency", "amnt", "status"]
+
+admin.site.register(Trans, TransAdmin)

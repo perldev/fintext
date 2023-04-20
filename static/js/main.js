@@ -132,6 +132,11 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 <p>Вы получаете: ${json['response']['taken_amount']} ${json['response']['taken_cur']}</p><br>
                 <p>Ссылка для связи: <a href=${json['response']['t_link']}>ссылка в телегу</a></p><br>
                 <p>Резвизиты для перечисления: </p><br>
+                <p>
+                    <form>
+                        <input type="text" id="given-cur-input" class="form-control">
+                    </form>
+                </p>
                 <h6>Пункты выдачи наличных:</h6>
                 `;
                 let cash_points = json['response']['cash_points'];

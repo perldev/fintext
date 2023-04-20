@@ -12,7 +12,7 @@ from datetime import datetime, timedelta as dt
 from datetime import timedelta
 import json
 from oper.models import rates_direction
-from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice
+from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice, Trans
 from oper.models import get_rate as exchange_get_rate
 from fintex.common import date_to_str
 
@@ -112,6 +112,13 @@ def create_exchange_request(req):
                                           take_currency=take_currency)
                     
                     invoice = order.invoice_order
+
+                    trans = Trans.objects.create(account='some account',
+                                                 payment_id='some payment id',
+                                                 currency=take_currency,
+                                                 amnt=taken_amount)
+                    
+                    print('HEREEEEE')
                     
                     respone_data = {
                         'given_cur': given_cur,
@@ -150,6 +157,11 @@ def create_exchange_request(req):
                                         take_currency=take_currency)
                 
                 invoice = order.invoice_order
+
+                trans = Trans.objects.create(account='some account',
+                                             payment_id='some payment id',
+                                             currency=take_currency,
+                                             amnt=taken_amount)
                 
                 respone_data = {
                     'given_cur': given_cur,

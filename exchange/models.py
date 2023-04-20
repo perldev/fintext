@@ -206,9 +206,14 @@ class PoolAccounts(models.Model):
     status = models.CharField(max_length=40,
                               choices=STATUS_ORDER,
                               default='created')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
-    currency = models.ForeignKey("Currency", verbose_name="Валюта", on_delete=models.PROTECT)
-    pub_date = models.DateTimeField(default=datetime.now, verbose_name="Дата публикации")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, 
+                             blank=True, null=True, 
+                             on_delete=models.PROTECT)
+    currency = models.ForeignKey("Currency", 
+                                 verbose_name="Валюта", 
+                                 on_delete=models.PROTECT)
+    pub_date = models.DateTimeField(default=datetime.now, 
+                                    verbose_name="Дата публикации")
     ext_info = models.CharField(max_length=255,
                                unique=True,
                                verbose_name="Внешний ключ идентификации")
@@ -237,7 +242,7 @@ class FiatAccounts(models.Model):
         return self.card_number
     
 
-class trans(models.Model):
+class Trans(models.Model):
     account = models.CharField(verbose_name="account ",
                                max_length=255,
                                editable=False,
