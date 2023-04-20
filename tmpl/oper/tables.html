@@ -366,87 +366,8 @@
     <script src="/static/oper/assets/extra-libs/multicheck/datatable-checkbox-init.js"></script>
     <script src="/static/oper/assets/extra-libs/multicheck/jquery.multicheck.js"></script>
     <script src="/static/oper/assets/extra-libs/DataTables/datatables.min.js"></script>
-    <script>
-        /****************************************
-         *       Basic Table                   *
-         ****************************************/
-       let csrftoken = $("[name=csrfmiddlewaretoken]").val();
-        $.ajaxSetup({
-            headers: { "X-CSRFToken": csrftoken }
-        });
-        $( document ).ajaxComplete(function( event, xhr, settings ) {
-             let cookies = xhr.getResponseHeader('Set-Cookie');
-             //csrftoken = xhr
-        });
-        let Main = {
-            "alert": function(msg, title){
-                $("#common_modal_dlg_title").html(title);
-                $("#common_modal_dlg_text").html(msg);
-                $("#common_modal").modal("show");
-            },
-            "make_process4order": function(i){
-                var request = $.ajax({
-                   url: "/oper/api/order/status/processed/" + i,
-                   method: "GET",
-                   dataType: "json"
-                });
+    <script src="/static/oper/js/myoper.js"></script>
 
-                request.done(function( msg ) {
-                   Main.alert("Done");
-                });
-
-                request.fail(function( jqXHR, textStatus ) {
-                  Main.alert("не могу изменить статус " );
-                });
-
-
-            },
-            "make_cancel4order": function(i){
-                var request = $.ajax({
-                   url: "/oper/api/order/status/canceled/" + i,
-                   method: "GET",
-                   dataType: "json"
-                });
-
-                request.done(function( msg ) {
-                   Main.alert("Done");
-                });
-
-                request.fail(function( jqXHR, textStatus ) {
-                  Main.alert("не могу изменить статус " );
-                });
-
-
-            }
-
-
-
-        }
-
-
-
-        $('#zero_config').DataTable({
-                               ajax: '/oper/api/orders',
-                               columns: [
-                                { data: 'buy' },
-                                { data: 'sell' },
-                                { data: 'rate' },
-                                { data: 'pub_date' },
-                                { data: 'operator' },
-                                { data: 'client_info' },
-                                { data: 'client_payed' },
-                                { data: 'client_get' },
-                                { data: 'status' },
-                                { data: 'actions' },
-                            ]
-        });
-         $('#zero_config tbody').on('mouseenter', 'td', function () {
-            var colIdx = table.cell(this).index().column;
-
-            $(table.cells().nodes()).removeClass('odd');
-            $(table.column(colIdx).nodes()).addClass('odd');
-        });
-    </script>
 
 {% include "oper/modal.html" %}
 </body>

@@ -11,9 +11,14 @@ urlpatterns = [
     path("api/delete_rate/<str:from_currency>/<str:to_currency>", views.delete_rate, name="delete_rate"),
     path("to_history_page/<int:deal>/", views.to_history_page, name="to_history_page"),
 
+
+    path("api/orders/chat_connect2deal", views.telegram2deal, name="telegram2deal"),
+
     path("api/orders/", views.oper_orders, name="oper_orders"),
-    path("api/get_history/<int:deal>/", views.get_history, name="get_history"),
-    path("api/post/<int:deal>/", views.post_message, name="post_msg"),
+    path("api/get_history/<str:chat_id>/", views.get_history, name="get_history"),
+    path("api/post/<str:chat_id>/", views.post_message, name="post_msg"),
+    path("api/message_income/<str:chat_id>/", views.message_income, name="message_income"),
+
 
     path("api/order/status/<str:status>/<str:order_id>/", views.order_status, name="oper_order_status"),
     path("api/get_direction/<str:from_currency>/<str:to_currency>", views.get_direction, name="get_direction"),

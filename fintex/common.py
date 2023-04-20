@@ -7,6 +7,7 @@ import decimal
 import datetime
 from django.core.cache import cache
 
+import time
 
 def get_fromcache(k):
     return cache.get(k)
@@ -40,6 +41,10 @@ def json_true(req, dictt=None):
         return render(req, "json.html", {"data": resp})
 
     return HttpResponse(resp, headers={"Content-Type": "application/json"})
+
+
+def convert2time(date):
+    return int(time.mktime(date.timetuple()))
 
 
 def json_500false(req, dicct):

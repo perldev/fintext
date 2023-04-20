@@ -89,8 +89,7 @@ def format_numbers(D, count=None):
 
 
 bot_settings = {
-    "TOKEN": "6129795437:AAE54BAWIyg24i_VUWVdczt1soezhLVmpN4",
-    "api_token": "sjdfkjsidf121s_SdfWe652"
+  
 }
 
 api_headers = {"token": bot_settings["api_token"]}
@@ -132,7 +131,6 @@ Lang = {"ru": {},
         }
 
 logger = logging.getLogger(__name__)
-TOKEN = ""
 ### HELPERS#####
 
 
@@ -323,7 +321,8 @@ def setup_context_from_site(token, msg):
     chat_id = msg["id"]
     # TODO add auth token for request to auth api
     jreq = {
-        "chat_id": chat_id
+        "chat_id": chat_id,
+        "token": token,
     }
 
     resp = requests.post(API_HOST + "chat_connect2deal",
@@ -336,6 +335,8 @@ def setup_context_from_site(token, msg):
     us = copy.deepcopy(def_settings)
     us["object"] = res
     us["chat_id"] = chat_id
+    us["token"] = token
+    us["from"] = msg["from"]
     us["last_update"] = datetime.now()
     user_settings[chat_id] = us
     return us
@@ -491,7 +492,7 @@ def process_text(content_type, chat_type, chat_id, msg):
     text_msg = msg["text"]
     context = None
     if text_msg.startswith("/start"):
-        ## this also for first start
+        # this also for first start
         try:
             m = re.match("/start ([^ ]+)", text_msg)
             if m:
@@ -517,7 +518,7 @@ def process_text(content_type, chat_type, chat_id, msg):
 
     if chat_id in FLOWS:
         if verbose:
-            print("flow")  ## in flow of messages
+            print("flow")  # in flow of messages
 
         params = receive_inline_answer(chat_id)
         if verbose:
@@ -534,8 +535,23 @@ def process_text(content_type, chat_type, chat_id, msg):
         obj_flow = form_flow.looking_flow(chat_id)
         loop.create_task(obj_flow(context, msg))
     else:
-        print("start markup")
-        default_menu(context, msg)
+        print("send message to us")
+        send_message2us(context, msg)
+        # default_menu(context, msg)
+
+def send_message2us(context, msg):
+    if verbose:
+        print(msg)
+    out_user = "%s ( %s %s )" % (context["from"]["username"],
+                                 context["from"]["first_name"],
+                                 context["from"]["last_name"])
+
+    resp = requests.post(API_HOST+"message_income/"+context["token"],
+                         params={"text": msg,
+                                 "username": out_user})
+    if verbose:
+        print(resp.text)
+
 
 
 def default_menu(context, msg, params=None):

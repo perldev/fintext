@@ -115,6 +115,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+BOTAPI = "http://127.0.0.1:8881/"
 
 TELEBOT = "https://t.me/uatrust_bot?start="
 STATIC_URL = 'static/'

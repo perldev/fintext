@@ -7,13 +7,18 @@ from django.contrib.auth.decorators import login_required
 
 from oper.models import rates_direction, context_vars, chat, get_telechat_link
 from exchange.models import Currency, Orders
-from fintex.common import json_500false, json_true, date_to_str
+from fintex.common import json_500false, json_true, date_to_str, convert2time
 from django.template.loader import render_to_string
 
+from fintex.settings import BOTAPI
+import json
+import requests
+from datetime import datetime
 from decimal import Decimal
 # Create your views here.
 
 
+@login_required(login_url="/oper/login/")
 def order_status(req, status, order_id):
     obj = get_object_or_404(Orders, pk=order_id)
 
@@ -26,14 +31,80 @@ def order_status(req, status, order_id):
 
     return json_true(req)
 
+
+@login_required(login_url="/oper/login/")
 def to_history_page(req, deal):
-    pass
+    obj = get_object_or_404(chat, deal_id=deal)
+    return render(req,
+                  "oper/chat_page.html", context={"chat_obj": obj,
+                                                  "username": req.user.username},
+                  content_type=None,
+                  status=None, using=None)
 
-def get_history(req, deal):
-    pass
 
-def post_message(req, deal):
-    pass
+# TODO add to cache
+@login_required(login_url="/oper/login/")
+def get_history(req, chat_id):
+    last = int(req.GET.get("last", None))
+    obj = get_object_or_404(chat, pk=chat_id)
+
+    if last is None:
+        return json_true(req, {"result": json.loads(obj.history)["msgs"]})
+    else:
+        res = json.loads(obj.history)
+        result_list = []
+        for i in res:
+            if i["time"]>last:
+                result_list.append(i)
+
+        return json_true(req, {"result": result_list})
+
+
+@login_required(login_url="/oper/login/")
+def post_message(req, chat_id):
+    obj = get_object_or_404(chat, pk=chat_id)
+    txt = req.POST("txt", "")
+
+    if len(txt) <= 1:
+        return json_500false(req)
+
+    resp = requests.post(BOTAPI+"alert/%s" % str(obj.telegram_id), json={"text": txt})
+    if resp.status_code != 200:
+        return json_500false(req)
+    else:
+        result = json.loads(obj.history)
+        msgs = result["msgs"]
+        n = datetime.now()
+        nt = convert2time(n)
+        msgs.append({"time": nt, "username": req.user.username, "text": txt})
+        result["msgs"] = msgs
+        obj.history = json.dumps(result)
+        return json_true(req, {"time": nt})
+
+
+# TODO add token auth
+def message_income(req, chat_id):
+    obj = get_object_or_404(chat, pk=chat_id)
+    txt = req.POST("text", "")
+    username = req.POST("username", "")
+    result = json.loads(obj.history)
+    msgs = result["msgs"]
+    n = datetime.now()
+    msgs.append({"time": nt, "username": req.user.username, "text": txt})
+    result["msgs"] = msgs
+    obj.history = json.dumps(result)
+    return json_true(req, {"time": nt})
+
+
+#TODO add token auth
+def telegram2deal(req):
+    uuid = req.POST("token", "")
+    chat_id = req.POST("chat_id", "")
+    obj = get_object_or_404(chat, pk=uuid)
+    obj.telegram_id = chat_id
+    obj.save()
+    # TODO add welcome message through inner API
+    return json_true(req)
 
 
 def process_item(i):
