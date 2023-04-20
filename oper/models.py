@@ -4,59 +4,6 @@ from fintex import settings
 from exchange.models import Currency, STATUS_ORDER, Orders
 import uuid
 
-# TODO realize creating trans
-class crypto_trans(models.Model):
-
-    account = models.CharField(verbose_name="account ",
-                               max_length=255,
-                               editable=False,
-                               null=False,
-                               blank=False)
-
-    payment_id = models.CharField(verbose_name="payment id",
-                                  max_length=255,
-                                  editable=False,
-                                  null=False,
-                                  blank=False)
-
-    status = models.CharField(max_length=40, choices=STATUS_ORDER, default='created', verbose_name="Статус")
-
-    currency = models.ForeignKey("exchange.Currency",
-                                 verbose_name="Currency",
-                                 on_delete=models.PROTECT,
-                                 related_name="currency_of_trans", )
-
-    pub_date = models.DateTimeField(default=datetime.now,
-                                    verbose_name="Дата публикации")
-
-    processed_date = models.DateTimeField(auto_now=False,
-                                          verbose_name="Дата валидности",
-                                          editable=True,
-                                          null=True,
-                                          blank=True)
-
-    amnt = models.DecimalField(decimal_places=20,
-                               max_digits=40,
-                               verbose_name="amnt give",
-                               max_length=255, editable=True)
-
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Опертор",
-                                related_name="user_issued",
-                                editable=False, on_delete=models.PROTECT,
-                                null=True,
-                                blank=True)
-
-    crypto_txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)
-
-    class Meta:
-        verbose_name = 'крипто транзакция'
-        verbose_name_plural = 'крипто транзакции'
-
-    def __unicode__(o):
-        return str(o.id) + " " + str(o.pub_date) + " " + o.currency + " " + o.amnt
-
-
-
 
 class chat(models.Model):
     uuid = models.UUIDField(verbose_name="uuid of page for quick connect",
@@ -90,7 +37,7 @@ class context_vars(models.Model):
 
 
 def get_telechat_link(chat):
-    return settings.TELEBOT + chat.uuid
+    return settings.TELEBOT + str(chat.uuid)
 
 def get_rate(from_currency, to_currency):
     cur1 = Currency.objects.get(title=from_currency)

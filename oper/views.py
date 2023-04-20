@@ -1,5 +1,7 @@
 from django.shortcuts import render, reverse
 
+
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
@@ -12,13 +14,25 @@ from decimal import Decimal
 # Create your views here.
 
 
-def order_status(req, status, order):
+def order_status(req, status, order_id):
+    obj = get_object_or_404(Orders, pk=order_id)
+
+    if obj.status in ("canceled", "processed"):
+        return json_500false(req)
+
+    if obj.status in ("created", "processing"):
+        obj.status = status
+        obj.save()
+
+    return json_true(req)
+
+def to_history_page(req, deal):
     pass
 
-def to_history(req, order):
+def get_history(req, deal):
     pass
 
-def get_history(req, order):
+def post_message(req, deal):
     pass
 
 
@@ -40,21 +54,27 @@ def process_item(i):
     if d.telegram_id is None:
         connected = False
     connected = True
+    username = ""
+
+    if i.operator is not None:
+        username = i.operator.username
 
     return {"id": i.id,
-            "buy": i.amnt_give + " " + i.give_currency.title,
-            "sell": i.amnt_take + " " + i.give_take.title,
+            "buy": str(i.amnt_give) + " " + i.give_currency.title,
+            "sell": str(i.amnt_take) + " " + i.take_currency.title,
             "pub_date": date_to_str(i.pub_date),
-            "operator": i.operator.username,
+            "operator": username,
             "client_info": "Ukraine",
             # TODO add invoice of payment
             "client_payed": "not created",
             "client_get": "not_created",
             "client_telegram_connected": connected,
             "status": i.status,
-            "actions": render_to_string("deals_menu.html", context={"item": i,
-                                                                    "connected": connected,
-                                                                    "chat_link": get_telechat_link(d) })
+            "rate": i.rate,
+            "actions": render_to_string("oper/deals_menu.html",
+                                        context={"item": i,
+                                                 "connected": connected,
+                                                 "chat_link": reverse("to_history_page", args=[i.id])})
             }
 
 
@@ -64,8 +84,7 @@ def oper_orders(request):
     res = []
     for i in Orders.objects.all().order_by("id"):
         result_dict = process_item(i)
-        res.append(res)
-
+        res.append(result_dict)
     return json_true(request, {"data": res})
 
 

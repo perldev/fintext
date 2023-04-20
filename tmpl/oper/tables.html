@@ -250,7 +250,7 @@
         <!-- ============================================================== -->
         <!-- Left Sidebar - style you can find in sidebar.scss  -->
         <!-- ============================================================== -->
-        {% include "side_bar.html" %}
+        {% include "oper/side_bar.html" %}
 
         <!-- ============================================================== -->
         <!-- End Left Sidebar - style you can find in sidebar.scss  -->
@@ -378,6 +378,52 @@
              let cookies = xhr.getResponseHeader('Set-Cookie');
              //csrftoken = xhr
         });
+        let Main = {
+            "alert": function(msg, title){
+                $("#common_modal_dlg_title").html(title);
+                $("#common_modal_dlg_text").html(msg);
+                $("#common_modal").modal("show");
+            },
+            "make_process4order": function(i){
+                var request = $.ajax({
+                   url: "/oper/api/order/status/processed/" + i,
+                   method: "GET",
+                   dataType: "json"
+                });
+
+                request.done(function( msg ) {
+                   Main.alert("Done");
+                });
+
+                request.fail(function( jqXHR, textStatus ) {
+                  Main.alert("не могу изменить статус " );
+                });
+
+
+            },
+            "make_cancel4order": function(i){
+                var request = $.ajax({
+                   url: "/oper/api/order/status/canceled/" + i,
+                   method: "GET",
+                   dataType: "json"
+                });
+
+                request.done(function( msg ) {
+                   Main.alert("Done");
+                });
+
+                request.fail(function( jqXHR, textStatus ) {
+                  Main.alert("не могу изменить статус " );
+                });
+
+
+            }
+
+
+
+        }
+
+
 
         $('#zero_config').DataTable({
                                ajax: '/oper/api/orders',
@@ -401,6 +447,8 @@
             $(table.column(colIdx).nodes()).addClass('odd');
         });
     </script>
+
+{% include "oper/modal.html" %}
 </body>
 
 </html>
