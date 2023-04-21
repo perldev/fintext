@@ -155,10 +155,16 @@
             <div class="modal-header">
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="exchange-modal-body">
+            <div class="modal-body" id="modal-body">
+                <div id="exchange-modal-body"></div>
+                <form method="POST" id="payment-details-form">
+                    {% csrf_token %}
+                    <input type="text" id="payment-details" class="form-control">
+                    <button class="btn btn-primary" type="submit">Отправить</button>
+                </form>
             </div>
           </div>
         </div>
-      </div>
+    </div>
 
 {% endblock %}
