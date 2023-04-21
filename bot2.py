@@ -88,9 +88,8 @@ def format_numbers(D, count=None):
         return format_string % D
 
 
-bot_settings = {
-  
-}
+# TODO move to settings
+
 
 api_headers = {"token": bot_settings["api_token"]}
 
