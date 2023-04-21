@@ -96,6 +96,7 @@ function setGivenCurQnty() {
     given_cur_input.value = given_cur_value;
 }
 
+
 document.getElementById("btn-exchange").addEventListener("click", function(event){
     event.preventDefault()
     let given_cur = document.getElementById("given-cur-select").value; 
@@ -121,28 +122,29 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
         })
         .then(response => response.json())
         .then(json => {
+
             let message_box = document.getElementById("exchange-modal-body");
             if(json['response']['is_expired'] == 'true') {
                 message_box.innerHTML = `<p>${json['response']['message_to_user']}</p>`;
                 ckeckCurrencyPair();
                 modal.show();
             } else {
+                var csrftoken = '{{ csrf_token }}';
                 message_box.innerHTML = `<h5>${json['response']['message_to_user']}</h5><br>
                 <p>Вы отдаете ${json['response']['amount']} ${json['response']['given_cur']}</p><br>
                 <p>Вы получаете: ${json['response']['taken_amount']} ${json['response']['taken_cur']}</p><br>
-                <p>Ссылка для связи: <a href=${json['response']['t_link']}>ссылка в телегу</a></p><br>
-                <p>Резвизиты для перечисления: </p><br>
-                <p>
-                    <form>
-                        <input type="text" id="given-cur-input" class="form-control">
-                    </form>
-                </p>
-                <h6>Пункты выдачи наличных:</h6>
                 `;
-                let cash_points = json['response']['cash_points'];
-                Object.entries(cash_points).forEach(([key, val]) => {
-                    message_box.innerHTML += `<p>${key} - ${val}</p>`
-                })
+                if (json['response']['taken_cur'] == 'uah') {
+                    message_box.innerHTML += `<h5>Куда получать? Укажите номер гривневой карты:</h5><br/>
+                    `
+                } else {
+                    message_box.innerHTML += `<h5>Куда получать? Укажите номер кошелька ${json['response']['taken_cur']}:</h5><br/>
+                `
+                }
+                // let cash_points = json['response']['cash_points'];
+                // Object.entries(cash_points).forEach(([key, val]) => {
+                //     message_box.innerHTML += `<p>${key} - ${val}</p>`
+                // })
                 ckeckCurrencyPair();
                 modal.show();
             }
@@ -160,3 +162,34 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
   });
 
 
+function sendPaymentDetails(e) {
+    e.preventDefault();
+    let payment_details = document.getElementById("payment-details").value;
+    let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    fetch('/api/create_invoice/', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({ 
+            'payment_details': payment_details,
+         })
+    })
+    .then(response => response.json())
+    .then(json => {
+        let message_box = document.getElementById("exchange-modal-body");
+        document.getElementById("payment-details-form").remove();
+        message_box.innerHTML = `
+        <h5>${json['response']['message']}</h5><br>
+        <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+        <a href="/invoices/${json['response']['invoice_id']}">Детали инвойса</a><br/>
+        `;
+    })
+    .catch(() => {
+        console.log('some error')
+    });
+}
+
+
+document.getElementById("payment-details-form").addEventListener("submit", sendPaymentDetails);

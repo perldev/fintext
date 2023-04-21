@@ -173,32 +173,6 @@ class Invoice(models.Model):
     
     def __str__(self):
         return str(self.id)
-    
-
-@receiver(post_save, sender=Orders)
-def create_invoice(sender, instance, created, **kwargs):
-    if created:
-        # if give currency is crypto
-        if instance.give_currency_id != 6:
-            currency_id = instance.give_currency_id
-            last_added_crypto_address = PoolAccounts.objects.filter(currency__id=currency_id).order_by('-pub_date')[0]
-            sum = instance.amnt_give
-
-            block_height = 0
-            # check if invoice currency is btc
-            if currency_id == 3:
-                block_height = get_current_height()
-            
-            new_invoice = Invoice(order=instance, 
-                                  currency_id=currency_id, 
-                                  crypto_payments_details_id=last_added_crypto_address.id, 
-                                  sum=sum, 
-                                  block_height=block_height)
-        else:
-            sum = instance.amnt_give
-            new_invoice = Invoice(order=instance, currency_id=6, fiat_payments_details_id=1, sum=sum)
-        new_invoice.save()
-
 
 
 class PoolAccounts(models.Model):
