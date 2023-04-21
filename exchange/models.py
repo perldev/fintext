@@ -58,6 +58,7 @@ class Orders(models.Model):
 
     rate = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="exchange rate", max_length=255, editable=True)
 
+
     class Meta:
         verbose_name = 'заявка на обмен'
         verbose_name_plural = 'заявки на обмен'
@@ -67,16 +68,16 @@ class Orders(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
 
-#rates
+
+# rates
 class rate(models.Model):
     source = models.CharField(max_length=255, verbose_name="source of rate")
     give_currency = models.ForeignKey("Currency", verbose_name="Give Currency", related_name="currency_provided1",
                                       on_delete=models.PROTECT,)
     take_currency = models.ForeignKey("Currency", verbose_name="Take currency", related_name="currency_provided2",
                                       on_delete=models.PROTECT,)
-    #DEFAULT its 1 = means system
+    # DEFAULT its 1 = means system
     edit_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Опертор",
                              related_name="user_provided_rate",
                              editable=False, on_delete=models.PROTECT,

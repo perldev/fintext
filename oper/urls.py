@@ -12,7 +12,9 @@ urlpatterns = [
     path("to_history_page/<int:deal>/", views.to_history_page, name="to_history_page"),
 
 
-    path("api/orders/chat_connect2deal", views.telegram2deal, name="telegram2deal"),
+    path("api/chat_connect2deal", views.telegram2deal, name="telegram2deal"),
+    path("api/get_deal_from_chat", views.deal2telegram, name="deal2telegram"),
+
 
     path("api/orders/", views.oper_orders, name="oper_orders"),
     path("api/get_history/<str:chat_id>/", views.get_history, name="get_history"),

@@ -25,6 +25,9 @@ class chat(models.Model):
                                    blank=True)
 
     history = models.TextField(default="{}")
+    @property
+    def get_telechat_link(self):
+        return settings.TELEBOT + str(self.uuid)
 
 
 class context_vars(models.Model):
@@ -38,6 +41,7 @@ class context_vars(models.Model):
 
 def get_telechat_link(chat):
     return settings.TELEBOT + str(chat.uuid)
+
 
 def get_rate(from_currency, to_currency):
     cur1 = Currency.objects.get(title=from_currency)

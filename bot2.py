@@ -33,6 +33,7 @@ import os
 import hashlib
 import base64
 import copy
+from private_settings import *
 from pymemcache.client.base import Client
 ## add chain of views
 
@@ -92,16 +93,12 @@ def format_numbers(D, count=None):
 
 
 api_headers = {"token": bot_settings["api_token"]}
-
-
 user_settings = {}
-
 
 def_settings = {
     "objects": None,
     "chat_id": None
 }
-
 
 bot = None
 LOCALS = None
@@ -322,20 +319,21 @@ def setup_context_from_site(token, msg):
     jreq = {
         "chat_id": chat_id,
         "token": token,
+        "from": msg
     }
 
     resp = requests.post(API_HOST + "chat_connect2deal",
-                         header=api_headers,
-                         params=jreq)
+                         headers=api_headers,
+                         json=jreq)
     if verbose:
         print(resp.text)
 
     res = resp.json()
     us = copy.deepcopy(def_settings)
-    us["object"] = res
+    us["object"] = res["deal"]
     us["chat_id"] = chat_id
     us["token"] = token
-    us["from"] = msg["from"]
+    us["from"] = msg
     us["last_update"] = datetime.now()
     user_settings[chat_id] = us
     return us
@@ -359,15 +357,19 @@ def setup_context_from_history(chat_id, msg=None):
         return user_settings[chat_id]
     else:
         print("call on btc trade ua")
-        resp = requests.post(API_HOST + "/get_deal_from_chat", headers=api_headers, params={"chat_id": chat_id})
+        resp = requests.post(API_HOST + "get_deal_from_chat",
+                             headers=api_headers,
+                             params={"chat_id": chat_id})
         res = resp.json()
         print("got response")
         print(res)
         if res["status"]:
             user_settings[chat_id] = us
-            us["object"] = res
+            us["object"] = res["deal"]
             us["chat_id"] = chat_id
-
+            us["token"] = res["token"]
+            us["from"] = msg
+            us["last_update"] = datetime.now()
             return us
         else:
             return None
@@ -376,11 +378,8 @@ def setup_context_from_history(chat_id, msg=None):
 async def coro(blocking_function):
     return blocking_function()
 
-
 ### HELPERS END#####
-
 ### VIEWS ####
-
 
 async def ignore_this(context, msg, currency):
     context["ignore_list"].append(currency)
@@ -484,11 +483,13 @@ def process_chat_member(content_type, chat_type, chat_id, msg):
 
 def process_text(content_type, chat_type, chat_id, msg):
     global loop, verbose
-    if verbose:
-        print("process text")
 
     # try to identify the user and save his profile
     text_msg = msg["text"]
+    if verbose:
+        print("process text")
+        print(msg)
+
     context = None
     if text_msg.startswith("/start"):
         # this also for first start
@@ -538,16 +539,18 @@ def process_text(content_type, chat_type, chat_id, msg):
         send_message2us(context, msg)
         # default_menu(context, msg)
 
+
 def send_message2us(context, msg):
     if verbose:
         print(msg)
+        print(context)
     out_user = "%s ( %s %s )" % (context["from"]["username"],
                                  context["from"]["first_name"],
                                  context["from"]["last_name"])
 
-    resp = requests.post(API_HOST+"message_income/"+context["token"],
-                         params={"text": msg,
-                                 "username": out_user})
+    resp = requests.post(API_HOST+"message_income/"+context["token"]+'/',
+                         json={"text": msg["text"],
+                               "username": out_user})
     if verbose:
         print(resp.text)
 

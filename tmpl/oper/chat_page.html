@@ -13,20 +13,6 @@
                                 <!-- Comment Row -->
 
                                 <!-- Comment Row -->
-                                <div class="d-flex flex-row comment-row">
-                                    <div class="p-2"><img src="../../assets/images/users/4.jpg" alt="user" class="rounded-circle" width="50"></div>
-                                    <div class="comment-text active w-100">
-                                        <h6 class="font-medium">Michael Jorden</h6>
-                                        <span class="mb-3 d-block">Lorem Ipsum is simply dummy text of the printing
-                                            and type setting industry. </span>
-                                        <div class="comment-footer">
-                                            <span class="text-muted float-end">May 10, 2021</span>
-                                            <button type="button" class="btn btn-cyan btn-sm text-white">Edit</button>
-                                            <button type="button" class="btn btn-success btn-sm text-white">Publish</button>
-                                            <button type="button" class="btn btn-danger btn-sm text-white">Delete</button>
-                                        </div>
-                                    </div>
-                                </div>
                                 <!-- Comment Row -->
 
                                 <div class="form-group row">
@@ -67,7 +53,7 @@
     <script src="/static/oper/assets/extra-libs/DataTables/datatables.min.js"></script>
     <script src="/static/oper/js/myoper.js"></script>
     <script>
-       let chat_id = {{chat_obj.uuid}};
+       let chat_id = "{{chat_obj.uuid}}";
        let username = "{{username}}";
         $(function() {
         "use strict";

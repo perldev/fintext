@@ -1,16 +1,17 @@
 from django.shortcuts import render, reverse
-
-
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 
 from oper.models import rates_direction, context_vars, chat, get_telechat_link
 from exchange.models import Currency, Orders
 from fintex.common import json_500false, json_true, date_to_str, convert2time
 from django.template.loader import render_to_string
 
-from fintex.settings import BOTAPI
+from fintex.settings import BOTAPI, COMMON_PASSWORD
 import json
 import requests
 from datetime import datetime
@@ -45,7 +46,11 @@ def to_history_page(req, deal):
 # TODO add to cache
 @login_required(login_url="/oper/login/")
 def get_history(req, chat_id):
-    last = int(req.GET.get("last", None))
+
+    try:
+        last = int(req.GET.get("last", None))
+    except:
+        last = 0
     obj = get_object_or_404(chat, pk=chat_id)
 
     if last is None:
@@ -53,24 +58,25 @@ def get_history(req, chat_id):
     else:
         res = json.loads(obj.history)
         result_list = []
-        for i in res:
-            if i["time"]>last:
+        for i in res["msgs"]:
+            if i["time"] > last:
                 result_list.append(i)
 
         return json_true(req, {"result": result_list})
 
 
 @login_required(login_url="/oper/login/")
+@csrf_exempt
 def post_message(req, chat_id):
     obj = get_object_or_404(chat, pk=chat_id)
-    txt = req.POST("txt", "")
+    txt = req.POST.get("txt", "")
 
     if len(txt) <= 1:
-        return json_500false(req)
+        return json_500false(req, {})
 
     resp = requests.post(BOTAPI+"alert/%s" % str(obj.telegram_id), json={"text": txt})
     if resp.status_code != 200:
-        return json_500false(req)
+        return json_500false(req, {})
     else:
         result = json.loads(obj.history)
         msgs = result["msgs"]
@@ -79,32 +85,74 @@ def post_message(req, chat_id):
         msgs.append({"time": nt, "username": req.user.username, "text": txt})
         result["msgs"] = msgs
         obj.history = json.dumps(result)
+        obj.save()
         return json_true(req, {"time": nt})
 
 
 # TODO add token auth
+@csrf_exempt
 def message_income(req, chat_id):
+    body_unicode = req.body.decode('utf-8')
+    body = json.loads(body_unicode)
     obj = get_object_or_404(chat, pk=chat_id)
-    txt = req.POST("text", "")
-    username = req.POST("username", "")
+    txt = body.get("text", "")
+    username = body.get("username", "")
     result = json.loads(obj.history)
+    print(result)
+    if "msgs" not in result:
+        result["msgs"] = []
     msgs = result["msgs"]
-    n = datetime.now()
-    msgs.append({"time": nt, "username": req.user.username, "text": txt})
+    nt = datetime.now()
+    msgs.append({"time": convert2time(nt), "username": username, "text": txt})
     result["msgs"] = msgs
     obj.history = json.dumps(result)
+    obj.save()
     return json_true(req, {"time": nt})
 
 
-#TODO add token auth
+# TODO add token auth
+@csrf_exempt
+def deal2telegram(req):
+    chat_id = req.GET.get("chat_id", "")
+    obj = chat.objects.filter(telegram_id=chat_id).first()
+    deal = Orders.objects.filter(user=obj.deal.user, status__in=["processing", "created"]).last()
+    obj = chat.objects.get(deal=deal)
+    # TODO add welcome message through inner API
+    res_dict = {"token": str(obj.uuid), "deal": json.loads(serializers.serialize("json", [deal]))}
+    print(res_dict)
+    return json_true(req, res_dict)
+
+
+# TODO add token auth
+@csrf_exempt
 def telegram2deal(req):
-    uuid = req.POST("token", "")
-    chat_id = req.POST("chat_id", "")
+
+    body_unicode = req.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    userf = body["from"]
+    uuid = body["token"]
+    chat_id = body["chat_id"]
     obj = get_object_or_404(chat, pk=uuid)
     obj.telegram_id = chat_id
     obj.save()
+    user = None
+    try:
+        user = User.objects.get(username=userf["username"])
+    except User.DoesNotExist:
+        user = User.objects.create_user(userf["username"],
+                                        "%s@t.me" % userf["username"],
+                                        settings.common_pasword)
+
+        user.first_name = userf["first_name"]
+        user.last_name = userf["last_name"]
+        user.save()
+    finally:
+        obj.deal.user = user
+        obj.deal.save()
+
     # TODO add welcome message through inner API
-    return json_true(req)
+    return json_true(req, {"deal": json.loads(serializers.serialize("json", [obj.deal]))})
 
 
 def process_item(i):
@@ -145,6 +193,7 @@ def process_item(i):
             "actions": render_to_string("oper/deals_menu.html",
                                         context={"item": i,
                                                  "connected": connected,
+                                                 "telechat_link": get_telechat_link(d),
                                                  "chat_link": reverse("to_history_page", args=[i.id])})
             }
 
