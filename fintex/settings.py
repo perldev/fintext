@@ -18,9 +18,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+#from private_settings import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t^*to&wf^ufk2bq1$0b^#_zr((dl5ld*2l%5p$^-7(yz+_u-w_'
+SECRET_KEY = "SECURE_TOKEN"
 AUTH_USER_MODEL = "auth.User"
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -109,14 +110,11 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
 USE_TZ = True
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 BOTAPI = "http://127.0.0.1:8881/"
-
+COMMON_PASSWORD = "sdfsdfsd_asdnaasfsdgggggggg_SDfs"
 TELEBOT = "https://t.me/uatrust_bot?start="
 STATIC_URL = 'static/'
 STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
