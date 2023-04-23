@@ -276,6 +276,7 @@ def get_direction(req, from_currency, to_currency):
 
     return json_true(req, {"raw_data": direction.raw_data})
 
+
 @login_required
 def save_rate(req,  from_currency, to_currency):
 
@@ -306,7 +307,6 @@ def try_login(request):
 def logout_view(request):
     logout(request)
     return json_true(request, {"redirect": reverse(login_page)})
-
 
 #TODO
 def reset_pwd_request(req):

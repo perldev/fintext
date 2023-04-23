@@ -27,7 +27,7 @@ class chat(models.Model):
     history = models.TextField(default="{}")
     @property
     def get_telechat_link(self):
-        return settings.TELEBOT + str(self.uuid)
+        return get_telechat_link(self)
 
 
 class context_vars(models.Model):

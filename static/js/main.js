@@ -95,6 +95,78 @@ function setGivenCurQnty() {
     given_cur_value = taken_cur_input.value / main_rate;
     given_cur_input.value = given_cur_value;
 }
+let Main = {
+    "draw_form_crypto": function(resp_obj){
+           return  `<div class="form-group row">
+                <label class="col-4 col-form-label" for="">Вы отдаете:</label>
+                <div class="col-8">
+                    ${resp_obj['amount']}&nbsp;${resp_obj['given_cur']}
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="text1" class="col-4 col-form-label">Вы получаете:</label>
+                <div class="col-8">
+                    ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="text" class="col-4 col-form-label">Укажите адрес кошелька ${resp_obj['taken_cur']}</label>
+                <div class="col-8">
+                  <div class="input-group">
+                    <input id="payment-details" name="text" placeholder="адрес валюты" type="text" class="form-control">
+                  </div>
+                </div>
+              </div>
+                <div class="form-group row">
+                <div class="col-2">
+                      <button  class="btn btn-info">Отменить</button>
+                    </div>
+                    <div class="offset-8 col-2">
+                      <button onclick="sendPaymentDetails(event)" class="btn btn-success">Отправить</button>
+                    </div>
+                </div>
+              `
+
+
+    },
+    "draw_form": function(resp_obj){
+
+        return  `<div class="form-group row">
+                <label class="col-4 col-form-label" for="">Вы отдаете:</label>
+                <div class="col-8">
+                    ${resp_obj['amount']}&nbsp;${resp_obj['given_cur']}
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="text1" class="col-4 col-form-label">Вы получаете:</label>
+                <div class="col-8">
+                    ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="text" class="col-4 col-form-label">Укажите номер карты</label>
+                <div class="col-8">
+                  <div class="input-group">
+                    <input id="payment-details" name="text" placeholder="номер карты получения средства" type="text" class="form-control">
+                  </div>
+                </div>
+              </div>
+                <div class="form-group row">
+                <div class="col-2">
+                      <button  class="btn btn-info">Отменить</button>
+                    </div>
+                    <div class="offset-6 col-2">
+                      <button onclick="sendPaymentDetails(event)" class="btn btn-success">Отправить</button>
+                    </div>
+                </div>
+              `
+
+    }
+
+
+
+}
+
 
 
 document.getElementById("btn-exchange").addEventListener("click", function(event){
@@ -124,27 +196,20 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
         .then(json => {
 
             let message_box = document.getElementById("exchange-modal-body");
+            let message_box_title = document.getElementById("exchange-modal-title");
             if(json['response']['is_expired'] == 'true') {
                 message_box.innerHTML = `<p>${json['response']['message_to_user']}</p>`;
                 ckeckCurrencyPair();
                 modal.show();
             } else {
-                var csrftoken = '{{ csrf_token }}';
-                message_box.innerHTML = `<h5>${json['response']['message_to_user']}</h5><br>
-                <p>Вы отдаете ${json['response']['amount']} ${json['response']['given_cur']}</p><br>
-                <p>Вы получаете: ${json['response']['taken_amount']} ${json['response']['taken_cur']}</p><br>
-                `;
+                ///!!!!! TODO remove this from here
+                // TODO also
+                message_box_title.innerHTML = json['response']['message_to_user'];
                 if (json['response']['taken_cur'] == 'uah') {
-                    message_box.innerHTML += `<h5>Куда получать? Укажите номер гривневой карты:</h5><br/>
-                    `
+                    message_box.innerHTML = Main.draw_form(json["response"]);
                 } else {
-                    message_box.innerHTML += `<h5>Куда получать? Укажите номер кошелька ${json['response']['taken_cur']}:</h5><br/>
-                `
+                    message_box.innerHTML = Main.draw_form_crypto(json["response"]);
                 }
-                // let cash_points = json['response']['cash_points'];
-                // Object.entries(cash_points).forEach(([key, val]) => {
-                //     message_box.innerHTML += `<p>${key} - ${val}</p>`
-                // })
                 ckeckCurrencyPair();
                 modal.show();
             }
@@ -160,7 +225,6 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
         modal.show();
     }
   });
-
 
 function sendPaymentDetails(e) {
     e.preventDefault();
@@ -179,17 +243,13 @@ function sendPaymentDetails(e) {
     .then(response => response.json())
     .then(json => {
         let message_box = document.getElementById("exchange-modal-body");
-        document.getElementById("payment-details-form").remove();
         message_box.innerHTML = `
         <h5>${json['response']['message']}</h5><br>
         <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
-        <a href="/invoices/${json['response']['invoice_id']}">Детали инвойса</a><br/>
+        <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
         `;
     })
     .catch(() => {
         console.log('some error')
     });
 }
-
-
-document.getElementById("payment-details-form").addEventListener("submit", sendPaymentDetails);

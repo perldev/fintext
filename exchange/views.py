@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import Http404
 from django.shortcuts import render
 import requests
-from fintex.common import json_true, json_500false, to_time
+from fintex.common import json_true, json_500false, to_time, get_telechat_link
 import traceback
 
 
@@ -12,13 +12,15 @@ from datetime import datetime, timedelta as dt
 from datetime import timedelta
 import json
 from oper.models import rates_direction
-from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice, Trans, PoolAccounts, FiatAccounts
-from oper.models import get_rate as exchange_get_rate
+from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice,\
+    Trans, PoolAccounts, FiatAccounts, CHECKOUT_STATUS_PROCESSING, CHECKOUT_STATUS_FREE
+from oper.models import get_rate as exchange_get_rate, chat
 from fintex.common import date_to_str
 
+from fintex.settings import FIAT_CURRENCIES
 import time
 from sdk.btc import get_in_trans_from, get_sum_from, get_current_height
-
+from sdk.factory import CryptoFactory
 
 def main(req):
     return render(req, "main.html", {})
@@ -101,15 +103,13 @@ def create_exchange_request(req):
                     
                     give_currency = Currency.objects.get(title=given_cur)
                     take_currency = Currency.objects.get(title=taken_cur)
-                    
-
 
                     order = Orders.objects.create(amnt_give=amount, amnt_take=taken_amount,
-                                          rate=rate,
-                                          provider_give=provider_give,
-                                          provider_take=provider_take,
-                                          give_currency=give_currency,
-                                          take_currency=take_currency)
+                                                  rate=rate,
+                                                  provider_give=provider_give,
+                                                  provider_take=provider_take,
+                                                  give_currency=give_currency,
+                                                  take_currency=take_currency)
                     
                     req.session['order_id'] = order.id
                     
@@ -118,16 +118,16 @@ def create_exchange_request(req):
                         'taken_cur': taken_cur,
                         'amount': amount,
                         'taken_amount': taken_amount,
-                        'message_to_user': 'You exchange request is created'
+                        'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
                     }
-                    c = chat.objects.create(deal=o)
-                    tele_link = get_telechat_link(c)
+                    c = chat.objects.create(deal=order)
+                    tele_link = get_telechat_link(order)
                     respone_data["t_link"] = tele_link
                     return json_true(req, {'response': respone_data})
                 else:
                     respone_data = {
                         'is_expired': 'true',
-                        'message_to_user': 'Time of your request is expired. Try one more time please.'
+                        'message_to_user': 'Время ожидания истекло, нужно сгенерировать новый курс'
                     }
                     return json_true(req, {'response': respone_data})  
             else:
@@ -157,11 +157,11 @@ def create_exchange_request(req):
                     'taken_cur': taken_cur,
                     'amount': amount,
                     'taken_amount': taken_amount,
-                    'message_to_user': 'You exchange request is created'
+                    'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
                 }
                 # CREATE chat for deal
-                c = chat.objects.create(deal=o)
-                tele_link = get_telechat_link(c)
+                c = chat.objects.create(deal=order)
+                tele_link = get_telechat_link(order)
                 respone_data["t_link"] = tele_link
                 
                 return json_true(req, {'response': respone_data})
@@ -175,33 +175,41 @@ def create_invoice(req):
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
         payment_details = body['payment_details']
-        t_link = 'https://t.me/books_extended/121'
-
         # create invoice
         order = Orders.objects.get(id=req.session['order_id'])
+        t_link = get_telechat_link(order)
+
         # print(order)
-        if order.give_currency_id != 6:
+        if order.give_currency.title not in FIAT_CURRENCIES:
+            factory = CryptoFactory(order.give_currency.title)
             currency_id = order.give_currency_id
-            last_added_crypto_address = PoolAccounts.objects.filter(currency__id=currency_id).order_by('-pub_date')[0]
+            last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
+                                                                    status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
             sum = order.amnt_give
             block_height = 0
-            # check if invoice currency is btc
-            if currency_id == 3:
-                block_height = get_current_height()
+            block_height = factory.get_current_height()
             new_invoice = Invoice(order=order,
-                                currency_id=currency_id, 
-                                crypto_payments_details_id=last_added_crypto_address.id, 
-                                sum=sum, 
-                                block_height=block_height)
+                                  currency_id=currency_id,
+                                  crypto_payments_details_id=last_added_crypto_address.id,
+                                  sum=sum,
+                                  block_height=block_height)
             payment_details_give = last_added_crypto_address.address
         else:
             sum = order.amnt_give
-            new_invoice = Invoice(order=order, currency_id=6, fiat_payments_details_id=1, sum=sum)
-            credit_card_number = FiatAccounts.objects.get(id=1)
-            payment_details_give = credit_card_number.card_number
+            currency_id = order.give_currency_id
+            credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
+                                                             status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
+            new_invoice = Invoice(order=order,
+                                  currency=order.give_currency,
+                                  crypto_payments_details_id=credit_card_number.id,
+                                  sum=sum)
+
+            payment_details_give = credit_card_number.address
+
         new_invoice.save()
+
         trans = Trans.objects.create(account=payment_details,
-                                     payment_id='some payment id',
+                                     payment_id='',
                                      currency=order.take_currency,
                                      amnt=order.amnt_take)
         
@@ -211,7 +219,7 @@ def create_invoice(req):
             'payment_details_give': payment_details_give,
             't_link': t_link,
             'invoice_id': new_invoice.id,
-            'message': 'We are waiting for your payment'
+            'message': 'Ожидаем вашей оплаты'
         }
 
         print(respone_data)
@@ -220,26 +228,23 @@ def create_invoice(req):
     else:
         return json_true(req, {'message': 'nothing to return'})
     
-    
 
-def check_invoices(req):
-    active_invoices = Invoice.objects.filter(status='created')
-    for i in active_invoices:
-        if i.currency_id == 3:
-            sum = get_sum_from(str(i.crypto_payments_details), i.block_height)
-            # data_from_api = get_in_trans_from(str(i.crypto_payments_details), i.block_height)
-            sum_for_camparing = sum / 100000000
-            if i.sum == sum_for_camparing:
-                i.status = 'paid'
-                i.save()
+def check_invoices(req, id_invoice):
 
-    return json_true(req, {'status': 'OK'})
+    active_invoice = Invoice.objects.get(id=id_invoice)
+    if active_invoice.currency.title not in FIAT_CURRENCIES:
+        factory = CryptoFactory(active_invoice.currency.title)
+        actual_sum, trances = factory.get_sum_from(active_invoice.crypto_payments_details.title,
+                                                   active_invoice.block_height)
+
+    return json_true(req, {"result": {"status": active_invoice.status}})
 
 
 def invoice_details(request, pk):
     invoice = Invoice.objects.get(pk=pk)
     context = {
-        'invoice': invoice
+        'invoice': invoice,
+        "t_link": get_telechat_link(invoice.order)
     }
     return render(request, "invoice-details.html", context)
 

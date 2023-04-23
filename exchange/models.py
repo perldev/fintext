@@ -11,7 +11,12 @@ STATUS_INVOICE = (
     ("created", u"выставлен"),
     ("paid", u"оплачен"),
     ("canceled", u"отменен"),
+    ("expired", u"просрочен"),
+
 );
+
+CHECKOUT_STATUS_FREE = "wait_checkout"
+CHECKOUT_STATUS_PROCESSING = "processing"
 
 STATUS_ORDER = (
     ("created", u"создана"),
@@ -142,18 +147,14 @@ class Invoice(models.Model):
                                  verbose_name="Order ID",
                                  on_delete=models.PROTECT,
                                  related_name="invoice_order")
-    crypto_payments_details = models.ForeignKey("PoolAccounts", 
+
+    crypto_payments_details = models.ForeignKey("PoolAccounts",
                                  verbose_name="Crypto Address",
                                  on_delete=models.PROTECT,
                                  related_name="crypto_payments_details",
                                  null=True,
                                  blank=True)
-    fiat_payments_details = models.ForeignKey("FiatAccounts", 
-                                 verbose_name="Fiat Card",
-                                 on_delete=models.PROTECT,
-                                 related_name="fiat_payments_details",
-                                 null=True,
-                                 blank=True)
+
     sum = models.DecimalField(decimal_places=20, 
                               max_digits=40, 
                               verbose_name="Сумма инвойса",
@@ -163,6 +164,9 @@ class Invoice(models.Model):
     block_height = models.IntegerField(verbose_name="Высота блока",
                                        default=0)
 
+    pub_date = models.DateTimeField(default=datetime.now, verbose_name="Дата публикации")
+    expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True,
+                                       blank=True)
 
     class Meta:
         verbose_name = u'инвойс'
@@ -200,17 +204,17 @@ class PoolAccounts(models.Model):
     
     def __str__(self):
         return self.address
-    
+
 
 class FiatAccounts(models.Model):
     card_number = models.CharField(max_length=32,
                                    unique=True,
                                    verbose_name="Номер карты")
-    
+
     class Meta:
         verbose_name = u'Фиат реквизиты'
         verbose_name_plural = u'Фиат реквизиты'
-    
+
     def __str__(self):
         return self.card_number
     

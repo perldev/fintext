@@ -7,17 +7,13 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 offset-lg-2 col-12">
-                    <h1>Invoice ID: {{ invoice.id }}</h1>
-                    <h3>Invoice Sum: {{ invoice.status }}</h3>
-                    <h3>Invoice currency: {{ invoice.currency }}</h3>
+                    <h3>Invoice currency: {{ invoice.currency.title }}</h3>
                     <h3>Invoice Sum: {{ invoice.sum }}</h3>
-                    {% if invoice.crypto_payments_details %}
                     <h3>Invoice payment details: {{ invoice.crypto_payments_details }}</h3>
-                    {% else %}
-                    <h3>Invoice payment details: {{ invoice.fiat_payments_details }}</h3>
-                    {% endif %}
+                    <h3>Status: {{ invoice.status }}</h3>
+
                     <br>
-                    <a href="#">Link to telegram for dialog with operator</a>
+                    <a href="{{t_link}}">Link to telegram for dialog with operator</a>
                 </div>
             </div>
         </div>
