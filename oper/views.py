@@ -6,9 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 
-from oper.models import rates_direction, context_vars, chat, get_telechat_link
-from exchange.models import Currency, Orders
-from fintex.common import json_500false, json_true, date_to_str, convert2time
+from oper.models import rates_direction, context_vars, chat
+from exchange.models import Currency, Orders, Invoice, Trans
+from fintex.common import json_500false, json_true, date_to_str, convert2time, get_telechat_link
 from django.template.loader import render_to_string
 
 from fintex.settings import BOTAPI, COMMON_PASSWORD
@@ -17,6 +17,7 @@ import requests
 from datetime import datetime
 from decimal import Decimal
 # Create your views here.
+import traceback
 
 
 @login_required(login_url="/oper/login/")
@@ -129,7 +130,6 @@ def telegram2deal(req):
 
     body_unicode = req.body.decode('utf-8')
     body = json.loads(body_unicode)
-
     userf = body["from"]
     uuid = body["token"]
     chat_id = body["chat_id"]
@@ -142,7 +142,7 @@ def telegram2deal(req):
     except User.DoesNotExist:
         user = User.objects.create_user(userf["username"],
                                         "%s@t.me" % userf["username"],
-                                        settings.common_pasword)
+                                        COMMON_PASSWORD)
 
         user.first_name = userf["first_name"]
         user.last_name = userf["last_name"]
@@ -178,6 +178,10 @@ def process_item(i):
     if i.operator is not None:
         username = i.operator.username
 
+    invoice = Invoice.objects.get(order=i)
+    invoice = Trans.objects.get(order=i)
+
+
     return {"id": i.id,
             "buy": str(i.amnt_give) + " " + i.give_currency.title,
             "sell": str(i.amnt_take) + " " + i.take_currency.title,
@@ -185,7 +189,7 @@ def process_item(i):
             "operator": username,
             "client_info": "Ukraine",
             # TODO add invoice of payment
-            "client_payed": "not created",
+            "client_payed": invoice.status,
             "client_get": "not_created",
             "client_telegram_connected": connected,
             "status": i.status,
@@ -193,7 +197,7 @@ def process_item(i):
             "actions": render_to_string("oper/deals_menu.html",
                                         context={"item": i,
                                                  "connected": connected,
-                                                 "telechat_link": get_telechat_link(d),
+                                                 "telechat_link": get_telechat_link(i),
                                                  "chat_link": reverse("to_history_page", args=[i.id])})
             }
 
@@ -203,7 +207,11 @@ def oper_orders(request):
 
     res = []
     for i in Orders.objects.all().order_by("id"):
-        result_dict = process_item(i)
+        try:
+            result_dict = process_item(i)
+        except:
+            traceback.print_exc()
+            continue
         res.append(result_dict)
     return json_true(request, {"data": res})
 
@@ -297,7 +305,7 @@ def try_login(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
-        return json_true(request, {"redirect": reverse(index)})
+        return json_true(request, {"redirect": reverse(oper_home)})
 
     else:
         # Return an 'invalid login' error message

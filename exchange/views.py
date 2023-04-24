@@ -212,7 +212,8 @@ def create_invoice(req):
                                      payment_id='',
                                      currency=order.take_currency,
                                      amnt=order.amnt_take)
-        
+        order.trans = trans
+        order.save()
         respone_data = {
             'given_cur': str(order.give_currency),
             'amount': order.amnt_give,
