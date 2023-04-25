@@ -14,6 +14,11 @@ let taken_cur_input = document.getElementById("taken-cur-input");
 let given_cur_select = document.getElementById("given-cur-select");
 let taken_cur_select = document.getElementById("taken-cur-select");
 
+let ifFiat = null;
+let cardInput = null;
+let errorDiv = null;
+let isPaymentDetailsValid = false;
+
 
 const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9\.]+/;
 given_cur_input.addEventListener("keypress", event => {
@@ -26,7 +31,7 @@ taken_cur_input.addEventListener("keypress", event => {
       event.preventDefault();
     }
   });
-
+const CARD_NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
 
 fetch(`/api/get_currency_list`)
 .then(response => response.json())
@@ -95,6 +100,16 @@ function setGivenCurQnty() {
     given_cur_value = taken_cur_input.value / main_rate;
     given_cur_input.value = given_cur_value;
 }
+
+
+
+
+
+
+
+
+
+
 let Main = {
     "draw_form_crypto": function(resp_obj){
            return  `<div class="form-group row">
@@ -115,6 +130,7 @@ let Main = {
                   <div class="input-group">
                     <input id="payment-details" name="text" placeholder="адрес валюты" type="text" class="form-control">
                   </div>
+                  <div id="payment-details-error" class="form-text"></div>
                 </div>
               </div>
                 <div class="form-group row">
@@ -147,8 +163,9 @@ let Main = {
                 <label for="text" class="col-4 col-form-label">Укажите номер карты</label>
                 <div class="col-8">
                   <div class="input-group">
-                    <input id="payment-details" name="text" placeholder="номер карты получения средства" type="text" class="form-control">
+                    <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" placeholder="номер карты получения средства" type="text" class="form-control">
                   </div>
+                  <div id="payment-details-error" class="form-text"></div>
                 </div>
               </div>
                 <div class="form-group row">
@@ -207,9 +224,22 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 message_box_title.innerHTML = json['response']['message_to_user'];
                 if (json['response']['taken_cur'] == 'uah') {
                     message_box.innerHTML = Main.draw_form(json["response"]);
+
+                    ifFiat = true;
+                    cardInput = document.getElementById("payment-details");
+                    cardInput.addEventListener("keypress", event => {
+                      if (!CARD_NUMBER_ALLOWED_CHARS_REGEXP.test(event.key)) {
+                        event.preventDefault();
+                      }
+                    });
+                    cardInput.addEventListener("input", () => cardInput.value = formatNumber(cardInput.value.replaceAll(" ", "")));
                 } else {
+                    isPaymentDetailsValid = true;
                     message_box.innerHTML = Main.draw_form_crypto(json["response"]);
                 }
+
+                errorDiv = document.getElementById("payment-details-error"); 
+
                 ckeckCurrencyPair();
                 modal.show();
             }
@@ -230,7 +260,9 @@ function sendPaymentDetails(e) {
     e.preventDefault();
     let payment_details = document.getElementById("payment-details").value;
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    fetch('/api/create_invoice/', {
+    if (isPaymentDetailsValid) {
+      errorDiv.innerHTML = ``;
+      fetch('/api/create_invoice/', {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -239,17 +271,89 @@ function sendPaymentDetails(e) {
         body: JSON.stringify({ 
             'payment_details': payment_details,
          })
-    })
-    .then(response => response.json())
-    .then(json => {
-        let message_box = document.getElementById("exchange-modal-body");
-        message_box.innerHTML = `
-        <h5>${json['response']['message']}</h5><br>
-        <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
-        <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
-        `;
-    })
-    .catch(() => {
-        console.log('some error')
-    });
+      })
+      .then(response => response.json())
+      .then(json => {
+          let message_box = document.getElementById("exchange-modal-body");
+          if (json['response']['error']) {
+            message_box.innerHTML = `
+            <h5>${json['response']['error']}</h5><br>
+            `;
+          } else {
+            message_box.innerHTML = `
+            <h5>${json['response']['message']}</h5><br>
+            <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+            <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
+            `;
+          }
+      })
+      .catch(() => {
+          console.log('some error')
+      });
+    } else {
+      errorDiv.innerHTML = `Ошибка в номере карты`;
+      console.log('payment details are not valid')
+    }
+
 }
+
+
+// luhn validation functions
+
+const validateCardNumber = number => {
+  if(ifFiat) {
+    var num = number.split(' ').join('');
+    var numInt = Number(num)
+    const regex = new RegExp("^[0-9]{16}$");
+    if (num.length == 16) {
+      if (!regex.test(numInt)){
+        isPaymentDetailsValid = false;
+        errorDiv.innerHTML = `Ошибка в номере карты`;
+        return false;
+      } else {
+        if (luhnCheck(numInt)) {
+          errorDiv.innerHTML = ``;
+          isPaymentDetailsValid = true;
+        } else {
+          errorDiv.innerHTML = `Ошибка в номере карты`;
+          isPaymentDetailsValid = false;
+        }
+      }
+    } else {
+      errorDiv.innerHTML = ``;
+      isPaymentDetailsValid = false;
+      return null;
+    }
+  }
+}
+
+const luhnCheck = val => {
+  let checksum = 0;
+  let j = 1; 
+
+  for (let i = val.length - 1; i >= 0; i--) {
+    let calc = 0;
+    calc = Number(val.charAt(i)) * j;
+
+    if (calc > 9) {
+      checksum = checksum + 1;
+      calc = calc - 10;
+    }
+
+    checksum = checksum + calc;
+
+    if (j == 1) {
+      j = 2;
+    } else {
+      j = 1;
+    }
+  }
+
+  return (checksum % 10) == 0;
+}
+
+
+const formatNumber = (number) => number.split("").reduce((seed, next, index) => {
+  if (index !== 0 && !(index % 4)) seed += " ";
+  return seed + next;
+}, "");

@@ -12,13 +12,13 @@ STATUS_INVOICE = (
     ("paid", u"оплачен"),
     ("canceled", u"отменен"),
     ("expired", u"просрочен"),
-
-);
+)
 
 CHECKOUT_STATUS_FREE = "wait_checkout"
 CHECKOUT_STATUS_PROCESSING = "processing"
 
 STATUS_ORDER = (
+    ("wait_checkout", u"waiting_checkout"),
     ("created", u"создана"),
     ("processing", u"в процессе"),
     ("wait_secure", u"проверяется"),
@@ -26,7 +26,7 @@ STATUS_ORDER = (
     ("canceled", u"отменена оператором"),
     ("processed", u"проведена"),
     ("failed", u"неуспешна"),
-);
+)
 
 
 # Create your models here.
@@ -148,7 +148,7 @@ class Invoice(models.Model):
                                  on_delete=models.PROTECT,
                                  related_name="invoice_currency", )
     status = models.CharField(max_length=40, 
-                              choices=STATUS_INVOICE, 
+                              choices=STATUS_ORDER, 
                               default='created', 
                               verbose_name="Статус")
     order = models.OneToOneField("Orders", 
@@ -190,7 +190,7 @@ class Invoice(models.Model):
 class PoolAccounts(models.Model):
     status = models.CharField(max_length=40,
                               choices=STATUS_ORDER,
-                              default='created')
+                              default=CHECKOUT_STATUS_FREE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, 
                              blank=True, null=True, 
                              on_delete=models.PROTECT)
@@ -230,7 +230,7 @@ class FiatAccounts(models.Model):
 class Trans(models.Model):
     account = models.CharField(verbose_name="account ",
                                max_length=255,
-                               editable=False,
+                               editable=True,
                                null=False,
                                blank=False)
     payment_id = models.CharField(verbose_name="payment id",

@@ -1,3 +1,10 @@
 from django.contrib import admin
+from .models import (
+    chat
+)  
 
-# Register your models here.
+
+class chatAdmin(admin.ModelAdmin):
+    list_display = ["uuid"]
+
+admin.site.register(chat, chatAdmin)

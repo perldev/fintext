@@ -6,12 +6,26 @@
     <section style="margin:40px 0px;">
         <div class="container">
             <div class="row">
-                <div class="col-lg-8 offset-lg-2 col-12">
-                    <h3>Invoice currency: {{ invoice.currency.title }}</h3>
-                    <h3>Invoice Sum: {{ invoice.sum }}</h3>
-                    <h3>Invoice payment details: {{ invoice.crypto_payments_details }}</h3>
-                    <h3>Status: {{ invoice.status }}</h3>
-
+                <div class="col-lg-6 offset-lg-3 col-12">
+                    <br><br>
+                    <table class="table">
+                        <tbody>
+                          <tr>
+                            <td>Invoice currency:</td>
+                            <td><h5>{{ invoice.currency.title }}</h5></td>
+                          </tr>
+                          <tr>
+                            <td>Invoice Sum:</td>
+                            <td><h5>{{ invoice.sum }}</h5></td>
+                          </tr>
+                          <tr>
+                            <td>Invoice payment details:</td>
+                            <td><h5>{{ invoice.crypto_payments_details }}</h5></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br>
+                    <h4>Status: {{ invoice.status }}</h4>
                     <br>
                     <a href="{{t_link}}">Link to telegram for dialog with operator</a>
                 </div>

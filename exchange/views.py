@@ -22,6 +22,9 @@ import time
 from sdk.btc import get_in_trans_from, get_sum_from, get_current_height
 from sdk.factory import CryptoFactory
 
+from sdk.functions import validate_credit_card
+
+
 def main(req):
     return render(req, "main.html", {})
 
@@ -178,60 +181,69 @@ def create_invoice(req):
         # create invoice
         order = Orders.objects.get(id=req.session['order_id'])
         t_link = get_telechat_link(order)
+        isCardValid = True
 
-        # print(order)
-        if order.give_currency.title not in FIAT_CURRENCIES:
-            factory = CryptoFactory(order.give_currency.title)
-            currency_id = order.give_currency_id
-            last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
-                                                                    status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
-            sum = order.amnt_give
-            block_height = 0
-            block_height = factory.get_current_height()
-            new_invoice = Invoice(order=order,
-                                  currency_id=currency_id,
-                                  crypto_payments_details_id=last_added_crypto_address.id,
-                                  sum=sum,
-                                  block_height=block_height)
-            payment_details_give = last_added_crypto_address.address
+        if (order.take_currency.title == 'uah'):
+            isCardValid = validate_credit_card(payment_details.replace(" ", ""))
+
+        if isCardValid:
+            if order.give_currency.title not in FIAT_CURRENCIES:
+                factory = CryptoFactory(order.give_currency.title)
+                currency_id = order.give_currency_id
+                last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
+                                                                        status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
+
+                print(last_added_crypto_address)
+                sum = order.amnt_give
+                block_height = 0
+                block_height = factory.get_current_height()
+                new_invoice = Invoice(order=order,
+                                    currency_id=currency_id,
+                                    crypto_payments_details_id=last_added_crypto_address.id,
+                                    sum=sum,
+                                    block_height=block_height)
+                payment_details_give = last_added_crypto_address.address
+            else:
+                sum = order.amnt_give
+                currency_id = order.give_currency_id
+                credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
+                                                                status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
+                new_invoice = Invoice(order=order,
+                                    currency=order.give_currency,
+                                    crypto_payments_details_id=credit_card_number.id,
+                                    sum=sum)
+
+                payment_details_give = credit_card_number.address
+
+            new_invoice.save()
+
+            trans = Trans.objects.create(account=payment_details,
+                                        payment_id='',
+                                        currency=order.take_currency,
+                                        amnt=order.amnt_take)
+            order.trans = trans
+            order.save()
+            respone_data = {
+                'given_cur': str(order.give_currency),
+                'amount': order.amnt_give,
+                'payment_details_give': payment_details_give,
+                't_link': t_link,
+                'invoice_id': new_invoice.id,
+                'message': 'Ожидаем вашей оплаты'
+            }
+
+            return json_true(req, {'response': respone_data})
         else:
-            sum = order.amnt_give
-            currency_id = order.give_currency_id
-            credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
-                                                             status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
-            new_invoice = Invoice(order=order,
-                                  currency=order.give_currency,
-                                  crypto_payments_details_id=credit_card_number.id,
-                                  sum=sum)
-
-            payment_details_give = credit_card_number.address
-
-        new_invoice.save()
-
-        trans = Trans.objects.create(account=payment_details,
-                                     payment_id='',
-                                     currency=order.take_currency,
-                                     amnt=order.amnt_take)
-        order.trans = trans
-        order.save()
-        respone_data = {
-            'given_cur': str(order.give_currency),
-            'amount': order.amnt_give,
-            'payment_details_give': payment_details_give,
-            't_link': t_link,
-            'invoice_id': new_invoice.id,
-            'message': 'Ожидаем вашей оплаты'
-        }
-
-        print(respone_data)
-        # return json_true(req, {'message': 'OK'})
-        return json_true(req, {'response': respone_data})
+            respone_data = {
+                'error': 'Карта не валидна',
+            }
+            return json_true(req, {'response': respone_data})
+    
     else:
         return json_true(req, {'message': 'nothing to return'})
     
 
 def check_invoices(req, id_invoice):
-
     active_invoice = Invoice.objects.get(id=id_invoice)
     if active_invoice.currency.title not in FIAT_CURRENCIES:
         factory = CryptoFactory(active_invoice.currency.title)
