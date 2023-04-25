@@ -134,10 +134,10 @@ let Main = {
                 </div>
               </div>
                 <div class="form-group row">
-                <div class="col-2">
+                    <div class="col-6 text-start">
                       <button  class="btn btn-info">Отменить</button>
                     </div>
-                    <div class="offset-8 col-2">
+                    <div class="col-6 text-end">
                       <button onclick="sendPaymentDetails(event)" class="btn btn-success">Отправить</button>
                     </div>
                 </div>
@@ -162,18 +162,20 @@ let Main = {
               <div class="form-group row">
                 <label for="text" class="col-4 col-form-label">Укажите номер карты</label>
                 <div class="col-8">
-                  <div class="input-group">
-                    <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" placeholder="номер карты получения средства" type="text" class="form-control">
-                  </div>
                   <div id="payment-details-error" class="form-text"></div>
+                  <div class="input-group">
+                    <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" onpaste="cardValidationOnPaste()" placeholder="номер карты получения средства" type="text" class="form-control">
+                  </div>
+                  
                 </div>
               </div>
+              <br/>
                 <div class="form-group row">
-                <div class="col-2">
+                    <div class="col-6 text-start">
                       <button  class="btn btn-info">Отменить</button>
                     </div>
-                    <div class="offset-6 col-2">
-                      <button onclick="sendPaymentDetails(event)" class="btn btn-success">Отправить</button>
+                    <div class="col-6 text-end">
+                      <button onclick="sendPaymentDetails(event)" id="btn-send-payment" disabled class="btn btn-success">Отправить</button>
                     </div>
                 </div>
               `
@@ -260,100 +262,126 @@ function sendPaymentDetails(e) {
     e.preventDefault();
     let payment_details = document.getElementById("payment-details").value;
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    if (isPaymentDetailsValid) {
-      errorDiv.innerHTML = ``;
-      fetch('/api/create_invoice/', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken,
-        },
-        body: JSON.stringify({ 
-            'payment_details': payment_details,
-         })
-      })
-      .then(response => response.json())
-      .then(json => {
-          let message_box = document.getElementById("exchange-modal-body");
-          if (json['response']['error']) {
-            message_box.innerHTML = `
-            <h5>${json['response']['error']}</h5><br>
-            `;
-          } else {
-            message_box.innerHTML = `
-            <h5>${json['response']['message']}</h5><br>
-            <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
-            <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
-            `;
-          }
-      })
-      .catch(() => {
-          console.log('some error')
-      });
-    } else {
-      errorDiv.innerHTML = `Ошибка в номере карты`;
-      console.log('payment details are not valid')
-    }
-
-}
-
-
-// luhn validation functions
-
-const validateCardNumber = number => {
-  if(ifFiat) {
-    var num = number.split(' ').join('');
-    var numInt = Number(num)
-    const regex = new RegExp("^[0-9]{16}$");
-    if (num.length == 16) {
-      if (!regex.test(numInt)){
-        isPaymentDetailsValid = false;
-        errorDiv.innerHTML = `Ошибка в номере карты`;
-        return false;
-      } else {
-        if (luhnCheck(numInt)) {
-          errorDiv.innerHTML = ``;
-          isPaymentDetailsValid = true;
+    fetch('/api/create_invoice/', {
+      method: 'POST',
+      headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify({ 
+          'payment_details': payment_details,
+        })
+    })
+    .then(response => response.json())
+    .then(json => {
+        let message_box = document.getElementById("exchange-modal-body");
+        if (json['response']['error']) {
+          message_box.innerHTML = `
+          <h5>${json['response']['error']}</h5><br>
+          `;
         } else {
-          errorDiv.innerHTML = `Ошибка в номере карты`;
-          isPaymentDetailsValid = false;
+          message_box.innerHTML = `
+          <h5>${json['response']['message']}</h5><br>
+          <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+          <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
+          <br/>
+          <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
+          `;
         }
-      }
-    } else {
-      errorDiv.innerHTML = ``;
-      isPaymentDetailsValid = false;
-      return null;
-    }
-  }
+    })
+    .catch(() => {
+        console.log('some error')
+    });
 }
 
-const luhnCheck = val => {
-  let checksum = 0;
-  let j = 1; 
-
-  for (let i = val.length - 1; i >= 0; i--) {
-    let calc = 0;
-    calc = Number(val.charAt(i)) * j;
-
-    if (calc > 9) {
-      checksum = checksum + 1;
-      calc = calc - 10;
-    }
-
-    checksum = checksum + calc;
-
-    if (j == 1) {
-      j = 2;
-    } else {
-      j = 1;
-    }
-  }
-
-  return (checksum % 10) == 0;
-}
+// luhn validation functions 4149499139344160
 
 
 const formatNumber = (number) => number.split("").reduce((seed, next, index) => {
   if (index !== 0 && !(index % 4)) seed += " ";
   return seed + next;
 }, "");
+
+
+// visa 4149499385009483
+// master 5168755512651007
+
+// TODO make validation on paste with promise
+function cardValidationOnPaste(){
+  function someF() {
+    var cardNum = document.getElementById('payment-details').value;
+    validateCardNumber(cardNum)
+  }
+  setTimeout(someF, 300)
+}
+
+function validateCardNumber(value){
+  
+  // console.log(btnSendPayment)
+  if(ifFiat) {
+    
+    if(value.length === 19) {
+      var num = value.split(' ').join('');
+
+      const cardArray = num.toString().split("").map((e) => parseInt(e) )
+      validlen(cardArray);
+      const splitArr =  arrSplit(cardArray)
+      const checksum = sumArrDigits(splitArr.arr1).reduce((a, c) => a + c) + splitArr.arr2.reduce((a, c) => a + c);
+    
+      if(checksum % 10 == 0) {
+        const typeValidatorArr = cardArray.slice(0,2)
+        const typeValidatorInt = parseInt(typeValidatorArr.join(""))
+        
+        if (typeValidatorArr[0] == 4){
+          console.log('Карта валидна visa');
+          var btnSendPayment = document.getElementById('btn-send-payment');
+          btnSendPayment.disabled = false;
+          return "VISA"
+        }else if(typeValidatorInt == 22 || typeValidatorInt == 51 || typeValidatorInt == 52 || typeValidatorInt == 53 || typeValidatorInt == 54){
+          console.log('Карта валидна master');
+          var btnSendPayment = document.getElementById('btn-send-payment');
+          btnSendPayment.disabled = false;
+          return "MASTERCARD";
+        }
+      } else {
+        console.log('карта не валидна')
+        var btnSendPayment = document.getElementById('btn-send-payment');
+
+        btnSendPayment.disabled = true;
+        errorDiv.innerHTML = `Ошибка в номере карты`;
+        return null;
+      }
+
+    } else {
+      errorDiv.innerHTML = ``;
+      var btnSendPayment = document.getElementById('btn-send-payment');
+      btnSendPayment.disabled = true;
+      return null;
+    }
+
+  }
+}
+  
+function sumArrDigits(array){
+  return array.join("").split("").map(e => parseInt(e))
+}
+
+function validlen(arr){
+  // checks for card length of 13, 15, or 16
+  return  arr.length == 13  || arr.length == 15 || arr.length == 16
+}
+
+function arrSplit(cardArray){
+  const selectOddValues = cardArray.filter((a,i)=>i%2 === 1);
+  const selectEvenValues = cardArray.filter((a,i)=>i%2 === 0);
+  let arr1;
+  let arr2;
+  if (cardArray.length % 2 == 1){
+    arr1 = selectOddValues.map(e => e * 2);
+    arr2 = selectEvenValues;
+  }else {
+    arr1 = selectEvenValues.map(e => e * 2);
+    arr2 = selectOddValues;
+  }
+  return {arr1, arr2}
+}
