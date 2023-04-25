@@ -284,6 +284,8 @@ function sendPaymentDetails(e) {
             <h5>${json['response']['message']}</h5><br>
             <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
             <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
+            <br/>
+            <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
             `;
           }
       })
