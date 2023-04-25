@@ -7,10 +7,8 @@ import decimal
 import datetime
 from django.core.cache import cache
 from oper.models import get_telechat_link as oper_get_telechat_link, chat
-
-
-
 import time
+
 
 def get_fromcache(k):
     return cache.get(k)
@@ -35,6 +33,7 @@ def date_to_str(t):
 def get_telechat_link(obj):
     c = chat.objects.get(deal=obj)
     return oper_get_telechat_link(c)
+
 
 def json_true(req, dictt=None):
     d = {"status": True}

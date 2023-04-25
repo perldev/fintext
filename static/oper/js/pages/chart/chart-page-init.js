@@ -1,3 +1,4 @@
+  "use strict";
   let Calculator = {"current":null};
 
   $(function() {
@@ -81,8 +82,20 @@
 
     };
 
-    var updateInterval = 5000;
+    var updateInterval = 15000;
+    function find_max(list, key_func){
+        var max_val = -100000000000000000;
+        var min_val = 1000000000000000;
 
+        for(var i=0; i<list.length; i++){
+            var current = key_func(list[i]);
+            if(current>max_val)
+                max_val=current
+            if(current<min_val)
+                min_val = current
+        }
+        return max_val, min_val;
+    }
 
 
     // we use an inline data source in the example, usually data would
@@ -90,56 +103,51 @@
    // ==============================================================
     // Real Time Visits
     // ==============================================================
-    function create_plot(name, value){
-
-
+    function create_plot(plot, name, value, init_vals){
+        console.log("drawing plot", name, value);
 
         var plot_id = "#real-time" + name + "_" + value;
-        var plot = $.plot(plot_id, [[]], {
-        series: {
-            shadowSize: 1, // Drawing is faster without shadows
-            lines: { fill: true, fillColor: 'transparent' },
-        },
-        yaxis: {
-            min: 0,
-            max: 100000,
-            show: true
-        },
-        xaxis: {
-            show: false
-        },
-        colors: ["#488c13"],
-        grid: {
-            color: "#AFAFAF",
-            hoverable: true,
-            borderWidth: 0,
-            backgroundColor: 'transparent'
-        },
-        tooltip: true,
-        tooltipOpts: {
-            content: "date: %x",
-            defaultTheme: false
-        }
-    });
+        var max_val, min_val = find_max(init_vals, function(x){ return  x[1]});
+        plot["name"] = name;
+        plot["value"] = value;
 
+        plot["plot_obj"] = $.plot(plot_id, [init_vals], {
+            series: {
+                shadowSize: 1, // Drawing is faster without shadows
+                lines: { fill: true, fillColor: 'transparent' },
+            },
+            yaxis: {
+                min: min_val,
+                max: max_val,
+                show: true
+            },
+            xaxis: {
+                show: false
+            },
+            colors: ["#488c13"],
+            grid: {
+                color: "#AFAFAF",
+                hoverable: true,
+                borderWidth: 0,
+                backgroundColor: 'transparent'
+            },
+            tooltip: true,
+            tooltipOpts: {
+                content: "%y.10",
+                defaultTheme: false
+            }
+        });
 
-    function data_handler(data) {
+        plot["data_handler"] = function data_handler(data) {
+            plot["plot_obj"].setData([data]);
+            // Since the axes don't change, we don't need to call plot.setupGrid()
+            plot["plot_obj"].draw();
+            setTimeout(plot["update"], updateInterval);
+        };
 
-        plot.setData([data]);
-        // Since the axes don't change, we don't need to call plot.setupGrid()
-        plot.draw();
-        setTimeout(update, updateInterval);
-    };
-
-    function update(){
-        getDataRates(name, value, data_handler)
-    };
-
-    window.onresize = function(event) {
-        $.plot($(plot_id), [[]]);
-        update();
-    }
-    update();
+        plot["update"] = function update(){
+                                getDataRates(plot["name"], plot["value"],  plot["data_handler"])
+                          };
 
 
 
@@ -151,42 +159,93 @@
                var request = $.ajax({
                    url: "/api/oper/getDataRate/" + chanelName + "/" + rate_name,
                    method: "GET",
-                   dataType: "json"
-                });
+                   dataType: "json",
+                  success: function( msg ) {
+                          var data  = msg["result"]
+                          var res = [];
+                          var last="";
+                            for (var i = 0; i < data.length; ++i) {
+                                var item = data[i];
+                                var k = item["name"];
+                                var val = item["value"];
+                                if(val>0){
+                                    res.push([i, val]);
+                                    last = val;
+                                }
 
-                request.done(function( msg ) {
-                  var data  = msg["result"]
-                  var res = [];
-                  var last="";
-                    for (var i = 0; i < data.length; ++i) {
-                        var item = data[i];
-                        var k = item["name"];
-                        var val = item["value"];
-                        last = val;
-                        res.push([k, val]);
-                    }
-                    $("#context_"+chanelName+"_"+rate_name).html(last);
-                    callback_handler(res);
-                });
-
-                request.fail(function( jqXHR, textStatus ) {
+                            }
+                            $("#context_"+chanelName+"_"+rate_name).html(last);
+                            callback_handler(res);
+                 },
+                fail: function( jqXHR, textStatus ) {
                   alert("не могу получить данные по курсу " + rate_name +" на " + chanelName );
+                 }
                 });
 
 
     }
     //setup plots from different stocks
-    var plots = [{"name":"bitstamp", "val":"btc_usd"},
-                  {"name":"bitstamp", "val":"eth_usd"},
-                  {"name":"kuna", "val":"btc_uah"},
-                  {"name":"btctradeua", "val": "btc_uah"}];
+    let plots = [{"name":"bitstamp", "val":"btc_usd", "plot":{}},
+                 {"name":"bitstamp", "val":"eth_usd", "plot": {}},
+                  {"name":"kuna", "val":"btc_uah", "plot": {}},
+                 {"name":"btctradeua", "val": "btc_uah", "plot": {}}
+                ];
 
-    for(k in plots){
-            var item = plots[k]
-            create_plot(item["name"], item["val"])
+    if(true){
+            //looks strange but do not work with cycle
+            //        for(var k in plots){
+                getDataRates(plots[0]["name"],
+                             plots[0]["val"],
+                             function(result){
+                                    create_plot(plots[0]["plot"],
+                                                plots[0]["name"],
+                                                plots[0]["val"], result)
+                             }
+                             );
+
+            //        for(var k in plots){
+                getDataRates(plots[0]["name"],
+                             plots[0]["val"],
+                             function(result){
+                                    create_plot(plots[0]["plot"],
+                                                plots[0]["name"],
+                                                plots[0]["val"], result)
+                             }
+                             );
+                getDataRates(plots[1]["name"],
+                             plots[1]["val"],
+                             function(result){
+                                    create_plot(plots[1]["plot"],
+                                                plots[1]["name"],
+                                                plots[1]["val"], result)
+                             }
+                             );
+                getDataRates(plots[2]["name"],
+                             plots[2]["val"],
+                             function(result){
+                                    create_plot(plots[2]["plot"],
+                                                plots[2]["name"],
+                                                plots[2]["val"], result)
+                             }
+                             );
+                getDataRates(plots[3]["name"],
+                             plots[3]["val"],
+                             function(result){
+                                    create_plot(plots[3]["plot"],
+                                                plots[3]["name"],
+                                                plots[3]["val"], result)
+                             }
+                             );
+
+
+        //}
+    }else{
+        create_plot("bitstamp", "btc_usd");
+
     }
 
     // Set up the control widget
+    /*
     $("#updateInterval").val(updateInterval).change(function() {
         var v = $(this).val();
         if (v && !isNaN(+v)) {
@@ -198,7 +257,7 @@
             }
             $(this).val("" + updateInterval);
         }
-    });
+    });*/
 
         console.log("document ready");
         var offset = 0;

@@ -31,6 +31,15 @@
                             </div>
                         </div>
                   </div>
+                  <div class="col-md-6">
+                    <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Данные по сделке:</h4>
+                            </div>
+                            <div id="order_info" class="card-body">
+                            </div>
+                    </div>
+                  </div>
                 </div>
                 {% endblock %}
 
@@ -51,14 +60,14 @@
     <script src="/static/oper/assets/extra-libs/multicheck/datatable-checkbox-init.js"></script>
     <script src="/static/oper/assets/extra-libs/multicheck/jquery.multicheck.js"></script>
     <script src="/static/oper/assets/extra-libs/DataTables/datatables.min.js"></script>
-    <script src="/static/oper/js/myoper.js"></script>
+    <script src="/static/oper/js/myoper.js?version=1"></script>
     <script>
        let chat_id = "{{chat_obj.uuid}}";
        let username = "{{username}}";
         $(function() {
         "use strict";
             Main.start_chat(chat_id, "chat_messages", "chat_msg");
-
+            Main.whole_order_info({{chat_obj.deal.id}}, "#order_info");
         });
 
     </script>

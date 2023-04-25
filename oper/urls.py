@@ -17,6 +17,7 @@ urlpatterns = [
     path("api/chat_connect2deal", views.telegram2deal, name="telegram2deal"),
     path("api/get_deal_from_chat", views.deal2telegram, name="deal2telegram"),
 
+    path("api/orders/<str:order_id>", views.whole_oper_info, name="whole_oper_info"),
 
     path("api/orders/", views.oper_orders, name="oper_orders"),
     path("api/get_history/<str:chat_id>/", views.get_history, name="get_history"),

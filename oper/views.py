@@ -32,7 +32,6 @@ def order_status(req, status, order_id):
         obj.status = status
         obj.save()
 
-
     return json_true(req)
 
 
@@ -251,6 +250,40 @@ def process_item(i):
 
 
 @login_required(login_url="/oper/login")
+def whole_oper_info(req, order_id):
+    i = get_object_or_404(Orders, pk=order_id)
+    connected = True
+    d = None
+    d = chat.objects.get(deal=i)
+    if d.telegram_id is None:
+        connected = False
+    connected = True
+    username = ""
+
+    if i.operator is not None:
+        username = i.operator.username
+
+    invoice = Invoice.objects.get(order=i)
+    return json_true(req, {"order":
+                               {"id": i.id,
+                                "buy": str(i.amnt_give) + " " + i.give_currency.title,
+                                "sell": str(i.amnt_take) + " " + i.take_currency.title,
+                                "pub_date": date_to_str(i.pub_date),
+                                "operator": username,
+                                "client_info": "Ukraine",
+                                # TODO add invoice of payment
+                                "client_payed": invoice.status,
+                                "invoice_address": invoice.crypto_payments_details.address,
+                                "trans_info": i.trans.account + " " + i.trans.payment_id,
+                                "client_get": i.trans.status,
+                                "client_telegram_connected": connected,
+                                "status": i.status,
+                                "rate": i.rate,
+                                }
+                           })
+
+
+@login_required(login_url="/oper/login")
 def show_payment(req, order_id):
     obj = get_object_or_404(Orders, pk=order_id)
 
@@ -293,7 +326,8 @@ def rates_settings(request):
 
     return render(request, "oper/charts.html",
                   context={"directions": directions,
-                           "title": "Exchange Operator Cabinet"},
+                           "title": "Exchange Operator Cabinet",
+                           "js_version": "3"},
                   content_type=None,
                   status=None,
                   using=None)

@@ -153,6 +153,21 @@ $(function() {
                   Main.alert("не могу завершить действие " + url );
                 });
             },
+            whole_order_info: function(order_id, view_id){
+                   var url = "/oper/api/orders/" + order_id;
+                   var request = $.ajax({
+                                    url: url,
+                                    method: "GET",
+                                    dataType: "json"
+                                });
+                    request.done(function( msg ) {
+                        $(view_id).html(Main.simple_form(msg["order"]));
+                    });
+                    request.fail(function( jqXHR, textStatus ) {
+                        Main.alert("не могу получить данные для ордеру");
+                    });
+
+            },
             simple_form: function(fields){
                     var res = [];
                     var terms = {
@@ -160,9 +175,19 @@ $(function() {
                         "payment_id": "Доп.данные",
                         "status": "Cтатус",
                         "currency":	"Валюта",
-                        "pub_date":	"Дата платежа",
+                        "pub_date":	"Дата",
                         "processed_date": "Дата проведения",
-                        "amnt":	"Сумма"
+                        "amnt":	"Сумма",
+                         "buy": "Продажа",
+                        "sell": "Покупка",
+                        "operator": "оператор",
+                        "client_info": "информация о клиенте",
+                        "client_payed": "Статус оплаты",
+                        "invoice_address": "Платежные данные оплаты",
+                        "trans_info": "платежные данные выплаты",
+                         "client_get": "статус выплаты",
+                        "client_telegram_connected": "подключился к боту",
+                        "rate": "курс",
                     }
                     for(var key in fields){
                         var name = key;
