@@ -190,7 +190,7 @@ class Invoice(models.Model):
 class PoolAccounts(models.Model):
     status = models.CharField(max_length=40,
                               choices=STATUS_ORDER,
-                              default='created')
+                              default=CHECKOUT_STATUS_FREE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, 
                              blank=True, null=True, 
                              on_delete=models.PROTECT)

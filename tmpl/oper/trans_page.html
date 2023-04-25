@@ -278,17 +278,18 @@
                             <div class="card-body">
                                 <h5 class="card-title">Сделки</h5>
                                 <div class="table-responsive">
-                                    <table id="zero_config" data-api-url="{% url 'oper_orders' %}" class="table table-striped table-bordered">
+                                    <table id="zero_config" data-api-url="{% url 'trans_api' %}"
+                                           class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th data-col="buy">Покупка</th>
-                                                <th data-col="sell">Продажа</th>
-                                                <th data-col="rate">Курс</th>
+                                                <th data-col="amnt">Сумма</th>
+                                                <th data-col="account">Адрес</th>
+                                                <th data-col="payment_id">Доп.реквизиты</th>
+                                                <th data-col="currency">Валюта</th>
                                                 <th data-col="pub_date">Дата заявки</th>
+                                                <th data-col="processed_date">Дата проведения</th>
+                                                <th data-col="txid">Txid</th>
                                                 <th data-col="operator">Оператор</th>
-                                                <th data-col="client_info">Информация о клиенте</th>
-                                                <th data-col="client_payed">Оплата клиента</th>
-                                                <th data-col="client_get">Выдача клиенту</th>
                                                 <th data-col="status">Общий статус</th>
                                                 <th data-col="actions">Действия</th>
                                             </tr>
@@ -297,16 +298,16 @@
                                         </tbody>
                                         <tfoot>
                                              <tr>
-                                                <th>Покупка</th>
-                                                <th>Продажа</th>
-                                                <th>Курс</th>
-                                                <th>Дата заявки</th>
-                                                <th>Оператор</th>
-                                                <th>Информация о клиенте</th>
-                                                <th>Оплата клиента</th>
-                                                <th>Выдача клиенту</th>
-                                                <th>Общий статус</th>
-                                                <th>Действия</th>
+                                                 <th data-col="amnt">Сумма</th>
+                                                <th data-col="account">Адрес</th>
+                                                <th data-col="payment_id">Доп.реквизиты</th>
+                                                <th data-col="currency">Валюта</th>
+                                                <th data-col="pub_date">Дата заявки</th>
+                                                <th data-col="processed_date">Дата проведения</th>
+                                                <th data-col="txid">Txid</th>
+                                                <th data-col="operator">Оператор</th>
+                                                <th data-col="status">Общий статус</th>
+                                                <th data-col="actions">Действия</th>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -366,7 +367,7 @@
     <script src="/static/oper/assets/extra-libs/multicheck/datatable-checkbox-init.js"></script>
     <script src="/static/oper/assets/extra-libs/multicheck/jquery.multicheck.js"></script>
     <script src="/static/oper/assets/extra-libs/DataTables/datatables.min.js"></script>
-    <script src="/static/oper/js/myoper.js?version=5"></script>
+    <script src="/static/oper/js/myoper.js?version=4"></script>
 
 
 {% include "oper/modal.html" %}
