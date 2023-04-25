@@ -135,24 +135,87 @@ $(function() {
                 request.fail(function( jqXHR, textStatus ) {
                   Main.alert("не могу изменить статус " );
                 });
-            }
-        }
+            },
+            one_line_api: function(url, postaction){
+              if(!url){
+                    Main.my_alert("Техническая ошибка, напишите разрабам")
+                    return;
+              }
+              var request = $.ajax({
+                   url: url,
+                   method: "GET",
+                   dataType: "json"
+                });
+                request.done(function( msg ) {
+                   Main.alert("Ok!");
+                });
+                request.fail(function( jqXHR, textStatus ) {
+                  Main.alert("не могу завершить действие " + url );
+                });
+            },
+            simple_form: function(fields){
+                    var res = [];
+                    var terms = {
+                        "account": "Адрес/Cчет",
+                        "payment_id": "Доп.данные",
+                        "status": "Cтатус",
+                        "currency":	"Валюта",
+                        "pub_date":	"Дата платежа",
+                        "processed_date": "Дата проведения",
+                        "amnt":	"Сумма"
+                    }
+                    for(var key in fields){
+                        var name = key;
+                        if(key in terms){
+                            name = terms[key]
+                        }
+                        var s = `<div class="form-group row">
+                <label class="col-4 col-form-label" for="">${name}</label>
+                <div class="col-8">
+                    ${fields[key]}
+                </div>
+              </div>`
+                        res.push(s)
+                    }
+                    return res.join("")
+            },
+            data_online_api: function(obj, post_action){
+                var url = $(obj).data("api-url");
+                Main.one_line_api(url, post_action)
+            },
+            show_trans_info: function(i){
+                var url = "/oper/api/order/show_payment/"+i;
+                var request = $.ajax({
+                   url: url,
+                   method: "GET",
+                   dataType: "json"
+                });
+                 request.done(function( msg ) {
+                        $("#info_modal").modal("show");
+                        $("#info_modal_title").html("#" + msg["trans"][0]["pk"]);
+                        $("#info_modal_dlg").html(Main.simple_form(msg["trans"][0]["fields"]));
+                        $("#info_modal_dlg_save").data({"api-url": "/oper/api/trans/processed/" + msg["trans"][0]["pk"]});
+                });
+                request.fail(function( jqXHR, textStatus ) {
+                  Main.alert("не могу получить данные для транзакции");
+                });
 
-        $('#zero_config').DataTable({
-                               ajax: '/oper/api/orders',
-                               columns: [
-                                { data: 'buy' },
-                                { data: 'sell' },
-                                { data: 'rate' },
-                                { data: 'pub_date' },
-                                { data: 'operator' },
-                                { data: 'client_info' },
-                                { data: 'client_payed' },
-                                { data: 'client_get' },
-                                { data: 'status' },
-                                { data: 'actions' },
-                            ]
+
+            }
+
+
+        }
+        var api_url = $('#zero_config').data("api-url");
+        var columns = []
+        $('#zero_config thead tr th ').each(function(){
+            columns.push({"data":$(this).data("col")});
         });
+
+        var table = $('#zero_config').DataTable({
+                                           ajax:api_url,
+                                           columns: columns
+                   });
+
          $('#zero_config tbody').on('mouseenter', 'td', function () {
             var colIdx = table.cell(this).index().column;
 

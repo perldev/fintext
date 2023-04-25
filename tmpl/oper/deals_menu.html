@@ -1,6 +1,6 @@
-<button type="button" onclick="Main.make_payment4order('{{item.id}}')" class="btn btn-primary btn-sm">Выплатить</button>
-<button type="button" onclick="Main.make_cancel4order('{{item.id}}')" class="btn btn-secondary btn-sm">Отменить</button>
-<button type="button" onclick="Main.make_process4order('{{item.id}}')"  class="btn btn-success btn-sm">Завершить</button>
+<button type="button" onclick="Main.show_trans_info({{item.id}})" class="btn btn-primary btn-sm">Выплатить</button>
+<button type="button" onclick="Main.one_line_api('/oper/api/order/status/canceled/{{item.id}}')" class="btn btn-secondary btn-sm">Отменить</button>
+<button type="button" onclick="Main.one_line_api('/oper/api/order/status/processed/{{item.id}}')"  class="btn btn-success btn-sm">Завершить</button>
 <button type="button" onclick="Main.alert('{{telechat_link}}')"  class="btn btn-light btn-sm">Chat link</button>
 
 {% if connected %}

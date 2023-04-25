@@ -23,6 +23,7 @@ import traceback
 @login_required(login_url="/oper/login/")
 def order_status(req, status, order_id):
     obj = get_object_or_404(Orders, pk=order_id)
+    obj.operator = req.user
 
     if obj.status in ("canceled", "processed"):
         return json_500false(req)
@@ -31,7 +32,54 @@ def order_status(req, status, order_id):
         obj.status = status
         obj.save()
 
+
     return json_true(req)
+
+
+@login_required(login_url="/oper/login/")
+def trans_status(req, status, trans_id):
+    obj = get_object_or_404(Trans, pk=trans_id)
+    obj.operator = req.user
+    if obj.status in ("processed", ):
+        # final status could not be reverted
+        return json_500false(req)
+
+    if obj.status in ("created", "processing"):
+        obj.status = status
+        obj.save()
+
+    return json_true(req)
+
+
+@login_required(login_url="/oper/login/")
+def trans_page(req):
+    return render(req, "oper/trans_page.html", context={"username": req.user.username},
+                  content_type=None, status=None, using=None)
+
+
+def process_item_trans(i):
+    return {"id": i.id,
+            "amnt": str(i.amnt),
+            "account": i.account,
+            "currency": i.currency.title,
+            "pub_date": date_to_str(i.pub_date),
+            "processed_date": date_to_str(i.processed_date) if i.processed_date else "",
+            "operator": i.operator.username if i.operator else "",
+            "payment_id": i.payment_id,
+            "txid": i.txid,
+            "status": i.status,
+            "actions": render_to_string("oper/trans_menu.html",
+                                        context={"item": i})
+            }
+
+
+@login_required(login_url="/oper/login/")
+def trans(req):
+    res = []
+    for i in Trans.objects.all().order_by("-pub_date"):
+        res.append(process_item_trans(i))
+
+    return json_true(req, {"data": res})
 
 
 @login_required(login_url="/oper/login/")
@@ -52,6 +100,7 @@ def get_history(req, chat_id):
         last = int(req.GET.get("last", None))
     except:
         last = 0
+
     obj = get_object_or_404(chat, pk=chat_id)
 
     if last is None:
@@ -59,9 +108,10 @@ def get_history(req, chat_id):
     else:
         res = json.loads(obj.history)
         result_list = []
-        for i in res["msgs"]:
-            if i["time"] > last:
-                result_list.append(i)
+        if "msgs" in res:
+            for i in res["msgs"]:
+                if i["time"] > last:
+                    result_list.append(i)
 
         return json_true(req, {"result": result_list})
 
@@ -179,8 +229,6 @@ def process_item(i):
         username = i.operator.username
 
     invoice = Invoice.objects.get(order=i)
-    invoice = Trans.objects.get(order=i)
-
 
     return {"id": i.id,
             "buy": str(i.amnt_give) + " " + i.give_currency.title,
@@ -190,7 +238,7 @@ def process_item(i):
             "client_info": "Ukraine",
             # TODO add invoice of payment
             "client_payed": invoice.status,
-            "client_get": "not_created",
+            "client_get": i.trans.status,
             "client_telegram_connected": connected,
             "status": i.status,
             "rate": i.rate,
@@ -200,6 +248,13 @@ def process_item(i):
                                                  "telechat_link": get_telechat_link(i),
                                                  "chat_link": reverse("to_history_page", args=[i.id])})
             }
+
+
+@login_required(login_url="/oper/login")
+def show_payment(req, order_id):
+    obj = get_object_or_404(Orders, pk=order_id)
+
+    return json_true(req, {"trans": json.loads(serializers.serialize("json", [obj.trans]))})
 
 
 @login_required(login_url="/oper/login/")
