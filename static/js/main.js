@@ -13,6 +13,7 @@ let given_cur_input = document.getElementById("given-cur-input");
 let taken_cur_input = document.getElementById("taken-cur-input");
 let given_cur_select = document.getElementById("given-cur-select");
 let taken_cur_select = document.getElementById("taken-cur-select");
+let spinner = document.getElementById("loading");
 
 let ifFiat = null;
 let cardInput = null;
@@ -190,6 +191,7 @@ let Main = {
 
 document.getElementById("btn-exchange").addEventListener("click", function(event){
     event.preventDefault()
+    spinner.style.display = 'block';
     let given_cur = document.getElementById("given-cur-select").value; 
     let taken_cur = document.getElementById("taken-cur-select").value; 
     let cur_pair = given_cur + '_' + taken_cur;
@@ -243,23 +245,27 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 errorDiv = document.getElementById("payment-details-error"); 
 
                 ckeckCurrencyPair();
+                spinner.style.display = 'none';
                 modal.show();
             }
         })
         .catch(() => {
             let message_box = document.getElementById("exchange-modal-body");
             message_box.innerHTML = `Что-то пошло не так...`;
+            spinner.style.display = 'none';
             modal.show();
         });
     } else {
         let message_box = document.getElementById("exchange-modal-body");
         message_box.innerHTML = '<h5 class="text-center">Вы указали неверные данные!</h5>';
+        spinner.style.display = 'none';
         modal.show();
     }
   });
 
 function sendPaymentDetails(e) {
     e.preventDefault();
+    spinner.style.display = 'block';
     let payment_details = document.getElementById("payment-details").value;
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     fetch('/api/create_invoice/', {
@@ -287,11 +293,14 @@ function sendPaymentDetails(e) {
           <br/>
           <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
           `;
-        }
+        };
+        spinner.style.display = 'none';
     })
     .catch(() => {
-        console.log('some error')
+        console.log('some error');
+        spinner.style.display = 'none';
     });
+
 }
 
 // luhn validation functions 4149499139344160
