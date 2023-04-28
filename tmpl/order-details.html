@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <section style="margin:40px 0px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 offset-lg-3 col-12">
+                    <br><br>
+                    <h1>Order #{{ order.pk }} details:</h1>
+                    <br>
+                    <table class="table">
+                        <tbody>
+                          <tr>
+                            <td>Order status:</td>
+                            <td><h5 style="color: #1bbd36;">{{ order.status }}</h5></td>
+                          </tr>
+                          <tr>
+                            <td>You give:</td>
+                            <td><h5>{{ order.amnt_give }} {{ order.give_currency.title }}</h5></td>
+                          </tr>
+                          <tr>
+                            <td>You take:</td>
+                            <td><h5>{{ order.amnt_take }} {{ order.take_currency.title }}</h5></td>
+                          </tr>
+                          {% if order.expire_date %}
+                          <tr>
+                            <td>Valid date:</td>
+                            <td><h5>{{ order.expire_date }}</h5></td>
+                          </tr>
+                          {% endif %}
+                        </tbody>
+                      </table>
+                      <br><br>
+
+                      <h4>Invoice details:</h4>
+                      <br>
+                      <table class="table">
+                          <tbody>
+                            <tr>
+                              <td>Invoice status:</td>
+                              <td><h5 style="color: #1bbd36;">{{ order.invoice_order.status }}</h5></td>
+                            </tr>
+                            <tr>
+                              <td>Invoice sum:</td>
+                              <td><h5>{{ order.invoice_order.sum }} {{ order.invoice_order.currency.title }}</h5></td>
+                            </tr>
+                            <tr>
+                              <td>Invoice crypto address:</td>
+                              <td><h5>{{ order.invoice_order.crypto_payments_details.address }}</h5></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br><br>
+
+                        <h4>Transaction details:</h4>
+                        <br>
+                        <table class="table">
+                            <tbody>
+                              <tr>
+                                <td>Transaction status:</td>
+                                <td><h5 style="color: #1bbd36;">{{ order.trans.status }}</h5></td>
+                              </tr>
+                              <tr>
+                                <td>Transaction sum:</td>
+                                <td><h5>{{ order.trans.amnt }} {{ order.trans.currency.title }}</h5></td>
+                              </tr>
+                              <tr>
+                                <td>Transaction payment details:</td>
+                                <td><h5>{{ order.trans.account }}</h5></td>
+                              </tr>
+                              {% if order.trans.debet_credit %}
+                              <tr>
+                                <td>Transaction debet/credit:</td>
+                                <td><h5>{{ order.trans.debet_credit }}</h5></td>
+                              </tr>
+                              {% endif %}
+                            </tbody>
+                          </table>
+
+                    <br>
+                    <a href="{{t_link}}"><strong>Link to telegram for dialog with operator</strong></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+{% endblock %}

@@ -254,6 +254,11 @@ class Trans(models.Model):
                                           editable=True,
                                           null=True,
                                           blank=True)
+    
+    debet_credit = models.CharField(max_length=255, 
+                                    verbose_name="дебет/кредит",
+                                    null=True,
+                                    blank=True)
 
     amnt = models.DecimalField(decimal_places=20,
                                max_digits=40,
