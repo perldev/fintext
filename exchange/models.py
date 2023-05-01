@@ -38,7 +38,7 @@ class OperTele(models.Model):
 
     tele_link = models.CharField(null=False, verbose_name="telegram temp link", max_length=255)
 
-    tele_id = models.IntegerField(null=False, verbose_name="telegram id")
+    tele_id = models.IntegerField(null=True, blank=True, verbose_name="telegram id")
 
     tele_username = models.CharField(max_length=40, default='', verbose_name="")
 
