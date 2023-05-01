@@ -29,6 +29,22 @@ STATUS_ORDER = (
 )
 
 
+class OperTele(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Клиент",
+                             related_name="user_p2p_suggester",
+                             editable=False, on_delete=models.PROTECT,
+                             null=True,
+                             blank=True,)
+
+    tele_link = models.CharField(null=False, verbose_name="telegram temp link")
+
+    tele_id = models.IntegerField(null=False, verbose_name="telegram id")
+
+    tele_username = models.CharField(max_length=40, default='', verbose_name="")
+
+
+
+
 # Create your models here.
 class Orders(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Клиент",
