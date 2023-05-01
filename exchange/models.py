@@ -151,6 +151,7 @@ class Invoice(models.Model):
                               choices=STATUS_ORDER, 
                               default='created', 
                               verbose_name="Статус")
+
     order = models.OneToOneField("Orders", 
                                  verbose_name="Order ID",
                                  on_delete=models.PROTECT,
