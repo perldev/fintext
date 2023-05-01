@@ -254,12 +254,13 @@ def check_invoices(req, id_invoice):
     return json_true(req, {"result": {"status": active_invoice.status}})
 
 
-def invoice_details(request, pk):
-    invoice = Invoice.objects.get(pk=pk)
+def order_details(request, pk):
+    order = Orders.objects.get(pk=pk)
+    print(order.invoice_order.status)
     context = {
-        'invoice': invoice,
-        "t_link": get_telechat_link(invoice.order)
+        'order': order,
+        "t_link": get_telechat_link(order)
     }
-    return render(request, "invoice-details.html", context)
+    return render(request, "order-details.html", context)
 
 
