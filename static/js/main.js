@@ -352,7 +352,13 @@ function sendPaymentDetails(e) {
             `;
           } else {
             message_box.innerHTML = `
-            <h5>6-ти значный код</h5><br>
+            <h5>${json['response']['message']}</h5><br>
+            <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+            <p>Секретный код для получения денег в точке выдачи: <strong>${json['response']['secret_key']}</strong></p>
+            <br/>
+            <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
+            <br/>
+            <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
             `;
           }
 

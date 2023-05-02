@@ -7,6 +7,8 @@ import requests
 from fintex.common import json_true, json_500false, to_time, get_telechat_link
 import traceback
 
+import random
+
 
 from datetime import datetime, timedelta as dt
 from datetime import timedelta
@@ -237,27 +239,42 @@ def create_invoice(req):
             new_invoice.save()
 
             if is_cash:
+                random_int = random.randrange(100001, 110000)
+                random_secret_key = order.id + random_int
                 cash_point_id = int(payment_details)
                 cash_point_obj = CashPointLocation.objects.get(id=cash_point_id)
                 trans = Trans.objects.create(payment_id='',
                                              currency=order.take_currency,
                                              cash_point=cash_point_obj,
-                                             amnt=order.amnt_take)
+                                             amnt=order.amnt_take,
+                                             secret_key_for_cash=str(random_secret_key))
+                order.trans = trans
+                order.save()
+
+                respone_data = {
+                    'given_cur': str(order.give_currency),
+                    'amount': order.amnt_give,
+                    'payment_details_give': payment_details_give,
+                    'secret_key': str(random_secret_key),
+                    't_link': t_link,
+                    'invoice_id': new_invoice.id,
+                    'message': 'Ожидаем вашей оплаты'
+                }
             else:
                 trans = Trans.objects.create(account=payment_details,
                                              payment_id='',
                                              currency=order.take_currency,
                                              amnt=order.amnt_take)
-            order.trans = trans
-            order.save()
-            respone_data = {
-                'given_cur': str(order.give_currency),
-                'amount': order.amnt_give,
-                'payment_details_give': payment_details_give,
-                't_link': t_link,
-                'invoice_id': new_invoice.id,
-                'message': 'Ожидаем вашей оплаты'
-            }
+                order.trans = trans
+                order.save()
+                respone_data = {
+                    'given_cur': str(order.give_currency),
+                    'amount': order.amnt_give,
+                    'payment_details_give': payment_details_give,
+                    't_link': t_link,
+                    'invoice_id': new_invoice.id,
+                    'message': 'Ожидаем вашей оплаты'
+                }
 
             return json_true(req, {'response': respone_data})
         else:

@@ -296,6 +296,11 @@ class Trans(models.Model):
                                    on_delete=models.PROTECT,
                                    null=True,
                                    blank=True)
+    
+    secret_key_for_cash = models.CharField(verbose_name="Код для получения наличных",
+                                  max_length=10,
+                                  null=True,
+                                  blank=True)
 
     txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)
 
