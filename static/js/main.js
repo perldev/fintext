@@ -20,6 +20,9 @@ let cardInput = null;
 let errorDiv = null;
 let isPaymentDetailsValid = false;
 
+let cashPoints = null;
+let cashPointsDiv = null;
+
 
 const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9\.]+/;
 given_cur_input.addEventListener("keypress", event => {
@@ -160,17 +163,37 @@ let Main = {
                     ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
                 </div>
               </div>
+
               <div class="form-group row">
-                <label for="text" class="col-4 col-form-label">Укажите номер карты</label>
-                <div class="col-8">
-                  <div id="payment-details-error" class="form-text"></div>
-                  <div class="input-group">
-                    <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" onpaste="cardValidationOnPaste()" placeholder="номер карты получения средства" type="text" class="form-control">
+                  <label for="text1" class="col-4 col-form-label">Способ получения средств:</label>
+                  <div class="col-8">
+                    <div class="form-check" id="card-form-check" >
+                      <input class="form-check-input" type="radio" onclick="selectCreditCard()" name="creditCard" id="creditCard1" checked value="option1" >
+                      <label class="form-check-label" for="creditCard1">
+                        Получить средства на карту
+                      </label>
+                    </div>
+                    <div class="form-check" >
+                      <input class="form-check-input" type="radio" onclick="selectCashPoint()" name="cashPoint" id="cashPoint1" value="option2">
+                      <label class="form-check-label" for="cashPoint1">
+                        Получить наличные в точке выдачи
+                      </label>
+                    </div>
                   </div>
-                  
-                </div>
               </div>
-              <br/>
+              <br>
+              <div id="creditCardForm" style="display:block">
+                <div class="form-group row">
+                  <label for="text" class="col-4 col-form-label">Укажите номер карты</label>
+                  <div class="col-8">
+                    <div id="payment-details-error" class="form-text"></div>
+                    <div class="input-group">
+                      <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" onpaste="cardValidationOnPaste()" placeholder="номер карты получения средства" type="text" class="form-control">
+                    </div>
+                    
+                  </div>
+                </div>
+                <br/>
                 <div class="form-group row">
                     <div class="col-6 text-start">
                       <button  class="btn btn-info">Отменить</button>
@@ -179,6 +202,28 @@ let Main = {
                       <button onclick="sendPaymentDetails(event)" id="btn-send-payment" disabled class="btn btn-success">Отправить</button>
                     </div>
                 </div>
+              </div>
+              <br>
+              <div id="cashPointsForm" style="display:none">
+                <div class="form-group row">
+                  <div class="col-4">Точки выдачи наличных:</div>
+                  <div class="col-8" id="cash-points-wrapper">
+
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6 text-start">
+                    <button  class="btn btn-info">Отменить</button>
+                  </div>
+                  <div class="col-6 text-end">
+                    <button onclick="sendPaymentDetails(event)" id="btn-send-cash-point" disabled class="btn btn-success">Отправить</button>
+                  </div>
+                </div>
+              </div>
+
+
+
+
               `
 
     }
@@ -228,6 +273,7 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 message_box_title.innerHTML = json['response']['message_to_user'];
                 if (json['response']['taken_cur'] == 'uah') {
                     message_box.innerHTML = Main.draw_form(json["response"]);
+                    cashPoints = JSON.parse(json["response"]["cash_points"]);
 
                     ifFiat = true;
                     cardInput = document.getElementById("payment-details");
@@ -266,7 +312,16 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
 function sendPaymentDetails(e) {
     e.preventDefault();
     spinner.style.display = 'block';
-    let payment_details = document.getElementById("payment-details").value;
+    let pay_details = document.getElementById("payment-details") ? document.getElementById("payment-details").value : null;
+    let pay_details_for_cash = document.querySelector('input[name="cashPointInput"]:checked') ? document.querySelector('input[name="cashPointInput"]:checked').value : null;
+    let payment_details = null;
+    let isCash = false;
+    if (pay_details) {
+      payment_details = pay_details;
+    } else if (pay_details_for_cash) {
+      payment_details = pay_details_for_cash;
+      isCash = true;
+    }
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     fetch('/api/create_invoice/', {
       method: 'POST',
@@ -276,6 +331,7 @@ function sendPaymentDetails(e) {
       },
       body: JSON.stringify({ 
           'payment_details': payment_details,
+          'is_cash': isCash ? '1' : '0',
         })
     })
     .then(response => response.json())
@@ -286,13 +342,20 @@ function sendPaymentDetails(e) {
           <h5>${json['response']['error']}</h5><br>
           `;
         } else {
-          message_box.innerHTML = `
-          <h5>${json['response']['message']}</h5><br>
-          <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
-          <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
-          <br/>
-          <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
-          `;
+          if (!isCash) {
+            message_box.innerHTML = `
+            <h5>${json['response']['message']}</h5><br>
+            <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+            <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
+            <br/>
+            <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
+            `;
+          } else {
+            message_box.innerHTML = `
+            <h5>6-ти значный код</h5><br>
+            `;
+          }
+
         };
         spinner.style.display = 'none';
     })
@@ -325,8 +388,6 @@ function cardValidationOnPaste(){
 }
 
 function validateCardNumber(value){
-  
-  // console.log(btnSendPayment)
   if(ifFiat) {
     
     if(value.length === 19) {
@@ -376,7 +437,6 @@ function sumArrDigits(array){
 }
 
 function validlen(arr){
-  // checks for card length of 13, 15, or 16
   return  arr.length == 13  || arr.length == 15 || arr.length == 16
 }
 
@@ -394,3 +454,40 @@ function arrSplit(cardArray){
   }
   return {arr1, arr2}
 }
+
+function selectCreditCard() {
+  document.getElementById("creditCard1").checked = true;
+  document.getElementById("cashPoint1").checked = false;
+  document.getElementById("creditCardForm").style.display = "block";
+  document.getElementById("cashPointsForm").style.display = "none";
+  document.getElementById("cash-points-wrapper").innerHTML = ``;
+  var btnSendPayment = document.getElementById('btn-send-cash-point');
+  btnSendPayment.disabled = true;
+}
+
+function selectCashPoint() {
+  document.getElementById("creditCard1").checked = false;
+  document.getElementById("cashPoint1").checked = true;
+
+  cashPointsDiv = document.getElementById("cash-points-wrapper")
+  for (const [key, value] of Object.entries(cashPoints)) {
+    document.getElementById("cash-points-wrapper").innerHTML += `
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="cashPointInput" onclick="setCashPoint()" id="cashPointInput${key}" value="${key}">
+        <label class="form-check-label" for="cashPointInput${key}">
+          ${value}
+        </label>
+      </div>
+    `
+  }
+  
+  document.getElementById("creditCardForm").style.display = "none";
+  document.getElementById("cashPointsForm").style.display = "block";
+  
+}
+
+function setCashPoint() {
+  var btnSendPayment = document.getElementById('btn-send-cash-point');
+  btnSendPayment.disabled = false;
+}
+

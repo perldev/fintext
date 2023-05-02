@@ -11,6 +11,7 @@ import traceback
 from datetime import datetime, timedelta as dt
 from datetime import timedelta
 import json
+from django.core import serializers
 from oper.models import rates_direction
 from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice,\
     Trans, PoolAccounts, FiatAccounts, CHECKOUT_STATUS_PROCESSING, CHECKOUT_STATUS_FREE
@@ -116,12 +117,18 @@ def create_exchange_request(req):
                                                   take_currency=take_currency)
                     
                     req.session['order_id'] = order.id
-                    
+
+                    cash_points_arr = CashPointLocation.objects.all()
+                    cash_points = {}
+                    for i in cash_points_arr:
+                        cash_points[i.pk] = i.title
+     
                     respone_data = {
                         'given_cur': given_cur,
                         'taken_cur': taken_cur,
                         'amount': amount,
                         'taken_amount': taken_amount,
+                        'cash_points': json.dumps(cash_points),
                         'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
                     }
                     c = chat.objects.create(deal=order)
@@ -155,12 +162,18 @@ def create_exchange_request(req):
                                         take_currency=take_currency)
                 
                 req.session['order_id'] = order.id
+
+                cash_points_arr = CashPointLocation.objects.all()
+                cash_points = {}
+                for i in cash_points_arr:
+                    cash_points[i.pk] = i.title
                 
                 respone_data = {
                     'given_cur': given_cur,
                     'taken_cur': taken_cur,
                     'amount': amount,
                     'taken_amount': taken_amount,
+                    'cash_points': json.dumps(cash_points),
                     'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
                 }
                 # CREATE chat for deal
@@ -179,15 +192,20 @@ def create_invoice(req):
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
         payment_details = body['payment_details']
-        # create invoice
+        is_cash = int(body['is_cash'])
+
         order = Orders.objects.get(id=req.session['order_id'])
         t_link = get_telechat_link(order)
-        isCardValid = True
+        isFiatPaymentDetailsValid = True
 
-        if (order.take_currency.title == 'uah'):
-            isCardValid = validate_credit_card(payment_details.replace(" ", ""))
+        if (order.take_currency.title == 'uah' and is_cash == False):
+            isFiatPaymentDetailsValid = validate_credit_card(payment_details.replace(" ", ""))
+        elif (order.take_currency.title == 'uah' and is_cash == True):
+            cash_point_id = int(payment_details)
+            if not CashPointLocation.objects.filter(id=cash_point_id).exists():
+                isFiatPaymentDetailsValid = False
 
-        if isCardValid:
+        if isFiatPaymentDetailsValid:
             if order.give_currency.title not in FIAT_CURRENCIES:
                 factory = CryptoFactory(order.give_currency.title)
                 currency_id = order.give_currency_id
@@ -213,15 +231,23 @@ def create_invoice(req):
                                     currency=order.give_currency,
                                     crypto_payments_details_id=credit_card_number.id,
                                     sum=sum)
-
                 payment_details_give = credit_card_number.address
+
 
             new_invoice.save()
 
-            trans = Trans.objects.create(account=payment_details,
-                                        payment_id='',
-                                        currency=order.take_currency,
-                                        amnt=order.amnt_take)
+            if is_cash:
+                cash_point_id = int(payment_details)
+                cash_point_obj = CashPointLocation.objects.get(id=cash_point_id)
+                trans = Trans.objects.create(payment_id='',
+                                             currency=order.take_currency,
+                                             cash_point=cash_point_obj,
+                                             amnt=order.amnt_take)
+            else:
+                trans = Trans.objects.create(account=payment_details,
+                                             payment_id='',
+                                             currency=order.take_currency,
+                                             amnt=order.amnt_take)
             order.trans = trans
             order.save()
             respone_data = {
@@ -236,7 +262,7 @@ def create_invoice(req):
             return json_true(req, {'response': respone_data})
         else:
             respone_data = {
-                'error': 'Карта не валидна',
+                'error': 'Платежные данные для выплаты не валидны',
             }
             return json_true(req, {'response': respone_data})
     
