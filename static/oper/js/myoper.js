@@ -100,7 +100,12 @@ $(function() {
 
 
             },
-
+            "subscribe_oper": function(url){
+                  var post_action = function(resp){
+                        Main.alert(resp["telegram_link"], "Ссылка для подписки на уведомления");
+                  };
+                  Main.one_line_api(url, post_action)
+            },
             "alert": function(msg, title){
                 $("#common_modal_dlg_title").html(title);
                 $("#common_modal_dlg_text").html(msg);

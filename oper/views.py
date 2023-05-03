@@ -1,17 +1,18 @@
-from django.shortcuts import render, reverse
+from django.shortcuts import render, reverse, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
+from fintex.common import convert2time
 
 from oper.models import rates_direction, context_vars, chat
-from exchange.models import Currency, Orders, Invoice, Trans
+from exchange.models import Currency, Orders, Invoice, Trans, OperTele
 from fintex.common import json_500false, json_true, date_to_str, convert2time, get_telechat_link
 from django.template.loader import render_to_string
 
-from fintex.settings import BOTAPI, COMMON_PASSWORD
+from fintex.settings import BOTAPI, COMMON_PASSWORD, OPERTELEBOT
 import json
 import requests
 from datetime import datetime
@@ -401,9 +402,40 @@ def try_login(request):
         return json_500false(request, {"description": "invalid login"})
 
 
+@login_required
+def telegram_subscribe(req):
+    link, created = OperTele.objects.get_or_create(user_id=req.user.id)
+    if created:
+        nw = datetime.now()
+        k = str(convert2time(nw))
+        link.tele_link = OPERTELEBOT + "subsribe " + str(convert2time(nw))
+        link.token = k
+
+        link.save()
+
+    return json_true(req, {"link": link.tele_link})
+
+
+@csrf_exempt
+def telegram_subscribe_callback(req, token):
+    body_unicode = req.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    obj = get_object_or_404(OperTele, token=token)
+    tid = body["telegram_id"]
+    username = body["username"]
+    if obj.tele_id is not None:
+        return json_500false(req)
+    obj.tele_id = tid
+    obj.tele_username = username
+    obj.status = "processing"
+    obj.save()
+    return json_true(req, {"description": u"Хорошо мы вас подписали"})
+
+
 def logout_view(request):
     logout(request)
-    return json_true(request, {"redirect": reverse(login_page)})
+    return redirect(reverse(login_page))
+
 
 #TODO
 def reset_pwd_request(req):

@@ -114,9 +114,11 @@ USE_I18N = True
 USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+API_HOST = "http://127.0.0.1:8000/oper/api/"
 BOTAPI = "http://127.0.0.1:8881/"
 COMMON_PASSWORD = "sdfsdfsd_asdnaasfsdgggggggg_SDfs"
 TELEBOT = "https://t.me/uatrust_bot?start="
+OPERTELEBOT = "https://t.me/uatrust_bot?start="
 STATIC_URL = 'static/'
 STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
 # STATIC_ROOT = str(BASE_DIR.joinpath('staticfiles'))

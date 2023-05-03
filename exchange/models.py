@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+import requests
 from sdk.btc import get_current_height
 
 STATUS_INVOICE = (
@@ -36,13 +36,15 @@ class OperTele(models.Model):
                              null=True,
                              blank=True,)
 
-    tele_link = models.CharField(null=False, verbose_name="telegram temp link", max_length=255)
+    tele_link = models.CharField(null=True, verbose_name="telegram temp link", max_length=255)
+
+    token = models.CharField(null=True, verbose_name="telegram k", max_length=255)
 
     tele_id = models.IntegerField(null=True, blank=True, verbose_name="telegram id")
 
     tele_username = models.CharField(max_length=40, default='', verbose_name="")
 
-
+    status = models.CharField(max_length=40, choices=STATUS_ORDER, default='created', verbose_name="Статус")
 
 
 # Create your models here.
@@ -67,9 +69,12 @@ class Orders(models.Model):
                                                    on_delete=models.PROTECT,)
 
     pub_date = models.DateTimeField(default=datetime.now, verbose_name="Дата публикации")
-    expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True, blank=True)
-    amnt_give = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="amnt give", max_length=255, editable=True)
-    amnt_take = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="amnt take", max_length=255, editable=True)
+    expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности",
+                                       editable=True, null=True, blank=True)
+    amnt_give = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="amnt give",
+                                    max_length=255, editable=True)
+    amnt_take = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="amnt take",
+                                    max_length=255, editable=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL,
                                  verbose_name="Оператор",
                                  related_name="user_open",
@@ -85,18 +90,47 @@ class Orders(models.Model):
                               blank=True
                               )
 
-    rate = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="exchange rate", max_length=255, editable=True)
+    rate = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="exchange rate",
+                               max_length=255, editable=True)
 
 
     class Meta:
         verbose_name = 'заявка на обмен'
         verbose_name_plural = 'заявки на обмен'
 
+    def to_nice_text(o):
+        return str(o.pub_date) + "\n" +\
+               "\nПокупка: " + o.amnt_give + " " + o.give_currency.title +\
+               "\nПродажа:" + o.amnt_take + " " + o.take_currency.title
+
+
     def __unicode__(o):
         return str(o.id) + " " + str(o.pub_date) + " " + o.give_currency.title + " " + o.take_currency.title
 
     def __str__(self):
         return str(self.id)
+
+
+# TODO maybe rewritten in separate process
+def tell_subscriber(oper, instance):
+
+    telegram_id = oper.telegram_id
+    txt = u"Новая заявка: \n" + instance.to_nice_text()
+    resp = requests.post(settings.BOTAPI+"alert/%s" % str(telegram_id),
+                         json={"text": txt,
+                                "actions": [{"text": u"подписаться",
+                                              "url":
+                                              settings.API_HOST + "getinwork/%i/%i" % (instance.id, oper.user_id )
+                                            }]})
+    if resp.status_code != 200:
+        print("something wrong during subsribing")
+
+
+@receiver(post_save, sender=Orders, dispatch_uid="tell_subscribers")
+def update_stock(sender, instance, **kwargs):
+    if kwargs.get("created", False):
+        for oper in OperTele.objects.filter(status="processing"):
+            tell_subscriber(oper, instance)
 
 
 # rates
@@ -192,6 +226,7 @@ class Invoice(models.Model):
     pub_date = models.DateTimeField(default=datetime.now, verbose_name="Дата публикации")
     expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True,
                                        blank=True)
+
 
     class Meta:
         verbose_name = u'инвойс'

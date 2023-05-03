@@ -4,6 +4,7 @@ import requests
 def_headers = {"content-type": "application/json"}
 PREC = 10000000
 
+
 def get_current_height():
     resp = requests.get("https://blockchain.info/latestblock", headers=def_headers)
     respj = resp.json()

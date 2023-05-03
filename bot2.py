@@ -385,6 +385,7 @@ async def ignore_this(context, msg, currency):
     context["ignore_list"].append(currency)
     loop.create_task(bot.sendMessage(context["chat_id"], get_text(context, "Done ") + currency))
 
+
 async def new_request_submit(context, msg, prefix):
     if verbose:
         print("new_request_submit")
@@ -416,6 +417,7 @@ async def finish_current_flow(context, raw_telepot_msg, params):
     finish_flow(chat_id)
     if showmenu:
         loop.create_task(bot.sendMessage(context["chat_id"], forgotmessage, reply_markup=default_reply(context)))
+
 
 
 async def send_ticket(context, raw_telepot_msg, messagefromchain):
@@ -494,7 +496,11 @@ def process_text(content_type, chat_type, chat_id, msg):
     if text_msg.startswith("/start"):
         # this also for first start
         try:
-            m = re.match("/start ([^ ]+)", text_msg)
+            cmd = re.match("/start ([^ ]+) ([^ ]+)", text_msg)
+            if cmd:
+                return cmd_from_site(cmd.group(1), cmd.group(2), msg)
+
+            m = re.match("/start ([^ ]+) ", text_msg)
             if m:
                 context = setup_context_from_site(m.group(1), msg["chat"])
             else:
@@ -539,6 +545,20 @@ def process_text(content_type, chat_type, chat_id, msg):
         send_message2us(context, msg)
         # default_menu(context, msg)
 
+
+def cmd_from_site(cmd, params, msg):
+    global loop, verbose
+    if cmd == "subsribe":
+        resp = requests.post(API_HOST + "telegram_subscribe_callback/" + params + '/',
+                             json={"username": msg["from"]["username"],
+                                   "telegram_id": msg["from"]["id"]})
+        if verbose:
+            print(resp.text)
+        respj = resp.json()
+        loop.create_task(bot.sendMessage(
+                                         chat_id=msg["from"]["id"],
+                                         text=respj["description"],
+                                        ))
 
 def send_message2us(context, msg):
     if verbose:
@@ -598,6 +618,7 @@ def on_callback_query(msg):
         loop.create_task(
             bot.sendMessage(operator_chat_id, "some unexpected command please write us on support@btc-trade.com.ua"))
         return
+
 
 ## process this function
 async def inline_await(list_subs):

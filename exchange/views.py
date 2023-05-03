@@ -199,10 +199,10 @@ def create_invoice(req):
                 block_height = 0
                 block_height = factory.get_current_height()
                 new_invoice = Invoice(order=order,
-                                    currency_id=currency_id,
-                                    crypto_payments_details_id=last_added_crypto_address.id,
-                                    sum=sum,
-                                    block_height=block_height)
+                                      currency_id=currency_id,
+                                      crypto_payments_details_id=last_added_crypto_address.id,
+                                      sum=sum,
+                                      block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
             else:
                 sum = order.amnt_give
