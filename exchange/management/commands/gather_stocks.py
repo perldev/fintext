@@ -27,6 +27,12 @@ class Command(BaseCommand):
 
         gather_btctradeua("btc", "uah")
 
+        print("gather whitebit btc uah, eth uah, usdt uah")
+        gather_whitebit("BTC", "UAH")
+        gather_whitebit("USDT", "UAH")
+        gather_whitebit("ETH", "UAH")
+
+        
 
 def gather_btctradeua(t1, t2):
     resp = requests.get("https://btc-trade.com.ua/api/ticker/%s_%s" % (t1, t2))
@@ -106,3 +112,36 @@ def gather_bitstamp(t1, t2):
     r.save()
 
 
+def gather_whitebit(t1, t2):
+    resp = requests.get("https://whitebit.com/api/v2/public/ticker")
+    currency_pair = t1 + '_' + t2
+    result = resp.json()
+    res = None
+    sell_rate = None
+    buy_rate = None
+    give_currency = Currency.objects.get(title=t1.lower())
+    take_currency = Currency.objects.get(title=t2.lower())
+    for i in result["result"]:      
+        if i["tradingPairs"] == currency_pair:
+            res = i
+            sell_rate = i["lowestAsk"]
+            buy_rate = i["highestBid"]
+            break
+    
+    r = rate(source="whitebit", 
+             edit_user_id=1,
+             raw_data=json.dumps(res),
+             give_currency=give_currency,
+             take_currency=take_currency,
+             rate=sell_rate)
+    r.save()
+
+    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s" % (t1, t2))
+    context_var.value = r.rate
+    context_var.save()
+
+    r.pk = None
+    r.give_currency = take_currency
+    r.take_currency = give_currency
+    r.rate = buy_rate
+    r.save()
