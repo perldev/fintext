@@ -190,6 +190,9 @@ class CashPointLocation(models.Model):
 
     def __unicode__(o):
         return str(o.id) + " " + str(o.title)
+    
+    def __str__(self):
+        return self.title
 
 
 class Invoice(models.Model):
@@ -243,21 +246,30 @@ class PoolAccounts(models.Model):
     status = models.CharField(max_length=40,
                               choices=STATUS_ORDER,
                               default=CHECKOUT_STATUS_FREE)
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, 
                              blank=True, null=True, 
                              on_delete=models.PROTECT)
+
     currency = models.ForeignKey("Currency", 
                                  verbose_name="Валюта", 
                                  on_delete=models.PROTECT)
+
     pub_date = models.DateTimeField(default=datetime.now, 
                                     verbose_name="Дата публикации")
+
     ext_info = models.CharField(max_length=255,
                                unique=True,
                                verbose_name="Внешний ключ идентификации")
+
     address = models.CharField(max_length=255,
                                unique=True,
                                verbose_name="Внешний ключ идентификации или кошелек криптовалюты")
-    
+
+    technical_info = models.CharField(max_length=255,
+                                      default="",
+                                      verbose_name="Техническая информация для обработки платежей")
+
     class Meta:
         verbose_name = u'Пул криптоадресов'
         verbose_name_plural = u'Пулы криптоадресов'
@@ -283,11 +295,11 @@ class Trans(models.Model):
     account = models.CharField(verbose_name="account ",
                                max_length=255,
                                editable=True,
-                               null=False,
-                               blank=False)
+                               null=True,
+                               blank=True)
     payment_id = models.CharField(verbose_name="payment id",
                                   max_length=255,
-                                  editable=False,
+                                  editable=True,
                                   null=False,
                                   blank=False)
 

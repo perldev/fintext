@@ -7,10 +7,13 @@ import requests
 from fintex.common import json_true, json_500false, to_time, get_telechat_link
 import traceback
 
+import random
+
 
 from datetime import datetime, timedelta as dt
 from datetime import timedelta
 import json
+from django.core import serializers
 from oper.models import rates_direction
 from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice,\
     Trans, PoolAccounts, FiatAccounts, CHECKOUT_STATUS_PROCESSING, CHECKOUT_STATUS_FREE
@@ -116,12 +119,18 @@ def create_exchange_request(req):
                                                   take_currency=take_currency)
                     
                     req.session['order_id'] = order.id
-                    
+
+                    cash_points_arr = CashPointLocation.objects.all()
+                    cash_points = {}
+                    for i in cash_points_arr:
+                        cash_points[i.pk] = i.title
+     
                     respone_data = {
                         'given_cur': given_cur,
                         'taken_cur': taken_cur,
                         'amount': amount,
                         'taken_amount': taken_amount,
+                        'cash_points': json.dumps(cash_points),
                         'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
                     }
                     c = chat.objects.create(deal=order)
@@ -155,12 +164,18 @@ def create_exchange_request(req):
                                         take_currency=take_currency)
                 
                 req.session['order_id'] = order.id
+
+                cash_points_arr = CashPointLocation.objects.all()
+                cash_points = {}
+                for i in cash_points_arr:
+                    cash_points[i.pk] = i.title
                 
                 respone_data = {
                     'given_cur': given_cur,
                     'taken_cur': taken_cur,
                     'amount': amount,
                     'taken_amount': taken_amount,
+                    'cash_points': json.dumps(cash_points),
                     'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
                 }
                 # CREATE chat for deal
@@ -179,15 +194,20 @@ def create_invoice(req):
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
         payment_details = body['payment_details']
-        # create invoice
+        is_cash = int(body['is_cash'])
+
         order = Orders.objects.get(id=req.session['order_id'])
         t_link = get_telechat_link(order)
-        isCardValid = True
+        isFiatPaymentDetailsValid = True
 
-        if (order.take_currency.title == 'uah'):
-            isCardValid = validate_credit_card(payment_details.replace(" ", ""))
+        if (order.take_currency.title == 'uah' and is_cash == False):
+            isFiatPaymentDetailsValid = validate_credit_card(payment_details.replace(" ", ""))
+        elif (order.take_currency.title == 'uah' and is_cash == True):
+            cash_point_id = int(payment_details)
+            if not CashPointLocation.objects.filter(id=cash_point_id).exists():
+                isFiatPaymentDetailsValid = False
 
-        if isCardValid:
+        if isFiatPaymentDetailsValid:
             if order.give_currency.title not in FIAT_CURRENCIES:
                 factory = CryptoFactory(order.give_currency.title)
                 currency_id = order.give_currency_id
@@ -195,48 +215,76 @@ def create_invoice(req):
                                                                         status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
 
                 print(last_added_crypto_address)
-                sum = order.amnt_give
+                asum = order.amnt_give
                 block_height = 0
                 block_height = factory.get_current_height()
                 new_invoice = Invoice(order=order,
                                       currency_id=currency_id,
                                       crypto_payments_details_id=last_added_crypto_address.id,
-                                      sum=sum,
+                                      sum=asum,
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
+                last_added_crypto_address.CHECKOUT_STATUS_PROCESSING
+                last_added_crypto_address.technical_info = factory.get_balance()
+                last_added_crypto_address.save()
+
             else:
-                sum = order.amnt_give
+                asum = order.amnt_give
                 currency_id = order.give_currency_id
                 credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
                                                                 status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
+                credit_card_number.status = CHECKOUT_STATUS_PROCESSING
                 new_invoice = Invoice(order=order,
-                                    currency=order.give_currency,
-                                    crypto_payments_details_id=credit_card_number.id,
-                                    sum=sum)
-
+                                      currency=order.give_currency,
+                                      crypto_payments_details_id=credit_card_number.id,
+                                      sum=asum)
+                credit_card_number.save()
                 payment_details_give = credit_card_number.address
+
 
             new_invoice.save()
 
-            trans = Trans.objects.create(account=payment_details,
-                                        payment_id='',
-                                        currency=order.take_currency,
-                                        amnt=order.amnt_take)
-            order.trans = trans
-            order.save()
-            respone_data = {
-                'given_cur': str(order.give_currency),
-                'amount': order.amnt_give,
-                'payment_details_give': payment_details_give,
-                't_link': t_link,
-                'invoice_id': new_invoice.id,
-                'message': 'Ожидаем вашей оплаты'
-            }
+            if is_cash:
+                random_int = random.randrange(100001, 110000)
+                random_secret_key = order.id + random_int
+                cash_point_id = int(payment_details)
+                cash_point_obj = CashPointLocation.objects.get(id=cash_point_id)
+                trans = Trans.objects.create(account=cash_point_obj.title,
+                                             payment_id=str(random_secret_key),
+                                             currency=order.take_currency,
+                                             amnt=order.amnt_take)
+                order.trans = trans
+                order.save()
+
+                respone_data = {
+                    'given_cur': str(order.give_currency),
+                    'amount': order.amnt_give,
+                    'payment_details_give': payment_details_give,
+                    'secret_key': str(random_secret_key),
+                    't_link': t_link,
+                    'invoice_id': new_invoice.id,
+                    'message': 'Ожидаем вашей оплаты'
+                }
+            else:
+                trans = Trans.objects.create(account=payment_details,
+                                             payment_id='',
+                                             currency=order.take_currency,
+                                             amnt=order.amnt_take)
+                order.trans = trans
+                order.save()
+                respone_data = {
+                    'given_cur': str(order.give_currency),
+                    'amount': order.amnt_give,
+                    'payment_details_give': payment_details_give,
+                    't_link': t_link,
+                    'invoice_id': new_invoice.id,
+                    'message': 'Ожидаем вашей оплаты'
+                }
 
             return json_true(req, {'response': respone_data})
         else:
             respone_data = {
-                'error': 'Карта не валидна',
+                'error': 'Платежные данные для выплаты не валидны',
             }
             return json_true(req, {'response': respone_data})
     
