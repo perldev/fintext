@@ -154,6 +154,9 @@ class CashPointLocation(models.Model):
 
     def __unicode__(o):
         return str(o.id) + " " + str(o.title)
+    
+    def __str__(self):
+        return self.title
 
 
 class Invoice(models.Model):
@@ -255,11 +258,11 @@ class Trans(models.Model):
     account = models.CharField(verbose_name="account ",
                                max_length=255,
                                editable=True,
-                               null=False,
-                               blank=False)
+                               null=True,
+                               blank=True)
     payment_id = models.CharField(verbose_name="payment id",
                                   max_length=255,
-                                  editable=False,
+                                  editable=True,
                                   null=False,
                                   blank=False)
 
