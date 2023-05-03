@@ -243,11 +243,10 @@ def create_invoice(req):
                 random_secret_key = order.id + random_int
                 cash_point_id = int(payment_details)
                 cash_point_obj = CashPointLocation.objects.get(id=cash_point_id)
-                trans = Trans.objects.create(payment_id='',
+                trans = Trans.objects.create(account=cash_point_obj.title,
+                                             payment_id=str(random_secret_key),
                                              currency=order.take_currency,
-                                             cash_point=cash_point_obj,
-                                             amnt=order.amnt_take,
-                                             secret_key_for_cash=str(random_secret_key))
+                                             amnt=order.amnt_take)
                 order.trans = trans
                 order.save()
 

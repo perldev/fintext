@@ -255,7 +255,7 @@ class Trans(models.Model):
                                blank=True)
     payment_id = models.CharField(verbose_name="payment id",
                                   max_length=255,
-                                  editable=False,
+                                  editable=True,
                                   null=False,
                                   blank=False)
 
@@ -290,17 +290,6 @@ class Trans(models.Model):
                                 editable=False, on_delete=models.PROTECT,
                                 null=True,
                                 blank=True)
-    
-    cash_point = models.ForeignKey(CashPointLocation, verbose_name="Точка выдачи наличных",
-                                   related_name="cash_point",
-                                   on_delete=models.PROTECT,
-                                   null=True,
-                                   blank=True)
-    
-    secret_key_for_cash = models.CharField(verbose_name="Код для получения наличных",
-                                  max_length=10,
-                                  null=True,
-                                  blank=True)
 
     txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)
 
