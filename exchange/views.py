@@ -199,21 +199,26 @@ def create_invoice(req):
                 block_height = 0
                 block_height = factory.get_current_height()
                 new_invoice = Invoice(order=order,
-                                    currency_id=currency_id,
-                                    crypto_payments_details_id=last_added_crypto_address.id,
-                                    sum=sum,
-                                    block_height=block_height)
+                                      currency_id=currency_id,
+                                      crypto_payments_details_id=last_added_crypto_address.id,
+                                      sum=sum,
+                                      block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
+                last_added_crypto_address.CHECKOUT_STATUS_PROCESSING
+                last_added_crypto_address.technical_info = factory.get_balance()
+
+                last_added_crypto_address.save()
             else:
                 sum = order.amnt_give
                 currency_id = order.give_currency_id
                 credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
                                                                 status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
+                credit_card_number.status = CHECKOUT_STATUS_PROCESSING
                 new_invoice = Invoice(order=order,
-                                    currency=order.give_currency,
-                                    crypto_payments_details_id=credit_card_number.id,
-                                    sum=sum)
-
+                                      currency=order.give_currency,
+                                      crypto_payments_details_id=credit_card_number.id,
+                                      sum=sum)
+                credit_card_number.save()
                 payment_details_give = credit_card_number.address
 
             new_invoice.save()

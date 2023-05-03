@@ -43,8 +43,6 @@ class OperTele(models.Model):
     tele_username = models.CharField(max_length=40, default='', verbose_name="")
 
 
-
-
 # Create your models here.
 class Orders(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Клиент",
@@ -208,21 +206,30 @@ class PoolAccounts(models.Model):
     status = models.CharField(max_length=40,
                               choices=STATUS_ORDER,
                               default=CHECKOUT_STATUS_FREE)
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, 
                              blank=True, null=True, 
                              on_delete=models.PROTECT)
+
     currency = models.ForeignKey("Currency", 
                                  verbose_name="Валюта", 
                                  on_delete=models.PROTECT)
+
     pub_date = models.DateTimeField(default=datetime.now, 
                                     verbose_name="Дата публикации")
+
     ext_info = models.CharField(max_length=255,
                                unique=True,
                                verbose_name="Внешний ключ идентификации")
+
     address = models.CharField(max_length=255,
                                unique=True,
                                verbose_name="Внешний ключ идентификации или кошелек криптовалюты")
-    
+
+    technical_info = models.CharField(max_length=255,
+                                      default="",
+                                      verbose_name="Техническая информация для обработки платежей")
+
     class Meta:
         verbose_name = u'Пул криптоадресов'
         verbose_name_plural = u'Пулы криптоадресов'
