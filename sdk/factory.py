@@ -1,39 +1,18 @@
 
-from sdk.btc import get_current_height, get_out_trans_from, get_in_trans_from, get_sum_from, get_balance
-
-
-from sdk.eth import get_current_height as heth, get_out_trans_from as outeth, get_in_trans_from as ineth, \
-    get_sum_from as sumfrometh, get_balance as balanceeth
+from sdk.btc import get_current_height, get_out_trans_from, get_in_trans_from, get_sum_from
 
 class CryptoFactory:
 
     def __init__(self, arg):
         self.__currency = arg
         self.__dict_call = {
-            "btc":{
+            arg:{
                 "get_current_height": get_current_height,
                 "get_out_trans_from": get_out_trans_from,
                 "get_in_trans_from": get_in_trans_from,
-                "get_sum_from": get_sum_from,
-                "get_balance": get_balance
+                "get_sum_from": get_sum_from
 
-            },
-            "eth": {
-                "get_current_height": heth,
-                "get_out_trans_from": outeth,
-                "get_in_trans_from": ineth,
-                "get_sum_from": sumfrometh,
-                "get_balance": balanceeth
-
-            },
-            "usdt": {
-                "get_current_height": heth,
-                "get_out_trans_from": outeth,
-                "get_in_trans_from": ineth,
-                "get_sum_from": sumfrometh,
-                "get_balance": balanceeth
-
-            },
+            }
         }
 
     def get_current_height(self, *args, **kwargs):
@@ -52,9 +31,3 @@ class CryptoFactory:
     def get_sum_from(self, *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["get_sum_from"]
         return call_obj(*args, **kwargs)
-
-    def get_balance(self,  *args, **kwargs):
-        call_obj = self.__dict_call[self.__currency]["get_balance"]
-        return call_obj(*args, **kwargs)
-
-

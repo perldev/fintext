@@ -54,7 +54,3 @@ def get_sum_from(acc, blockheight=0):
     return d/PREC, in_trans
 
 
-def get_balance(acc):
-    resp = requests.get("https://blockchain.info/balance?active=%s" % acc, headers=def_headers)
-    respj = resp.json()
-    return respj[acc]["final_balance"]

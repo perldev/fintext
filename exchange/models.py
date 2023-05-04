@@ -230,6 +230,7 @@ class Invoice(models.Model):
     expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True,
                                        blank=True)
 
+
     class Meta:
         verbose_name = u'инвойс'
         verbose_name_plural = u'инвойсы'
