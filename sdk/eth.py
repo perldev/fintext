@@ -11,8 +11,14 @@ import re
 from web3 import Web3, AsyncWeb3
 
 from binascii import hexlify, unhexlify
-INFURA_KEY = "d39891a052eb4b10bdb30310df537d97"
 
+INFURA_KEY = None
+try
+   from private_settings import INFURA_KEY as INF
+   INFURA_KEY = INF
+except:
+   pass
+    
 
 class CryptoAccountERC20:
     def __init__(self):
