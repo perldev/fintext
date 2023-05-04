@@ -16,7 +16,7 @@ def_headers = {"Content-Type": "application/json"}
 PREC = 10 ** 18
 
 INFURA_KEY = None
-try
+try:
    from private_settings import INFURA_KEY as INF
    INFURA_KEY = INF
 except:
@@ -148,5 +148,5 @@ def get_sum_from(acc, blockheight=0):
 
 def get_balance(acc):
     w3 = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
-    return w3.get_balance(acc)
+    return Decimal(w3.get_balance(acc))/PREC
 
