@@ -102,11 +102,11 @@ def create_exchange_request(req):
 
                     # providers are cash of crypto
                     if (given_cur != 'uah'):
-                        provider_give = CurrencyProvider.objects.get(id=1)
-                        provider_take = CurrencyProvider.objects.get(id=2)
+                        provider_give = CurrencyProvider.objects.get(title='native')
+                        provider_take = CurrencyProvider.objects.get(title='cash')
                     else:
-                        provider_give = CurrencyProvider.objects.get(id=2)
-                        provider_take = CurrencyProvider.objects.get(id=1)
+                        provider_give = CurrencyProvider.objects.get(title='cash')
+                        provider_take = CurrencyProvider.objects.get(title='native')
                     
                     give_currency = Currency.objects.get(title=given_cur)
                     take_currency = Currency.objects.get(title=taken_cur)
@@ -147,11 +147,11 @@ def create_exchange_request(req):
                 taken_amount = amount * rate
 
                 if (given_cur != 'uah'):
-                    provider_give = CurrencyProvider.objects.get(id=1)
-                    provider_take = CurrencyProvider.objects.get(id=2)
+                    provider_give = CurrencyProvider.objects.get(title='native')
+                    provider_take = CurrencyProvider.objects.get(title='cash')
                 else:
-                    provider_give = CurrencyProvider.objects.get(id=2)
-                    provider_take = CurrencyProvider.objects.get(id=1)
+                    provider_give = CurrencyProvider.objects.get(title='cash')
+                    provider_take = CurrencyProvider.objects.get(title='native')
 
                 give_currency = Currency.objects.get(title=given_cur)
                 take_currency = Currency.objects.get(title=taken_cur)
@@ -226,7 +226,7 @@ def create_invoice(req):
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
                 last_added_crypto_address.status = CHECKOUT_STATUS_PROCESSING
-                if order.give_currency.title == 'usdt' or order.take_currency.title == 'usdt':
+                if order.give_currency.title == 'usdt':
                     currency_provider = CurrencyProvider.objects.get(title=usd_net)
                     last_added_crypto_address.currency_provider = currency_provider
                 # last_added_crypto_address.technical_info = factory.get_balance()
@@ -242,9 +242,6 @@ def create_invoice(req):
                                       currency=order.give_currency,
                                       crypto_payments_details_id=credit_card_number.id,
                                       sum=asum)
-                if order.give_currency.title == 'usdt' or order.take_currency.title == 'usdt':
-                    currency_provider = CurrencyProvider.objects.get(title=usd_net)
-                    credit_card_number.currency_provider = currency_provider
                 credit_card_number.save()
                 payment_details_give = credit_card_number.address
 
@@ -277,6 +274,10 @@ def create_invoice(req):
                                              payment_id='',
                                              currency=order.take_currency,
                                              amnt=order.amnt_take)
+                if order.take_currency.title == 'usdt':
+                    currency_provider = CurrencyProvider.objects.get(title=usd_net)
+                    trans.currency_provider = currency_provider
+                trans.save()
                 order.trans = trans
                 order.save()
                 respone_data = {

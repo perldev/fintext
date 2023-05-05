@@ -306,6 +306,12 @@ class Trans(models.Model):
 
     txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)
 
+    currency_provider = models.ForeignKey("CurrencyProvider", 
+                                          verbose_name="Сеть", 
+                                          blank=True,
+                                          null=True, 
+                                          on_delete=models.PROTECT)
+
     class Meta:
         verbose_name = 'Транзакция'
         verbose_name_plural = 'Транзакции'
