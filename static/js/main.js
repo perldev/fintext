@@ -118,6 +118,33 @@ function setGivenCurQnty() {
 
 let Main = {
     "draw_form_crypto": function(resp_obj){
+
+            let provider_select = '';
+            if (resp_obj['taken_cur'] == "usdt") {
+              provider_select = `
+                <br>
+                <div class="form-group row">
+                  <label class="col-4 col-form-label">Тип сети USDT:</label>
+                  <div class="col-8">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
+                      <label class="form-check-label" for="ercNet1">
+                        ERC-20
+                      </label>
+                    </div>
+                    <div class="form-check" >
+                      <input class="form-check-input" type="radio" onclick="selectTron()" name="tronNet" id="tronNet1" value="option2">
+                      <label class="form-check-label" for="tronNet1">
+                        TRON
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <br>
+              `
+            }
+
+
            return  `<div class="form-group row">
                 <label class="col-4 col-form-label" for="">Вы отдаете:</label>
                 <div class="col-8">
@@ -130,6 +157,7 @@ let Main = {
                     ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
                 </div>
               </div>
+              ${provider_select}
               <div class="form-group row">
                 <label for="text" class="col-4 col-form-label">Укажите адрес кошелька ${resp_obj['taken_cur']}</label>
                 <div class="col-8">
