@@ -61,6 +61,6 @@ admin.site.register(Trans, TransAdmin)
 
 
 class RateAdmin(admin.ModelAdmin):
-    list_display = ["id"]
+    list_display = ["id", "give_currency", "take_currency"]
 
 admin.site.register(rate, RateAdmin)

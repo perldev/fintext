@@ -195,6 +195,8 @@ def create_invoice(req):
         body = json.loads(body_unicode)
         payment_details = body['payment_details']
         is_cash = int(body['is_cash'])
+        usd_net = body['usdt_net']
+        print()
 
         order = Orders.objects.get(id=req.session['order_id'])
         t_link = get_telechat_link(order)
@@ -224,8 +226,11 @@ def create_invoice(req):
                                       sum=asum,
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
-                last_added_crypto_address.CHECKOUT_STATUS_PROCESSING
-                last_added_crypto_address.technical_info = factory.get_balance()
+                last_added_crypto_address.status = CHECKOUT_STATUS_PROCESSING
+                if order.give_currency.title == 'usdt':
+                    currency_provider = CurrencyProvider.objects.get(title=usd_net)
+                    last_added_crypto_address.currency_provider = currency_provider
+                # last_added_crypto_address.technical_info = factory.get_balance()
                 last_added_crypto_address.save()
 
             else:

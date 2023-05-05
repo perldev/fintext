@@ -232,6 +232,12 @@ class PoolAccounts(models.Model):
     technical_info = models.CharField(max_length=255,
                                       default="",
                                       verbose_name="Техническая информация для обработки платежей")
+    
+    currency_provider = models.ForeignKey("CurrencyProvider", 
+                                          verbose_name="Сеть", 
+                                          blank=True,
+                                          null=True, 
+                                          on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = u'Пул криптоадресов'
