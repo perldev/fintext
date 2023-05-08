@@ -719,6 +719,12 @@ h6 {
     border-radius: 16px;
     border: 1px solid #e4e4e4;
   }
+  .table-wrapper-colored {
+    padding: 25px;
+    border-radius: 16px;
+    background-color: #d1e7dd;
+    /* border: 1px solid #e4e4e4; */
+  }
   .table-wrapper hr {
     color: #e4e4e4;
     opacity: 1;

@@ -415,7 +415,7 @@ function sendPaymentDetails(e) {
             message_box.innerHTML = `
             <h5>${json['response']['message']}</h5><br>
             <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
-            <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
+            <a href="/orders/${json['response']['order_id']}">Страница для отслеживания деталей сделки</a><br/>
             <br/>
             <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
             `;
@@ -425,7 +425,7 @@ function sendPaymentDetails(e) {
             <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
             <p>Секретный код для получения денег в точке выдачи: <strong>${json['response']['secret_key']}</strong></p>
             <br/>
-            <a href="/invoices/${json['response']['invoice_id']}">Страница для отслеживания деталей сделки</a><br/>
+            <a href="/orders/${json['response']['order_id']}">Страница для отслеживания деталей сделки</a><br/>
             <br/>
             <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
             `;

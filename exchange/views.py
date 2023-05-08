@@ -201,9 +201,9 @@ def create_invoice(req):
         t_link = get_telechat_link(order)
         isFiatPaymentDetailsValid = True
 
-        if (order.take_currency.title == 'uah' and is_cash == False):
+        if (order.take_currency.title in FIAT_CURRENCIES and is_cash == False):
             isFiatPaymentDetailsValid = validate_credit_card(payment_details.replace(" ", ""))
-        elif (order.take_currency.title == 'uah' and is_cash == True):
+        elif (order.take_currency.title in FIAT_CURRENCIES and is_cash == True):
             cash_point_id = int(payment_details)
             if not CashPointLocation.objects.filter(id=cash_point_id).exists():
                 isFiatPaymentDetailsValid = False
@@ -212,10 +212,15 @@ def create_invoice(req):
             if order.give_currency.title not in FIAT_CURRENCIES:
                 factory = CryptoFactory(order.give_currency.title, usd_net)
                 currency_id = order.give_currency_id
-                last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
-                                                                        status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
-
-                print(last_added_crypto_address)
+                if order.give_currency.title == 'usdt':
+                    last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
+                                                                            status=CHECKOUT_STATUS_FREE,
+                                                                            currency_provider__title=usd_net).order_by('-pub_date').first()
+                    order.provider_give = CurrencyProvider.objects.get(title=usd_net)
+                    order.save()
+                else:
+                    last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
+                                                                            status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
                 asum = order.amnt_give
                 block_height = 0
                 block_height = factory.get_current_height()
@@ -226,9 +231,7 @@ def create_invoice(req):
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
                 last_added_crypto_address.status = CHECKOUT_STATUS_PROCESSING
-                if order.give_currency.title == 'usdt':
-                    currency_provider = CurrencyProvider.objects.get(title=usd_net)
-                    last_added_crypto_address.currency_provider = currency_provider
+
                 # last_added_crypto_address.technical_info = factory.get_balance()
                 last_added_crypto_address.save()
 
@@ -242,6 +245,10 @@ def create_invoice(req):
                                       currency=order.give_currency,
                                       crypto_payments_details_id=credit_card_number.id,
                                       sum=asum)
+                if order.take_currency.title == 'usdt':
+                    credit_card_number.currency_provider = CurrencyProvider.objects.get(title=usd_net)
+                    order.provider_take = CurrencyProvider.objects.get(title=usd_net)
+                    order.save()
                 credit_card_number.save()
                 payment_details_give = credit_card_number.address
 
@@ -265,7 +272,7 @@ def create_invoice(req):
                     'payment_details_give': payment_details_give,
                     'secret_key': str(random_secret_key),
                     't_link': t_link,
-                    'invoice_id': new_invoice.id,
+                    'order_id': order.id,
                     'message': 'Ожидаем вашей оплаты'
                 }
             else:
@@ -285,7 +292,7 @@ def create_invoice(req):
                     'amount': order.amnt_give,
                     'payment_details_give': payment_details_give,
                     't_link': t_link,
-                    'invoice_id': new_invoice.id,
+                    'order_id': order.id,
                     'message': 'Ожидаем вашей оплаты'
                 }
 
