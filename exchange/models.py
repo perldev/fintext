@@ -268,6 +268,12 @@ class PoolAccounts(models.Model):
     technical_info = models.CharField(max_length=255,
                                       default="",
                                       verbose_name="Техническая информация для обработки платежей")
+    
+    currency_provider = models.ForeignKey("CurrencyProvider", 
+                                          verbose_name="Сеть", 
+                                          blank=True,
+                                          null=True, 
+                                          on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = u'Пул криптоадресов'
@@ -335,6 +341,12 @@ class Trans(models.Model):
                                 blank=True)
 
     txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)
+
+    currency_provider = models.ForeignKey("CurrencyProvider", 
+                                          verbose_name="Сеть", 
+                                          blank=True,
+                                          null=True, 
+                                          on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = 'Транзакция'

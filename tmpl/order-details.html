@@ -5,84 +5,179 @@
 
     <section style="margin:40px 0px;">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-6 offset-lg-3 col-12">
-                    <br><br>
-                    <h1>Order #{{ order.pk }} details:</h1>
-                    <br>
-                    <table class="table">
-                        <tbody>
-                          <tr>
-                            <td>Order status:</td>
-                            <td><h5 style="color: #1bbd36;">{{ order.status }}</h5></td>
-                          </tr>
-                          <tr>
-                            <td>You give:</td>
-                            <td><h5>{{ order.amnt_give }} {{ order.give_currency.title }}</h5></td>
-                          </tr>
-                          <tr>
-                            <td>You take:</td>
-                            <td><h5>{{ order.amnt_take }} {{ order.take_currency.title }}</h5></td>
-                          </tr>
-                          {% if order.expire_date %}
-                          <tr>
-                            <td>Valid date:</td>
-                            <td><h5>{{ order.expire_date }}</h5></td>
-                          </tr>
-                          {% endif %}
-                        </tbody>
-                      </table>
+
+
+                  <div class="row">
+
+                    <div class="col-xl-8 offset-xl-2 col-12">
                       <br><br>
-
-                      <h4>Invoice details:</h4>
+                      <h1>Order #{{ order.pk }} details:</h1>
                       <br>
-                      <table class="table">
-                          <tbody>
-                            <tr>
-                              <td>Invoice status:</td>
-                              <td><h5 style="color: #1bbd36;">{{ order.invoice_order.status }}</h5></td>
-                            </tr>
-                            <tr>
-                              <td>Invoice sum:</td>
-                              <td><h5>{{ order.invoice_order.sum }} {{ order.invoice_order.currency.title }}</h5></td>
-                            </tr>
-                            <tr>
-                              <td>Invoice crypto address:</td>
-                              <td><h5>{{ order.invoice_order.crypto_payments_details.address }}</h5></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <br><br>
 
-                        <h4>Transaction details:</h4>
-                        <br>
-                        <table class="table">
-                            <tbody>
-                              <tr>
-                                <td>Transaction status:</td>
-                                <td><h5 style="color: #1bbd36;">{{ order.trans.status }}</h5></td>
-                              </tr>
-                              <tr>
-                                <td>Transaction sum:</td>
-                                <td><h5>{{ order.trans.amnt }} {{ order.trans.currency.title }}</h5></td>
-                              </tr>
-                              <tr>
-                                <td>Transaction payment details:</td>
-                                <td><h5>{{ order.trans.account }}</h5></td>
-                              </tr>
-                              {% if order.trans.debet_credit %}
-                              <tr>
-                                <td>Transaction debet/credit:</td>
-                                <td><h5>{{ order.trans.debet_credit }}</h5></td>
-                              </tr>
-                              {% endif %}
-                            </tbody>
-                          </table>
+                      <div class="row">
+                        <div class="col-lg-8 col-12">
 
-                    <br>
-                    <a href="{{t_link}}"><strong>Link to telegram for dialog with operator</strong></a>
-                </div>
-            </div>
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="table-wrapper">
+      
+                                <div class="row align-items-center order-info-row">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/ios/50/null/purchase-order.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Order status:</p>
+                                    <h5 style="color: #1bbd36;">{{ order.status }}</h5>
+                                  </div>
+                                </div>
+                                <hr>
+                                <div class="row align-items-center">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/ios/50/null/wallet--v1.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>You give:</p>
+                                    <h5>{{ order.amnt_give }} {{ order.give_currency.title }}</h5>
+                                  </div>
+                                </div>
+                                <hr>
+                                <div class="row align-items-center">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/ios/50/null/borrow-book.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>You receive:</p>
+                                    <h5>{{ order.amnt_take }} {{ order.take_currency.title }}</h5>
+                                  </div>
+                                </div>
+      
+                              </div>
+                            </div>
+                          </div>
+      
+                          <br>
+                          <br>
+      
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="table-wrapper">
+      
+                                <div class="row align-items-center order-info-row">
+                                  <div class="col-12">
+                                    <h5>Invoice details:</h5><br>
+                                  </div>
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/ios/50/null/invoice.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Invoice status:</p>
+                                    <h5 style="color: #1bbd36;">{{ order.invoice_order.status }}</h5>
+                                  </div>
+                                </div>
+                                <hr>
+                                <div class="row align-items-center">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/fluency-systems-filled/96/null/stack-of-coins.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Invoice sum:</p>
+                                    <h5>{{ order.invoice_order.sum }} {{ order.invoice_order.currency.title }}</h5>
+                                  </div>
+                                </div>
+                                <hr>
+                                <div class="row align-items-center">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/external-wanicon-lineal-wanicon/64/null/external-transfer-money-exchange-wanicon-lineal-wanicon-3.png" />
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Invoice payment address:</p>
+                                    <h5>{{ order.invoice_order.crypto_payments_details.address }}</h5>
+                                  </div>
+                                </div>
+      
+                              </div>
+                            </div>
+                          </div> 
+                          
+                          <br>
+                          <br>
+      
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="table-wrapper">
+      
+                                <div class="row align-items-center order-info-row">
+                                  <div class="col-12">
+                                    <h5>Transaction details:</h5><br>
+                                  </div>
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/external-outline-lafs/64/null/external-ic_transaction-cryptocurrency-and-cryptowallet-outline-lafs.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Transaction status:</p>
+                                    <h5 style="color: #1bbd36;">{{ order.trans.status }}</h5>
+                                  </div>
+                                </div>
+                                <hr>
+                                <div class="row align-items-center">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/ios/100/null/exchange.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Transaction sum:</p>
+                                    <h5>{{ order.trans.amnt }} {{ order.trans.currency.title }}</h5>
+                                  </div>
+                                </div>
+                                <hr>
+                                <div class="row align-items-center">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/dotty/80/null/numbers-input-form.png" class="img-fluid"/>
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Transaction payment details:</p>
+                                    <h5>{{ order.trans.account }}</h5>
+                                  </div>
+                                </div>
+      
+                                {% if order.trans.debet_credit %}
+                                <hr>
+                                <div class="row align-items-center">
+                                  <div class="col-2">
+                                    <img src="https://img.icons8.com/external-wanicon-lineal-wanicon/64/null/external-transfer-money-exchange-wanicon-lineal-wanicon-3.png" />
+                                  </div>
+                                  <div class="col-10">
+                                    <p>Transaction debet/credit:</p>
+                                    <h5>{{ order.trans.debet_credit }}</h5>
+                                  </div>
+                                </div>
+                                {% endif %}
+      
+                              </div>
+                            </div>
+                          </div> 
+
+                        </div>
+
+                        <div class="col-lg-4">
+                          <div class="operator-block">
+                            <div class="row">
+                              <div class="col-12 text-center">
+                                <img src="{% static '/images/telegram.svg' %}" alt="" class="img-fluid">
+                              </div>
+                              <div class="col-12">
+                                <p>Dialog with operator</p><br>
+                                <a href="{{t_link}}" class="btn btn-dialog">start</a>
+                              </div>
+                            </div>
+                          </div> 
+
+                        </div>
+                      </div>
+        
+                    </div>
+                  </div>
+ 
+
         </div>
     </section>
 

@@ -3,7 +3,9 @@ let avaliable_pairs = [
     'btc_uah',
     'uah_btc',
     'eth_uah',
-    'usdt_uah'
+    'usdt_uah',
+    'uah_usdt',
+    'usdt_btc'
 ]
 
 let main_rate = 0;
@@ -116,6 +118,33 @@ function setGivenCurQnty() {
 
 let Main = {
     "draw_form_crypto": function(resp_obj){
+
+            let provider_select = '';
+            if (resp_obj['taken_cur'] == "usdt") {
+              provider_select = `
+                <br>
+                <div class="form-group row">
+                  <label class="col-4 col-form-label">Тип сети USDT:</label>
+                  <div class="col-8">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
+                      <label class="form-check-label" for="ercNet1">
+                        ERC-20
+                      </label>
+                    </div>
+                    <div class="form-check" >
+                      <input class="form-check-input" type="radio" onclick="selectTron()" name="tronNet" id="tronNet1" value="option2">
+                      <label class="form-check-label" for="tronNet1">
+                        TRON
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <br>
+              `
+            }
+
+
            return  `<div class="form-group row">
                 <label class="col-4 col-form-label" for="">Вы отдаете:</label>
                 <div class="col-8">
@@ -128,6 +157,7 @@ let Main = {
                     ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
                 </div>
               </div>
+              ${provider_select}
               <div class="form-group row">
                 <label for="text" class="col-4 col-form-label">Укажите адрес кошелька ${resp_obj['taken_cur']}</label>
                 <div class="col-8">
@@ -151,6 +181,31 @@ let Main = {
     },
     "draw_form": function(resp_obj){
 
+        let provider_select = '';
+        if (resp_obj['given_cur'] == "usdt") {
+          provider_select = `
+            <br>
+            <div class="form-group row">
+              <label class="col-4 col-form-label">Тип сети USDT:</label>
+              <div class="col-8">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
+                  <label class="form-check-label" for="ercNet1">
+                    ERC-20
+                  </label>
+                </div>
+                <div class="form-check" >
+                  <input class="form-check-input" type="radio" onclick="selectTron()" name="tronNet" id="tronNet1" value="option2">
+                  <label class="form-check-label" for="tronNet1">
+                    TRON
+                  </label>
+                </div>
+              </div>
+            </div>
+            <br>
+          `
+        }
+
         return  `<div class="form-group row">
                 <label class="col-4 col-form-label" for="">Вы отдаете:</label>
                 <div class="col-8">
@@ -163,6 +218,8 @@ let Main = {
                     ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
                 </div>
               </div>
+
+              ${provider_select}
 
               <div class="form-group row">
                   <label for="text1" class="col-4 col-form-label">Способ получения средств:</label>
@@ -181,6 +238,7 @@ let Main = {
                     </div>
                   </div>
               </div>
+
               <br>
               <div id="creditCardForm" style="display:block">
                 <div class="form-group row">
@@ -322,6 +380,16 @@ function sendPaymentDetails(e) {
       payment_details = pay_details_for_cash;
       isCash = true;
     }
+
+    let usdt_net = null;
+    if (document.getElementById("ercNet1")) {
+      if (document.querySelector('input[name="ercNet"]:checked')) {
+        usdt_net = "erc20"
+      } else {
+        usdt_net = "tron"
+      }
+    }
+
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     fetch('/api/create_invoice/', {
       method: 'POST',
@@ -332,6 +400,7 @@ function sendPaymentDetails(e) {
       body: JSON.stringify({ 
           'payment_details': payment_details,
           'is_cash': isCash ? '1' : '0',
+          'usdt_net': usdt_net
         })
     })
     .then(response => response.json())
@@ -461,6 +530,22 @@ function arrSplit(cardArray){
   return {arr1, arr2}
 }
 
+
+// logic of tron/erc select fields
+
+function selectErc() {
+  document.getElementById("ercNet1").checked = true;
+  document.getElementById("tronNet1").checked = false;
+}
+function selectTron() {
+  document.getElementById("ercNet1").checked = false;
+  document.getElementById("tronNet1").checked = true;
+}
+
+
+
+// logic of payment details select fields.
+
 function selectCreditCard() {
   document.getElementById("creditCard1").checked = true;
   document.getElementById("cashPoint1").checked = false;
@@ -472,10 +557,7 @@ function selectCreditCard() {
 }
 
 function selectCashPoint() {
-  document.getElementById("creditCard1").checked = false;
-  document.getElementById("cashPoint1").checked = true;
-
-  cashPointsDiv = document.getElementById("cash-points-wrapper")
+  document.getElementById("cash-points-wrapper").innerHTML = ``
   for (const [key, value] of Object.entries(cashPoints)) {
     document.getElementById("cash-points-wrapper").innerHTML += `
       <div class="form-check">
@@ -486,7 +568,10 @@ function selectCashPoint() {
       </div>
     `
   }
-  
+
+  document.getElementById("creditCard1").checked = false;
+  document.getElementById("cashPoint1").checked = true;
+
   document.getElementById("creditCardForm").style.display = "none";
   document.getElementById("cashPointsForm").style.display = "block";
   
