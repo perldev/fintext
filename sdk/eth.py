@@ -23,6 +23,9 @@ except:
    pass
     
 
+def get_prec():
+    return PREC
+
 def get_current_height():
     w3 = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
     return w3.eth.get_block_number()
@@ -55,12 +58,14 @@ def get_out_trans_from(acc, blockheight=0):
                 result.append({"hash": trans["transactionHash"],
                                "value": trans["value"],
                                "addr": acc,
+                               "to": trans["to"],
+                               "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
     if "accountTransactions" in respj2:
         for trans in respj2["accountTransactions"]:
 
-            if  "blockNumber" not in trans:
+            if "blockNumber" not in trans:
                 continue
 
             if not Decimal(trans["value"]):
@@ -76,10 +81,13 @@ def get_out_trans_from(acc, blockheight=0):
                 result.append({"hash": trans["hash"],
                                "value": trans["value"],
                                "addr": acc,
+                               "to": trans["to"],
+                               "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
 
     return result
+
 
 def get_in_trans_from(self, acc, blockheight=0):
 
@@ -111,6 +119,8 @@ def get_in_trans_from(self, acc, blockheight=0):
                 result.append({"hash": trans["transactionHash"],
                                "value": trans["value"],
                                "addr": acc,
+                               "from": trans["from"],
+                               "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
     if "accountTransactions" in respj2:
@@ -132,6 +142,8 @@ def get_in_trans_from(self, acc, blockheight=0):
                 result.append({"hash": trans["hash"],
                                "value": trans["value"],
                                "addr": acc,
+                               "from": trans["from"],
+                               "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
 

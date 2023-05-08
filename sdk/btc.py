@@ -1,9 +1,12 @@
 import requests
-
+import json
 
 def_headers = {"content-type": "application/json"}
 PREC = 10000000
 
+
+def get_prec():
+    return PREC
 
 def get_current_height():
     resp = requests.get("https://blockchain.info/latestblock", headers=def_headers)
@@ -20,11 +23,13 @@ def get_out_trans_from(acc, blockheight=0):
         if not trans["block_height"]:
             continue
 
-        if trans["block_height"]<blockheight:
+        if trans["block_height"] < blockheight:
             continue
+
         for i2 in trans["inputs"]:
             if i2["addr"] == acc:
-                i2["hash"]= trans["hash"]
+                i2["hash"] = trans["hash"]
+                i2["block_height"] = trans["block_height"]
                 result.append(i2)
     return result
 
@@ -42,6 +47,7 @@ def get_in_trans_from(acc, blockheight=0):
         for i2 in trans["out"]:
             if i2["addr"] == acc:
                 i2["hash"] = trans["hash"]
+                i2["block_height"] = trans["block_height"]
                 result.append(i2)
     return result
                   

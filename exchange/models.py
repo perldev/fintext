@@ -13,7 +13,10 @@ STATUS_INVOICE = (
     ("canceled", u"отменен"),
     ("expired", u"просрочен"),
 )
-
+DEBIT_CREDIT = (
+    ("in", u"debit"),
+    ("out", u"credit"),
+)
 CHECKOUT_STATUS_FREE = "wait_checkout"
 CHECKOUT_STATUS_PROCESSING = "processing"
 
@@ -227,6 +230,7 @@ class Invoice(models.Model):
                                        default=0)
 
     pub_date = models.DateTimeField(default=datetime.now, verbose_name="Дата публикации")
+
     expire_date = models.DateTimeField(auto_now=False, verbose_name="Дата валидности", editable=True, null=True,
                                        blank=True)
 
@@ -324,7 +328,8 @@ class Trans(models.Model):
                                           null=True,
                                           blank=True)
     
-    debet_credit = models.CharField(max_length=255, 
+    debet_credit = models.CharField(max_length=255,
+                                    choices=DEBIT_CREDIT,
                                     verbose_name="дебет/кредит",
                                     null=True,
                                     blank=True)
@@ -340,6 +345,7 @@ class Trans(models.Model):
                                 null=True,
                                 blank=True)
 
+
     txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)
 
     currency_provider = models.ForeignKey("CurrencyProvider", 
@@ -347,6 +353,8 @@ class Trans(models.Model):
                                           blank=True,
                                           null=True, 
                                           on_delete=models.PROTECT)
+
+    tx_raw = models.TextField(default={}, unique=True)
 
     class Meta:
         verbose_name = 'Транзакция'

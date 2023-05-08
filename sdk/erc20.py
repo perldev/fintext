@@ -54,11 +54,19 @@ ABI = [
         ],
     },
 ]
+
+
+def setup_title_usdt_token():
+    setup_title("usdt", "0xdac17f958d2ee523a2206206994597c13d831ec7")
+
+
 def setup_title(token_title, token_contract):
     global TOKEN_CONTRACT, TOKEN_TITLE
     TOKEN_CONTRACT = token_contract
     TOKEN_TITLE = token_title
 
+def get_prec():
+    return PREC
 
 def get_current_height():
     global w3
@@ -88,6 +96,8 @@ def get_out_trans_from(acc, blockheight=0, blockto="latest"):
                 result.append({"hash": item["transactionHash"],
                                "value": trans["value"],
                                "addr": acc,
+                               "to": trans["to"],
+                               "raw": json.dumps(trans),
                                "block_height": item["blockNumber"]})
 
     return result
@@ -116,9 +126,12 @@ def get_in_trans_from(self, acc, blockheight=0, blockto="latest"):
                 result.append({"hash": item["transactionHash"],
                                "value": trans["value"],
                                "addr": acc,
+                               "from": trans["from"],
+                               "raw": json.dumps(trans),
                                "block_height": item["blockNumber"]})
 
     return result
+
 
 def get_sum_from(acc, blockheight=0, blockto="latest"):
     in_trans = get_in_trans_from(acc, blockheight, blockto)
