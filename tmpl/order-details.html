@@ -11,11 +11,31 @@
 
                     <div class="col-xl-8 offset-xl-2 col-12">
                       <br><br>
-                      <h1>Order #{{ order.pk }} details:</h1>
+                      <h1>Заявка #{{ order.pk }}:</h1>
                       <br>
 
                       <div class="row">
                         <div class="col-lg-8 col-12">
+
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="table-wrapper-colored">
+      
+                                <div class="row">
+                                  <div class="col-12">
+                                    <div class="main-status-wrapper">
+                                      <p>Процес виконання заявки:</p>
+                                      <h5>Крок 1/5. Очікуємо оплати</h5>
+                                    </div>
+                                  </div>
+                                </div>
+      
+                              </div>
+                            </div>
+                          </div>
+      
+                          <br>
+                          <br>
 
                           <div class="row">
                             <div class="col-12">
@@ -26,7 +46,7 @@
                                     <img src="https://img.icons8.com/ios/50/null/purchase-order.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>Order status:</p>
+                                    <p>Статус заявки:</p>
                                     <h5 style="color: #1bbd36;">{{ order.status }}</h5>
                                   </div>
                                 </div>
@@ -36,8 +56,8 @@
                                     <img src="https://img.icons8.com/ios/50/null/wallet--v1.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>You give:</p>
-                                    <h5>{{ order.amnt_give }} {{ order.give_currency.title }}</h5>
+                                    <p>Ви віддаєте:</p>
+                                    <h5>{{ order.amnt_give.normalize }} {{ order.give_currency.title }}</h5>
                                   </div>
                                 </div>
                                 <hr>
@@ -46,8 +66,8 @@
                                     <img src="https://img.icons8.com/ios/50/null/borrow-book.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>You receive:</p>
-                                    <h5>{{ order.amnt_take }} {{ order.take_currency.title }}</h5>
+                                    <p>Ви отримуєте:</p>
+                                    <h5>{{ order.amnt_take.normalize }} {{ order.take_currency.title }}</h5>
                                   </div>
                                 </div>
       
@@ -64,13 +84,13 @@
       
                                 <div class="row align-items-center order-info-row">
                                   <div class="col-12">
-                                    <h5>Invoice details:</h5><br>
+                                    <h5>Деталі інвойсу:</h5><br>
                                   </div>
                                   <div class="col-2">
                                     <img src="https://img.icons8.com/ios/50/null/invoice.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>Invoice status:</p>
+                                    <p>Статус інвойсу:</p>
                                     <h5 style="color: #1bbd36;">{{ order.invoice_order.status }}</h5>
                                   </div>
                                 </div>
@@ -80,8 +100,8 @@
                                     <img src="https://img.icons8.com/fluency-systems-filled/96/null/stack-of-coins.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>Invoice sum:</p>
-                                    <h5>{{ order.invoice_order.sum }} {{ order.invoice_order.currency.title }}</h5>
+                                    <p>Сума інвойсу:</p>
+                                    <h5>{{ order.invoice_order.sum.normalize }} {{ order.invoice_order.currency.title }}</h5>
                                   </div>
                                 </div>
                                 <hr>
@@ -90,7 +110,7 @@
                                     <img src="https://img.icons8.com/external-wanicon-lineal-wanicon/64/null/external-transfer-money-exchange-wanicon-lineal-wanicon-3.png" />
                                   </div>
                                   <div class="col-10">
-                                    <p>Invoice payment address:</p>
+                                    <p>Адреса для оплати інвойсу:</p>
                                     <h5>{{ order.invoice_order.crypto_payments_details.address }}</h5>
                                   </div>
                                 </div>
@@ -108,13 +128,13 @@
       
                                 <div class="row align-items-center order-info-row">
                                   <div class="col-12">
-                                    <h5>Transaction details:</h5><br>
+                                    <h5>Деталі транзакції:</h5><br>
                                   </div>
                                   <div class="col-2">
                                     <img src="https://img.icons8.com/external-outline-lafs/64/null/external-ic_transaction-cryptocurrency-and-cryptowallet-outline-lafs.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>Transaction status:</p>
+                                    <p>Статус транзакції:</p>
                                     <h5 style="color: #1bbd36;">{{ order.trans.status }}</h5>
                                   </div>
                                 </div>
@@ -124,8 +144,8 @@
                                     <img src="https://img.icons8.com/ios/100/null/exchange.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>Transaction sum:</p>
-                                    <h5>{{ order.trans.amnt }} {{ order.trans.currency.title }}</h5>
+                                    <p>Сума транзакції:</p>
+                                    <h5>{{ order.trans.amnt.normalize }} {{ order.trans.currency.title }}</h5>
                                   </div>
                                 </div>
                                 <hr>
@@ -134,7 +154,7 @@
                                     <img src="https://img.icons8.com/dotty/80/null/numbers-input-form.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>Transaction payment details:</p>
+                                    <p>Платіжні реквізити:</p>
                                     <h5>{{ order.trans.account }}</h5>
                                   </div>
                                 </div>
@@ -146,7 +166,7 @@
                                     <img src="https://img.icons8.com/external-wanicon-lineal-wanicon/64/null/external-transfer-money-exchange-wanicon-lineal-wanicon-3.png" />
                                   </div>
                                   <div class="col-10">
-                                    <p>Transaction debet/credit:</p>
+                                    <p>Дебет/кредит:</p>
                                     <h5>{{ order.trans.debet_credit }}</h5>
                                   </div>
                                 </div>
@@ -165,8 +185,8 @@
                                 <img src="{% static '/images/telegram.svg' %}" alt="" class="img-fluid">
                               </div>
                               <div class="col-12">
-                                <p>Dialog with operator</p><br>
-                                <a href="{{t_link}}" class="btn btn-dialog">start</a>
+                                <p>Діалог з оператором</p><br>
+                                <a href="{{t_link}}" class="btn btn-dialog">почати</a>
                               </div>
                             </div>
                           </div> 
