@@ -210,7 +210,7 @@ def create_invoice(req):
 
         if isFiatPaymentDetailsValid:
             if order.give_currency.title not in FIAT_CURRENCIES:
-                factory = CryptoFactory(order.give_currency.title)
+                factory = CryptoFactory(order.give_currency.title, usd_net)
                 currency_id = order.give_currency_id
                 last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
                                                                         status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
@@ -236,7 +236,7 @@ def create_invoice(req):
                 asum = order.amnt_give
                 currency_id = order.give_currency_id
                 credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
-                                                                status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
+                                                                 status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
                 credit_card_number.status = CHECKOUT_STATUS_PROCESSING
                 new_invoice = Invoice(order=order,
                                       currency=order.give_currency,
@@ -244,7 +244,6 @@ def create_invoice(req):
                                       sum=asum)
                 credit_card_number.save()
                 payment_details_give = credit_card_number.address
-
 
             new_invoice.save()
 
@@ -277,6 +276,7 @@ def create_invoice(req):
                 if order.take_currency.title == 'usdt':
                     currency_provider = CurrencyProvider.objects.get(title=usd_net)
                     trans.currency_provider = currency_provider
+
                 trans.save()
                 order.trans = trans
                 order.save()
