@@ -355,6 +355,7 @@ class Trans(models.Model):
                                           on_delete=models.PROTECT)
 
     tx_raw = models.TextField(default={}, unique=True)
+    aml_check = models.TextField(default={}, unique=True)
 
     class Meta:
         verbose_name = 'Транзакция'

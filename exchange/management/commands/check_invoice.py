@@ -48,9 +48,11 @@ class Command(BaseCommand):
                             continue
 
                         i.status = 'paid'
+
                         i.save()
                         i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
                         i.crypto_payments_details.save()
+
 
                     if i.expire_date < nw:
                         i.status = 'expired'
