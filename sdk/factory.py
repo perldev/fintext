@@ -67,8 +67,7 @@ class CryptoFactory:
                 "get_sum_from": sumfromtron,
                 "get_balance": balancetron
             }
-
-        self.prec = self.__dict_call[arg].get_prec()
+        self.prec = self.__dict_call[arg]["get_prec"]()
 
 
     def get_current_height(self, *args, **kwargs):
