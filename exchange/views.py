@@ -196,6 +196,8 @@ def create_invoice(req):
         payment_details = body['payment_details']
         is_cash = int(body['is_cash'])
         usd_net = body['usdt_net']
+        if usd_net == "null":
+            usd_net = None
 
         order = Orders.objects.get(id=req.session['order_id'])
         t_link = get_telechat_link(order)
