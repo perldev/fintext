@@ -303,7 +303,8 @@ def create_invoice(req):
 def check_invoices(req, id_invoice):
     active_invoice = Invoice.objects.get(id=id_invoice)
     if active_invoice.currency.title not in FIAT_CURRENCIES:
-        factory = CryptoFactory(active_invoice.currency.title)
+        factory = CryptoFactory(active_invoice.currency.title,
+                                active_invoice.crypto_payments_details.currency_provider.title)
         actual_sum, trances = factory.get_sum_from(active_invoice.crypto_payments_details.title,
                                                    active_invoice.block_height)
 
