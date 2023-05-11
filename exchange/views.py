@@ -101,7 +101,7 @@ def create_exchange_request(req):
                     taken_amount = amount * rate
 
                     # providers are cash of crypto
-                    if (given_cur != 'uah'):
+                    if (given_cur not in FIAT_CURRENCIES):
                         provider_give = CurrencyProvider.objects.get(title='native')
                         provider_take = CurrencyProvider.objects.get(title='cash')
                     else:
@@ -146,7 +146,7 @@ def create_exchange_request(req):
             else:
                 taken_amount = amount * rate
 
-                if (given_cur != 'uah'):
+                if (given_cur not in FIAT_CURRENCIES):
                     provider_give = CurrencyProvider.objects.get(title='native')
                     provider_take = CurrencyProvider.objects.get(title='cash')
                 else:
