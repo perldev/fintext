@@ -9,6 +9,7 @@ import base58
 import base64
 from decimal import Decimal
 import tronpy.providers.http
+import traceback
 
 ACCESS = None
 
@@ -63,13 +64,24 @@ def setup_title(token_contract):
     global TOKEN_CONTRACT, ACCESS
     TOKEN_CONTRACT = token_contract
     # HACK install my api key
-    ACCESS = CryptoAccountTron()
+    ACCESS = CryptoAccountTron(contract=TOKEN_CONTRACT)
     return True
 
 
 def get_current_height():
     global ACCESS
     return ACCESS.getblockcount()
+
+
+def sweep_address_to(priv, acc, to, amnt):
+    return ACCESS.transfer_of_contract(acc, to, int(amnt*PREC),  private_key=priv)
+
+
+def generate_address():
+    resp = ACCESS.getnewaddress()
+    resp["address"] = resp["public_key"]
+    resp["key"] = resp["private_key"]
+    return resp
 
 
 def get_out_trans_from(acc, blockheight=0, blockto="latest"):
@@ -135,7 +147,7 @@ def get_balance(acc):
 
 class CryptoAccountTron(object):
 
-    def __init__(self, wallet=None):
+    def __init__(self, contract=None, wallet=None):
         currency = "TRX"
         self.__currency = currency
         self.__wallet = None
@@ -242,22 +254,29 @@ class CryptoAccountTron(object):
         precision = contract.functions.decimals()
         return contract.functions.balanceOf(addr) / (10 ** precision)
 
-    def transfer_of_contract(self, from_addr, to_addr, amnt, contract=None):
-        if contract is None:
+    def transfer_of_contract(self, from_addr, to_addr, amnt,  private_key=None):
+        try:
             contract = self.__contract
+            if self.__wallet is None and private_key is None:
+                raise Exception("private key is needed")
+            if private_key is None:
+                data = self.__wallet.filter(address=from_addr)
+                private_key  = data.private
 
-        data = self.__wallet.filter(address=from_addr)
-        priv_key = PrivateKey(bytes.fromhex(data.private))
+            priv_key = PrivateKey(bytes.fromhex(private_key))
 
-        txn = (
-            contract.functions.transfer(to_addr, amnt)
-            .with_owner(from_addr)  # address of the private key
-            .fee_limit(100 * PREC)
-            .build()
-            .sign(priv_key)
-            .broadcast()
-        )
-        return txn
+            txn = (
+                contract.functions.transfer(to_addr, amnt)
+                .with_owner(from_addr)  # address of the private key
+                .fee_limit(100 * PREC)
+                .build()
+                .sign(priv_key)
+                .broadcast()
+            )
+            return txn["txid"]
+        except:
+            traceback.print_exc()
+            return  None
 
     def addr2base58(self, pub):
         primitive_addr = b"\x41" + keccak256(pub)[-20:]

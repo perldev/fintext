@@ -10,10 +10,13 @@ import sys
 import re
 from web3 import Web3, AsyncWeb3
 
+from eth_account import Account
+
 from binascii import hexlify, unhexlify
 API_HOST = "https://api.blockchain.info/v2/eth/data/account/"
 def_headers = {"Content-Type": "application/json"}
 PREC = 10 ** 18
+ACCESS = None
 
 INFURA_KEY = None
 try:
@@ -26,8 +29,13 @@ except:
 def get_prec():
     return PREC
 
+def setup_eth_access():
+    global ACCESS
+    ACCESS = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
+
+
 def get_current_height():
-    w3 = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
+    w3 = ACCESS
     return w3.eth.get_block_number()
 
 
@@ -71,7 +79,7 @@ def get_out_trans_from(acc, blockheight=0):
             if not Decimal(trans["value"]):
                 continue
 
-            if trans["state"] != "CONFIRMED" or  not trans["success"]:
+            if trans["state"] != "CONFIRMED" or not trans["success"]:
                 continue
 
             if int(trans["blockNumber"]) < blockheight:
@@ -85,11 +93,47 @@ def get_out_trans_from(acc, blockheight=0):
                                "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
-
     return result
 
 
-def get_in_trans_from(self, acc, blockheight=0):
+def get_normal_fee():
+    global ACCESS
+    return ACCESS.eth.generate_gas_price()
+
+
+def sweep_address_to(priv, acc, to, amnt, gas=2000000):
+
+    global ACCESS
+    w3 = ACCESS
+    try:
+        gasPrice = get_normal_fee()
+        key = priv
+        nonce = w3.eth.get_transaction_count(acc)
+        legacy_transaction = {
+            # Note that the address must be in checksum format or native bytes:
+            'to': to,
+            'value': amnt*PREC-gas*gasPrice,
+            'gas': gas,
+            'gasPrice': gasPrice,
+            'nonce': nonce,
+            'chainId': 1
+        }
+        signed = Account.sign_transaction(legacy_transaction, key)
+        w3.eth.sendRawTransaction(signed["rawTransaction"])
+        return signed["hash"]
+    except:
+        traceback.print_exc()
+        return False
+
+
+def generate_address():
+    new_addr = Account.create()
+    return {"address": new_addr.address, "key": str(new_addr.key)}
+
+
+def get_in_trans_from(self,
+                      acc,
+                      blockheight=0):
 
     resp1 = requests.get(API_HOST + "%s/internalTransactions?page=0&size=20" % acc,
                          headers=def_headers)
@@ -146,7 +190,6 @@ def get_in_trans_from(self, acc, blockheight=0):
                                "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
-
     return result
 
 
@@ -159,6 +202,7 @@ def get_sum_from(acc, blockheight=0):
 
 
 def get_balance(acc):
-    w3 = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
+    global ACCESS
+    w3 = ACCESS
     return Decimal(w3.get_balance(acc))/PREC
 

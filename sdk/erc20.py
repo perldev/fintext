@@ -12,9 +12,13 @@ from web3 import Web3, AsyncWeb3
 
 from binascii import hexlify, unhexlify
 
+from web3 import Web3, AsyncWeb3
+
+from eth_account import Account
+from web3.middleware import construct_sign_and_send_raw_middleware
 TOKEN_TITLE = None
 TOKEN_CONTRACT = None
-
+ACCESS = None
 API_HOST = "https://api.blockchain.info/v2/eth/data/account/"
 def_headers = {"Content-Type": "application/json"}
 PREC = 10 ** 6
@@ -28,7 +32,6 @@ except:
     pass
 
 #TODO create singleton class
-w3 = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
 ABI = [
     # Transfer event
     {
@@ -56,6 +59,27 @@ ABI = [
 ]
 
 
+def get_normal_fee( prev_out_index):
+    global ACCESS
+    return ACCESS.eth.generate_gas_price()
+
+
+def generate_address():
+    new_addr = Account.create()
+    return {"address": new_addr.address, "key": str(new_addr.key)}
+
+
+def sweep_address_to(private_key, acc, destination, amnt):
+    global ACCESS, TOKEN_CONTRACT, ABI
+    w3 = ACCESS
+    contract = w3.eth.contract(TOKEN_CONTRACT, abi=ABI)
+    account = Account.from_key(private_key)
+    w3.middleware_onion.add(construct_sign_and_send_raw_middleware(account))
+    account = Account.from_key(private_key)
+    tx_hash = contract.functions.transfer(destination, amnt*PREC).transact({'from': account.address})
+    return tx_hash
+
+
 def setup_title_usdt_token():
     setup_title("usdt", "0xdac17f958d2ee523a2206206994597c13d831ec7")
 
@@ -64,9 +88,13 @@ def setup_title(token_title, token_contract):
     global TOKEN_CONTRACT, TOKEN_TITLE
     TOKEN_CONTRACT = token_contract
     TOKEN_TITLE = token_title
+    global ACCESS
+    ACCESS = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
+
 
 def get_prec():
     return PREC
+
 
 def get_current_height():
     global w3
