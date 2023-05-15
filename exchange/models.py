@@ -6,6 +6,18 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import requests
 from sdk.btc import get_current_height
+import json
+
+
+# imports for whitebit api calls
+import base64
+import hashlib
+import hmac
+import json
+import time
+from private_settings import WHITEBIT_API_KEY, WHITEBIT_SECRET_KEY
+
+
 
 STATUS_INVOICE = (
     ("created", u"выставлен"),
@@ -363,3 +375,47 @@ class Trans(models.Model):
 
     def unicode(o):
         return str(o.id) + " " + str(o.pub_date) + " " + o.currency + " " + o.amnt
+    
+
+class WhitebitDeals(models.Model):
+    buy_currency = models.CharField(max_length=255, verbose_name="Buy Currency")
+    sell_currency = models.CharField(max_length=255, verbose_name="Sell Currency")
+
+    class Meta:
+        verbose_name = u'Whitebit операция'
+        verbose_name_plural = u'Whitebit операции'
+    
+    def __str__(self):
+        return str(self.id)
+
+    def buy(self):
+        request = '/api/v4/order/stock_market'
+        nonce = time.time_ns()
+
+        data = {
+            "market": "BTC_USDT",
+            "side": "buy",
+            "amount": "0.001",     
+            "clientOrderId": "order1987111",
+            "request": request,
+            "nonce": nonce,
+            'nonceWindow': False
+        }
+
+        completeUrl = 'https://whitebit.com/api/v4/order/stock_market'
+
+        data_json = json.dumps(data, separators=(',', ':'))
+        payload = base64.b64encode(data_json.encode('ascii'))
+        signature = hmac.new(WHITEBIT_SECRET_KEY.encode('ascii'), payload, hashlib.sha512).hexdigest()
+
+        headers = {
+            'Content-type': 'application/json',
+            'X-TXC-APIKEY': WHITEBIT_API_KEY,
+            'X-TXC-PAYLOAD': payload,
+            'X-TXC-SIGNATURE': signature,
+        }
+
+        resp = requests.post(completeUrl, headers=headers, data=data_json)
+        return resp
+
+

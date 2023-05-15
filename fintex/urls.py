@@ -32,4 +32,5 @@ urlpatterns = [
     path('orders/<int:pk>', views.order_details, name='order_details'),
     path('oper/', include('oper.urls')), #new
     path('admin/', admin.site.urls),
+    path('api/test-call', views.req_to_whitebit_api, name="req_to_whitebit_api"),
 ]

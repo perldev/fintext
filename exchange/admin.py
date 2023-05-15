@@ -8,7 +8,8 @@ from .models import (
     PoolAccounts,
     FiatAccounts,
     Trans,
-    rate
+    rate,
+    WhitebitDeals
 )  
 
 
@@ -64,3 +65,9 @@ class RateAdmin(admin.ModelAdmin):
     list_display = ["id", "give_currency", "take_currency"]
 
 admin.site.register(rate, RateAdmin)
+
+
+class WhitebitDealsAdmin(admin.ModelAdmin):
+    list_display = ["id"]
+
+admin.site.register(WhitebitDeals, WhitebitDealsAdmin)

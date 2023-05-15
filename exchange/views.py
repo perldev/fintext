@@ -16,7 +16,7 @@ import json
 from django.core import serializers
 from oper.models import rates_direction
 from .models import Orders, CurrencyProvider, Currency, rate, CashPointLocation, Invoice,\
-    Trans, PoolAccounts, FiatAccounts, CHECKOUT_STATUS_PROCESSING, CHECKOUT_STATUS_FREE
+    Trans, PoolAccounts, FiatAccounts, CHECKOUT_STATUS_PROCESSING, CHECKOUT_STATUS_FREE, WhitebitDeals
 from oper.models import get_rate as exchange_get_rate, chat
 from fintex.common import date_to_str
 
@@ -26,6 +26,8 @@ from sdk.btc import get_in_trans_from, get_sum_from, get_current_height
 from sdk.factory import CryptoFactory
 
 from sdk.functions import validate_credit_card
+
+from django.http import HttpResponse
 
 
 def main(req):
@@ -328,5 +330,12 @@ def order_details(request, pk):
         "t_link": get_telechat_link(order)
     }
     return render(request, "order-details.html", context)
+
+
+def req_to_whitebit_api(request):
+    deal = WhitebitDeals.objects.get(pk=1)
+    data = deal.buy()
+    response = HttpResponse(data, content_type='application/json charset=utf-8')
+    return response
 
 
