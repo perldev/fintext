@@ -389,7 +389,7 @@ class WhitebitDeals(models.Model):
         return str(self.id)
 
     def buy(self):
-        request = '/api/v4/order/stock_market'
+        request = '/api/v4/order/market'
         nonce = time.time_ns()
 
         data = {

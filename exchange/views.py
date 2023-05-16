@@ -29,6 +29,8 @@ from sdk.functions import validate_credit_card
 
 from django.http import HttpResponse
 
+from sdk.whitebitcalls import get_address_call
+
 
 def main(req):
     return render(req, "main.html", {})
@@ -336,6 +338,18 @@ def req_to_whitebit_api(request):
     deal = WhitebitDeals.objects.get(pk=1)
     data = deal.buy()
     response = HttpResponse(data, content_type='application/json charset=utf-8')
+    return response
+
+
+def req_for_adress_to_whitebit_api(request):
+    processed_invoices = Invoice.objects.filter(status='processed')
+
+    for i in processed_invoices:
+        resp = get_address_call(i.currency.title.upper())
+        # logic of saving received address
+
+    # code below is just to show that everything is working now
+    response = HttpResponse(resp, content_type='application/json charset=utf-8')
     return response
 
 
