@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "162.55.95.183", "162.55.95.183:9001"
 INSTALLED_APPS = [
     "exchange.apps.ExchangeConfig",
     "oper.apps.OperConfig",
+    "wallet.apps.WalletConfig",
     "django.contrib.admin",
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,6 +81,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'security': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db_security.sqlite3',
     }
 }
 

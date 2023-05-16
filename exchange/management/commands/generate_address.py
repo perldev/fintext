@@ -20,7 +20,6 @@ class Command(BaseCommand):
         parser.add_argument("network", nargs="+", type=str)
         parser.add_argument("count", nargs="+", type=int)
 
-
     help = "Create test  order for exchange"
 
     def handle(self, *args, **options):
@@ -28,7 +27,8 @@ class Command(BaseCommand):
         network = options["network"]
 
         factory = CryptoFactory(c.title, network)
-        factory.generate
+        respj = factory.generate_address()
+
 
 
 
