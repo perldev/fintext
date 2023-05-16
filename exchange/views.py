@@ -346,7 +346,8 @@ def req_for_adress_to_whitebit_api(request):
 
     for i in processed_invoices:
         resp = get_address_call(i.currency.title.upper())
-        # logic of saving received address
+        resp_data = resp.json()
+        print(resp_data['account']['address'])
 
     # code below is just to show that everything is working now
     response = HttpResponse(resp, content_type='application/json charset=utf-8')
