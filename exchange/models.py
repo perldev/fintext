@@ -97,14 +97,6 @@ class Orders(models.Model):
                                  null=True,
                                  blank=True)
 
-    trans = models.ForeignKey("Trans",
-                              verbose_name="транзакция выплаты",
-                              related_name="user_open",
-                              editable=False, on_delete=models.PROTECT,
-                              null=True,
-                              blank=True
-                              )
-
     rate = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="exchange rate",
                                max_length=255, editable=True)
 
@@ -356,6 +348,13 @@ class Trans(models.Model):
                                 editable=False, on_delete=models.PROTECT,
                                 null=True,
                                 blank=True)
+    
+    order = models.ForeignKey("Orders", 
+                              verbose_name="Order",
+                              on_delete=models.PROTECT,
+                              related_name="trans_order",
+                              null=True,
+                              blank=True)
 
 
     txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)

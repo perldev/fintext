@@ -29,8 +29,6 @@ from sdk.functions import validate_credit_card
 
 from django.http import HttpResponse
 
-from sdk.whitebitcalls import get_address_call
-
 
 def main(req):
     return render(req, "main.html", {})
@@ -268,9 +266,8 @@ def create_invoice(req):
                 trans = Trans.objects.create(account=cash_point_obj.title,
                                              payment_id=str(random_secret_key),
                                              currency=order.take_currency,
-                                             amnt=order.amnt_take)
-                order.trans = trans
-                order.save()
+                                             amnt=order.amnt_take,
+                                             order=order)
 
                 respone_data = {
                     'given_cur': str(order.give_currency),
@@ -285,14 +282,13 @@ def create_invoice(req):
                 trans = Trans.objects.create(account=payment_details,
                                              payment_id='',
                                              currency=order.take_currency,
-                                             amnt=order.amnt_take)
+                                             amnt=order.amnt_take,
+                                             order=order)
                 if order.take_currency.title == 'usdt':
                     currency_provider = CurrencyProvider.objects.get(title=usd_net)
                     trans.currency_provider = currency_provider
-
-                trans.save()
-                order.trans = trans
-                order.save()
+                    trans.save()
+                
                 respone_data = {
                     'given_cur': str(order.give_currency),
                     'amount': order.amnt_give,
@@ -326,7 +322,6 @@ def check_invoices(req, id_invoice):
 
 def order_details(request, pk):
     order = Orders.objects.get(pk=pk)
-    print(order.invoice_order.status)
     context = {
         'order': order,
         "t_link": get_telechat_link(order)
@@ -341,16 +336,5 @@ def req_to_whitebit_api(request):
     return response
 
 
-def req_for_adress_to_whitebit_api(request):
-    processed_invoices = Invoice.objects.filter(status='processed')
-
-    for i in processed_invoices:
-        resp = get_address_call(i.currency.title.upper())
-        resp_data = resp.json()
-        print(resp_data['account']['address'])
-
-    # code below is just to show that everything is working now
-    response = HttpResponse(resp, content_type='application/json charset=utf-8')
-    return response
 
 
