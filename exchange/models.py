@@ -2,8 +2,6 @@ from django.db import models
 import fintex.settings as settings
 from datetime import datetime
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 import requests
 from sdk.btc import get_current_height
 import json
@@ -18,10 +16,11 @@ import time
 from private_settings import WHITEBIT_API_KEY, WHITEBIT_SECRET_KEY
 
 
-
 STATUS_INVOICE = (
     ("created", u"выставлен"),
     ("paid", u"оплачен"),
+    ("processing", "в процессе"),
+    ("wait_secure", "проверяется"),
     ("canceled", u"отменен"),
     ("expired", u"просрочен"),
 )
@@ -126,28 +125,6 @@ class Orders(models.Model):
         return str(self.id)
 
 
-# TODO maybe rewritten in separate process
-def tell_subscriber(oper, instance):
-
-    telegram_id = oper.telegram_id
-    txt = u"Новая заявка: \n" + instance.to_nice_text()
-    resp = requests.post(settings.BOTAPI+"alert/%s" % str(telegram_id),
-                         json={"text": txt,
-                                "actions": [{"text": u"подписаться",
-                                              "url":
-                                              settings.API_HOST + "getinwork/%i/%i" % (instance.id, oper.user_id )
-                                            }]})
-    if resp.status_code != 200:
-        print("something wrong during subsribing")
-
-
-@receiver(post_save, sender=Orders, dispatch_uid="tell_subscribers")
-def update_stock(sender, instance, **kwargs):
-    if kwargs.get("created", False):
-        for oper in OperTele.objects.filter(status="processing"):
-            tell_subscriber(oper, instance)
-
-
 # rates
 class rate(models.Model):
     source = models.CharField(max_length=255, verbose_name="source of rate")
@@ -156,11 +133,13 @@ class rate(models.Model):
     take_currency = models.ForeignKey("Currency", verbose_name="Take currency", related_name="currency_provided2",
                                       on_delete=models.PROTECT,)
     # DEFAULT its 1 = means system
-    edit_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Опертор",
-                             related_name="user_provided_rate",
-                             editable=False, on_delete=models.PROTECT,
-                             null=True,
-                             blank=True)
+    edit_user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                  verbose_name="Опертор",
+                                  related_name="user_provided_rate",
+                                  editable=False, on_delete=models.PROTECT,
+                                  null=True,
+                                  blank=True)
+
     pub_date = models.DateTimeField(default=datetime.now, verbose_name="date of gathering")
     raw_data = models.TextField(blank=True, default="{}", editable=True)
     rate = models.DecimalField(decimal_places=20, max_digits=40, verbose_name="rate", max_length=255, editable=True)
@@ -310,7 +289,17 @@ class FiatAccounts(models.Model):
 
     def __str__(self):
         return self.card_number
-    
+
+class CheckAml(models.Model):
+    trans = models.ForeignKey("exchange.Trans",
+                              verbose_name="транса на проверку",
+                              on_delete=models.PROTECT,
+                              related_name="currency_of_trans_check", )
+    status = models.CharField(max_length=40, choices=STATUS_ORDER, default='created', verbose_name="Статус")
+    aml_check = models.TextField(default={})
+    pub_date = models.DateTimeField(default=datetime.now,
+                                    verbose_name="Дата публикации")
+
 
 class Trans(models.Model):
     account = models.CharField(verbose_name="account ",
@@ -356,7 +345,6 @@ class Trans(models.Model):
                                 editable=False, on_delete=models.PROTECT,
                                 null=True,
                                 blank=True)
-
 
     txid = models.CharField(verbose_name="crypto txid", null=True, blank=True, max_length=255)
 
@@ -417,5 +405,4 @@ class WhitebitDeals(models.Model):
 
         resp = requests.post(completeUrl, headers=headers, data=data_json)
         return resp
-
 
