@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from sdk.btc import get_sum_from
-from exchange.models import Invoice, CHECKOUT_STATUS_FREE, Trans
+from exchange.models import Invoice, CHECKOUT_STATUS_FREE, Trans, CheckAml
 from oper.models import context_vars
 from sdk.factory import CryptoFactory
 from datetime import datetime
@@ -26,7 +26,8 @@ class Command(BaseCommand):
     help = "Check incoming on transes on risk"
 
     def handle(self, *args, **options):
-        for trans in Trans.objects.filter(status='created'):
+        for aml_trans in CheckAml.objects.filter(status='created'):
+            trans = aml_trans.trans
 
             asset = None
             if trans.currency_provider.title == "tron":
@@ -38,7 +39,7 @@ class Command(BaseCommand):
             if trans.currency.title in ("eth", "btc"):
                 asset = trans.currency.title.upper()
 
-            def_risk_accepted = context_vars.objects.get(name="risk"+ trans.currency.title)
+            def_risk_accepted = context_vars.objects.get(name="risk" + trans.currency.title)
             def_risk_accepted = float(def_risk_accepted.value)
 
             signature = trans.txid + ":" + AML_ACCESSTOKEN + ":" + AML_ACCESSID
@@ -52,7 +53,9 @@ class Command(BaseCommand):
 
             resp = requests.post("https://extrnlapiendpoint.silencatech.com/", data=params)
             try:
-                trans.aml_check = resp.text
+                aml_trans.aml_check = resp.text
+                aml_trans.status = "processed"
+
                 js = resp.json()
                 if not js["result"]:
                     raise BaseException("some error during security check")
@@ -62,8 +65,15 @@ class Command(BaseCommand):
                     else:
                         trans.status = "processed"
 
+                    aml_trans.result = js["data"]["riskscore"]
+                    aml_trans.save()
+
                     trans.save()
             except:
+                aml_trans.status = "wait_secure"
+                aml_trans.aml_check = resp.text
+                aml_trans.save()
+
                 print(resp.text)
                 traceback.print_exc()
                 return

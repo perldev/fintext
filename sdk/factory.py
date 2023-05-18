@@ -104,5 +104,15 @@ class CryptoFactory:
     def get_balance(self,  *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["get_balance"]
         return call_obj(*args, **kwargs)
+    
+    def generate_address(self,  *args, **kwargs):
+        call_obj = self.__dict_call[self.__currency]["generate_address"]
+        return call_obj(*args, **kwargs)
+    
+    def sweep_address_to(self,  *args, **kwargs):
+        call_obj = self.__dict_call[self.__currency]["sweep_address_to"]
+        return call_obj(*args, **kwargs)
+
+
 
 

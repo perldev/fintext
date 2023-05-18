@@ -1,18 +1,20 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from exchange.models import rate, Currency
-from oper.models import context_vars
+from exchange.models import Currency, CurrencyProvider
 
 import bitstamp.client
 import json
 import requests
 
-from exchange.models import Orders, Currency, CurrencyProvider
+from wallet.models import CryptoAccounts
+from exchange.models import PoolAccounts
 from oper.models import chat
 
 from datetime import datetime, timedelta as dt
 from decimal import Decimal
 from sdk.factory import CryptoFactory
+
+from uuid import uuid4
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -23,11 +25,24 @@ class Command(BaseCommand):
     help = "Create test  order for exchange"
 
     def handle(self, *args, **options):
-        c = Currency.objects.get(title=options["currency"])
-        network = options["network"]
+        print(options)
 
+        c = Currency.objects.get(title=options["currency"][0])
+
+        network = options["network"][0]
+        currency_provider = CurrencyProvider.objects.get(title=network)
         factory = CryptoFactory(c.title, network)
-        respj = factory.generate_address()
+        for i in range(0, options["count"][0]):
+            respj = factory.generate_address()
+            obj = CryptoAccounts.objects.using("security").create(address=respj["address"], raw_data=json.dumps(respj))
+            PoolAccounts.objects.create(currency=c,
+                                        address=obj.address,
+                                        currency_provider=currency_provider,
+                                        ext_info=str(uuid4()))
+
+
+
+
 
 
 

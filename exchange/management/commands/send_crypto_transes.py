@@ -36,12 +36,11 @@ class Command(BaseCommand):
                         # if could not save the transes that is mean that we could contact to developer
                         try:
                             for trans in transes:
-
                                 trans_obj = Trans.objects.create(account=i.crypto_payments_details.address,
                                                                  currency=i.currency,
                                                                  debit_credit="in",
                                                                  order=i.order,
-                                                                 amnt=Decimal(trans["value"]/factory.prec),
+                                                                 amnt=Decimal(trans["value"] / factory.prec),
                                                                  txid=trans["hash"],
                                                                  tx_raw=json.dumps(trans),
                                                                  currency_provider=i.crypto_payments_details.currency_provider
@@ -58,11 +57,10 @@ class Command(BaseCommand):
                         i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
                         i.crypto_payments_details.save()
 
-
                     if i.expire_date < nw:
                         i.status = 'expired'
                         i.save()
                         i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
                         i.crypto_payments_details.save()
 
-    
+
