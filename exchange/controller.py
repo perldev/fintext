@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from exchange.models import Invoice, CheckAml, Trans
 from exchange.models import Orders, OperTele
-
+from fintex import settings
 from fintex.settings import NATIVE_CRYPTO_CURRENCY, CRYPTO_CURRENCY
 
 

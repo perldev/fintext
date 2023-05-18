@@ -1,6 +1,7 @@
 from django.db import models
 
 from datetime import datetime
+import json
 
 
 # Create your models here.
@@ -16,3 +17,10 @@ class CryptoAccounts(models.Model):
                                 null=False,
                                 blank=False,
                                 verbose_name="Full info")
+
+
+def get_full_data(acc):
+    resp = CryptoAccounts.objects.using("security").get(address=acc)
+    d = json.loads(resp.raw_data)
+    return d
+

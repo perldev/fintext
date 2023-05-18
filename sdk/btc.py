@@ -68,23 +68,29 @@ def get_normal_fee( prev_out_index):
     return 230 * 240
 
 
-def sweep_address_to(wif_priv, acc, destination):
+def sweep_address_to(wif_priv, acc, amnt, destination):
+    amnt = to_satoshis(amnt)
     try:
         resp = requests.get("https://blockchain.info/unspent?active=%s" % acc, headers=def_headers)
         respj = resp.json()
-        prev_tx_id, prev_out_index, amnt = [],[], 0
+        prev_tx_id, prev_out_index, whole_amnt = [], [], 0
         inputs = []
         for item in respj["unspent_outputs"]:
             inputs.append(TxInput(TxInput(item["tx_hash"], item["tx_output_n"])))
-            amnt = amnt + item["value"]
+            whole_amnt = whole_amnt + item["value"]
 
         addr = P2pkhAddress(destination)
         myfee = get_normal_fee(prev_out_index)
+        if whole_amnt<amnt:
+            raise Exception("lack of balance!!!!")
+
         amnt2send = amnt - myfee
         txout = TxOutput(amnt2send, Script(['OP_DUP', 'OP_HASH160', addr.to_hash160(),
                                                    'OP_EQUALVERIFY', 'OP_CHECKSIG']))
+        txout_change = TxOutput(whole_amnt-amnt, Script(['OP_DUP', 'OP_HASH160', addr.to_hash160(),
+                                                          'OP_EQUALVERIFY', 'OP_CHECKSIG']))
 
-        tx = Transaction(inputs, [txout])
+        tx = Transaction(inputs, [txout, txout_change])
         sk = PrivateKey(wif_priv)
 
         from_addr = P2pkhAddress(acc)
