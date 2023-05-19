@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from sdk.whitebitcalls import get_address_call, check_balance, sell_currency
+from sdk.whitebitcalls import get_address_call, check_balance, sell_currency, check_order
 from exchange.models import Orders, Trans
 import time
 from decimal import Decimal
@@ -55,7 +55,7 @@ class Command(BaseCommand):
                 resp_data2 = resp2.json()
                 balance_amnt = Decimal(resp_data2['main_balance'])
                 print('This is balance on whitebit: ' + str(balance_amnt))
-                if (amnt_to_sell < balance_amnt):
+                if (amnt_to_sell > balance_amnt):
                     print('Success. Balance is OK.')
                     # Go to step 3: selling currency
                     resp2_status = int(resp2.status_code)
@@ -73,18 +73,32 @@ class Command(BaseCommand):
         resp3_error_statuses = [400, 422, 503]
         market = str(give_currency.title.upper()) + '_' + str(take_currency.title.upper())
         amount = str(amnt_to_sell)
+        uniqueOrderId = str(order.id) + str(int(time.time() * 1000)) # need to save this somewhere
         while resp3_status in resp3_error_statuses:
-            resp3 = sell_currency(market, amount)
+            resp3 = sell_currency(market, amount, uniqueOrderId)
             if resp3.status_code == 200:
-                print('Sell was done')
+                print('Market order was placed')
                 resp3_status = int(resp3.status_code)
             else:
-                print(resp3.status_code)
-                resp_data3 = resp3.json()
-                print(resp_data3)
+                resp3_status = int(resp3.status_code)
             time.sleep(3)
 
-
-            
+    
+        # Step 4. Checking if order is among executed ones.
+        resp4_status = 422
+        resp4_error_statuses = [400, 422, 503]
+        while resp4_status in resp4_error_statuses:
+            resp4 = check_order(uniqueOrderId)
+            if resp4.status_code == 200:
+                resp_data4 = resp4.json()
+                if not resp_data4:
+                    # order is not executed yet
+                    resp4_status = 422
+                else:
+                    # order is executed. need futher logic for results
+                    resp4_status = int(resp4.status_code)
+            else:
+                resp4_status = int(resp4.status_code)
+            time.sleep(3)
 
 
