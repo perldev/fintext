@@ -107,9 +107,11 @@ class Orders(models.Model):
         verbose_name_plural = 'заявки на обмен'
 
     def to_nice_text(o):
+        invoice = Invoice.objects.get(order=o)
         return str(o.pub_date) + "\n" +\
                "\nПокупка: " + o.amnt_give + " " + o.give_currency.title +\
-               "\nПродажа:" + o.amnt_take + " " + o.take_currency.title
+               "\nПродажа:" + o.amnt_take + " " + o.take_currency.title +\
+               "\nОплата: "  + invoice.crypto_payments_details.address + " " + str(invoice.amnt)
 
 
     def __unicode__(o):

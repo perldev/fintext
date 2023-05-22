@@ -84,7 +84,42 @@ def trans_check(sender, instance, **kwargs):
 
 # TODO move to background tasks
 def notify_dispetcher(order, event):
-    pass
+    txt = order.to_nice_text()
+    events_keys = {
+        "trans_aml_failed": "Транзакция по инвойсу не прошла aml проверку, провести в ручном режиме можно в кабинете",
+        "invoice_checking": "Проверяем  входящии транзакции по сделке",
+        "invoice_unpayed": "Транзакции по сделке не поступили к нам",
+        "invoice_payed": "Входящий платеж получен и прошел проверку",
+        "aml_checked": "Входящии платежи по сделке прошли проверку aml",
+        "aml_failed": "Входящии платежи по сделке НЕ прошли проверку aml",
+        "invoice_wait_secure": "Проверьте входящии платежи по сделке в кабинете оператора",
+
+    }
+    msg = None
+    if event not in events_keys:
+        msg = "Не расспознанное событие по сделке %s" % event
+    else:
+        msg = events_keys[event]
+
+    txt = msg + " \n\n" + txt
+    oper_list = None
+
+    if order.operator is not None:
+        oper = OperTele.objects.get(user=order.operator)
+        oper_list = [oper]
+    else:
+        oper_list =OperTele.objects.filter(status="processing")
+
+    # if some operator took in work then list will contain only one element
+    # in other case spam everybody
+
+    for oper in oper_list:
+        telegram_id = oper.telegram_id
+        resp = requests.post(settings.BOTAPI + "alert/%s" % str(telegram_id),
+                             json={"text": txt})
+
+        if resp.status_code != 200:
+            print("something wrong during subsribing")
 
 
 @receiver(post_save, sender=Orders, dispatch_uid="tell_subscribers")
