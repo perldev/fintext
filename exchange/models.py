@@ -44,6 +44,12 @@ STATUS_ORDER = (
     ("failed", u"неуспешна"),
 )
 
+STATUS_WHITEBIT_EXCHANGE = (
+    ("processing", u"в процессе"),
+    ("processed", u"проведена"),
+    ("failed", u"неуспешна"),
+)
+
 
 class OperTele(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Клиент",
@@ -374,13 +380,43 @@ class Trans(models.Model):
         verbose_name = 'Транзакция'
         verbose_name_plural = 'Транзакции'
 
+    def __str__(self):
+        return str(self.id)
+
     def unicode(o):
         return str(o.id) + " " + str(o.pub_date) + " " + o.currency + " " + o.amnt
     
 
 class WhitebitDeals(models.Model):
-    buy_currency = models.CharField(max_length=255, verbose_name="Buy Currency")
-    sell_currency = models.CharField(max_length=255, verbose_name="Sell Currency")
+    currency_give = models.CharField(max_length=255, verbose_name="Give Currency")
+    currency_take = models.CharField(max_length=255, verbose_name="Take Currency")
+    amnt_give = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="Сумма продана",
+                                   max_length=255, editable=True, blank=True, null=True)
+    amnt_take = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="Сумма получена",
+                                   max_length=255, editable=True, blank=True, null=True)
+    fee = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="Комиссия биржи",
+                                   max_length=255, editable=True, blank=True, null=True)
+    price = models.DecimalField(decimal_places=10, max_digits=20, verbose_name="Цена продажи",
+                                     max_length=255, editable=True, blank=True, null=True)
+    timestamp = models.CharField(max_length=40, blank=True, null=True, verbose_name="Время выполнения сделки")
+    client_order_id = models.CharField(max_length=255, 
+                                       verbose_name="whitebit ID сделки", 
+                                       blank=True, 
+                                       null=True)
+    order = models.ForeignKey("Orders", 
+                              verbose_name="Order",
+                              on_delete=models.PROTECT,
+                              related_name="order",
+                              null=True,
+                              blank=True)
+    trans = models.ForeignKey("Trans", 
+                              verbose_name="Trans",
+                              on_delete=models.PROTECT,
+                              related_name="Trans",
+                              null=True,
+                              blank=True)
+    status = models.CharField(max_length=40, choices=STATUS_WHITEBIT_EXCHANGE, default='processing',
+                              verbose_name="Статус", blank=True, null=True)
 
     class Meta:
         verbose_name = u'Whitebit операция'
@@ -389,33 +425,4 @@ class WhitebitDeals(models.Model):
     def __str__(self):
         return str(self.id)
 
-    def buy(self):
-        request = '/api/v4/order/market'
-        nonce = time.time_ns()
-
-        data = {
-            "market": "BTC_USDT",
-            "side": "buy",
-            "amount": "0.001",     
-            "clientOrderId": "order1987111",
-            "request": request,
-            "nonce": nonce,
-            'nonceWindow': False
-        }
-
-        completeUrl = 'https://whitebit.com/api/v4/order/stock_market'
-
-        data_json = json.dumps(data, separators=(',', ':'))
-        payload = base64.b64encode(data_json.encode('ascii'))
-        signature = hmac.new(WHITEBIT_SECRET_KEY.encode('ascii'), payload, hashlib.sha512).hexdigest()
-
-        headers = {
-            'Content-type': 'application/json',
-            'X-TXC-APIKEY': WHITEBIT_API_KEY,
-            'X-TXC-PAYLOAD': payload,
-            'X-TXC-SIGNATURE': signature,
-        }
-
-        resp = requests.post(completeUrl, headers=headers, data=data_json)
-        return resp
 
