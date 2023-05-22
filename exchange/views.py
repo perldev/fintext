@@ -259,12 +259,11 @@ def create_invoice(req):
             new_invoice.save()
 
             if is_cash:
-                random_int = random.randrange(100001, 110000)
-                random_secret_key = order.id + random_int
+                random_key = generate_pseudo_random(8)
                 cash_point_id = int(payment_details)
                 cash_point_obj = CashPointLocation.objects.get(id=cash_point_id)
                 trans = Trans.objects.create(account=cash_point_obj.title,
-                                             payment_id=str(random_secret_key),
+                                             payment_id=random_key,
                                              currency=order.take_currency,
                                              amnt=order.amnt_take,
                                              order=order)
@@ -319,6 +318,42 @@ def check_invoices(req, id_invoice):
 
     return json_true(req, {"result": {"status": active_invoice.status}})
 
+
+def create_cash_invoice(order, cashpoint_location, amnt, currency):
+    address_time_code = None
+    cash_provider = CurrencyProvider.objects.get(title="cash")
+    address_recieve = None
+    # try ten times create uniq  with code
+
+    for i in range(1, 10):
+        try:
+            # create temporary poolaccounts objects with combination address and code
+            address_time_code = generate_pseudo_random(8)
+
+            address_recieve = PoolAccounts.objects.create(address=cashpoint_location.title + "," + str(address_time_code),
+                                                          currency=currency,
+                                                          technical_info=str(amnt),
+                                                          currency_provider=cash_provider,
+                                                          status="processing")
+            break
+        except:
+            traceback.print_exc()
+            continue
+        break
+
+    invoice = Invoice.objects.create(crypto_payments_details=address_recieve,
+                                     currency=currency,
+                                     sum=amnt,
+                                     order=order,
+                                     expire_date=datetime.now() + timedelta(days=1))
+    return invoice
+
+def generate_pseudo_random(number_of_items=6):
+    res = []
+    for i in range(0,number_of_items):
+        rand =  random.choice([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0])
+        res.append( "%0.1X" % rand )
+    return "".join(res)
 
 def order_details(request, pk):
     order = Orders.objects.get(pk=pk)
