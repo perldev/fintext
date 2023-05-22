@@ -12,7 +12,7 @@ from exchange.models import Currency, Orders, Invoice, Trans, OperTele, PoolAcco
 from fintex.common import json_500false, json_true, date_to_str, convert2time, get_telechat_link
 from django.template.loader import render_to_string
 
-from fintex.settings import BOTAPI, COMMON_PASSWORD, OPERTELEBOT
+from fintex.settings import BOTAPI, COMMON_PASSWORD, OPERTELEBOT, FIAT_CURRENCIES, CRYPTO_CURRENCY
 import json
 import requests
 from datetime import datetime
@@ -246,9 +246,27 @@ def invoices_api(req, ):
     return json_true(req, {"data": res})
 
 
+# only for cash invoices
+@csrf_exempt
 @login_required(login_url="/oper/login/")
-def invoices_status(req, ):
-    pass
+def invoices_status(req, status, invoice_id):
+    obj = get_object_or_404(Invoice, pk=invoice_id)
+
+    if obj.currency.title in FIAT_CURRENCIES:
+        if status in ("payed", "canceled") and obj.status in ("processing", ):
+            obj.status = status
+            obj.save()
+            return json_true(req)
+        return json_500false(req, {"description": "Это действие уже невозможно"})
+
+    if obj.currency.title in CRYPTO_CURRENCY:
+        if status in ("payed", "canceled") and obj.status in ("created", "wait_secure"):
+            obj.status = status
+            obj.save()
+            return json_true(req)
+
+        return json_500false(req, {"description": "Это действие уже невозможно"})
+
 
 @csrf_exempt
 @login_required(login_url="/oper/login/")

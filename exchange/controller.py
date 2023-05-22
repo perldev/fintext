@@ -5,14 +5,16 @@ from exchange.models import Invoice, CheckAml, Trans
 from exchange.models import Orders, OperTele
 from fintex import settings
 from fintex.settings import NATIVE_CRYPTO_CURRENCY, CRYPTO_CURRENCY
-
+import requests
 
 # module that works like a gathering all logic for provide deals
 # SIGNALS HERE
+
+
 @receiver(post_save,
           sender=Invoice,
-          dispatch_uid="controller_order")
-def invoice_payed(sender, instance, **kwargs):
+          dispatch_uid="controller_invoice")
+def invoice_check(sender, instance, **kwargs):
     if kwargs.get("created", True):
         print("do nothing")
         return True
@@ -33,6 +35,11 @@ def invoice_payed(sender, instance, **kwargs):
                 pass # here will be command of andrey
             else:
                 notify_dispetcher(order, "invoice_payed")
+
+        if instance.status in ("canceled", "expired"):
+            instance.order.status = "canceled"
+            instance.order.save()
+            notify_dispetcher(order, "invoice_unpayed")
 
         return True
 
@@ -57,6 +64,7 @@ def trans_check(sender, instance, **kwargs):
     if instance.status == "wait_secure":
         notify_dispetcher(instance.order, "trans_aml_failed")
 
+    # here we are checking all incoming transes for invoice
     if instance.status == "processed" \
             and instance.debit_credit == 'in'\
             and instance.currency.title in CRYPTO_CURRENCY:
@@ -68,7 +76,7 @@ def trans_check(sender, instance, **kwargs):
                 return True
 
         # all payed and checked
-        invoice_of_order = Invoice.objects.get(order = instance.order)
+        invoice_of_order = Invoice.objects.get(order=instance.order)
         invoice_of_order.status = "payed"
         invoice_of_order.save()
         return True
@@ -84,6 +92,13 @@ def update_stock(sender, instance, **kwargs):
     if kwargs.get("created", False):
         for oper in OperTele.objects.filter(status="processing"):
             tell_subscriber(oper, instance)
+
+    if instance.status == "canceled":
+        # disable all operations
+        Trans.objects.filter(order=instance, status="created").update(status="canceled")
+        Invoice.objects.filter(order=instance).update(status="canceled")
+
+        return True
 
 
 # TODO maybe rewritten in separate process

@@ -12,12 +12,8 @@ import os
 from django.core.wsgi import get_wsgi_application
 import traceback
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fintex.settings')
-try:
-    print("import controller and notify dispetcher")
-    from exchange import controller
-
-except:
-    traceback.print_exc()
+print("import controller and notify dispetcher")
+from exchange import controller
 
 try:
 

@@ -348,12 +348,14 @@ def create_cash_invoice(order, cashpoint_location, amnt, currency):
                                      expire_date=datetime.now() + timedelta(days=1))
     return invoice
 
+
 def generate_pseudo_random(number_of_items=6):
     res = []
     for i in range(0,number_of_items):
-        rand =  random.choice([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0])
-        res.append( "%0.1X" % rand )
+        rand = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0])
+        res.append("%0.1X" % rand)
     return "".join(res)
+
 
 def order_details(request, pk):
     order = Orders.objects.get(pk=pk)
