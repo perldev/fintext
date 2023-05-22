@@ -29,6 +29,7 @@ except:
 def get_prec():
     return PREC
 
+
 def setup_eth_access():
     global ACCESS
     ACCESS = Web3(Web3.WebsocketProvider("wss://mainnet.infura.io/ws/v3/%s" % INFURA_KEY))
@@ -204,5 +205,5 @@ def get_sum_from(acc, blockheight=0):
 def get_balance(acc):
     global ACCESS
     w3 = ACCESS
-    return Decimal(w3.get_balance(acc))/PREC
+    return Decimal(w3.eth.get_balance(acc))/PREC
 

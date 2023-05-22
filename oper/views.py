@@ -6,9 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from fintex.common import convert2time
-
+from sdk.factory import CryptoFactory
 from oper.models import rates_direction, context_vars, chat
-from exchange.models import Currency, Orders, Invoice, Trans, OperTele
+from exchange.models import Currency, Orders, Invoice, Trans, OperTele, PoolAccounts
 from fintex.common import json_500false, json_true, date_to_str, convert2time, get_telechat_link
 from django.template.loader import render_to_string
 
@@ -19,6 +19,7 @@ from datetime import datetime
 from decimal import Decimal
 # Create your views here.
 import traceback
+from wallet.models import CryptoAccounts
 
 
 @login_required(login_url="/oper/login/")
@@ -140,6 +141,158 @@ def post_message(req, chat_id):
         return json_true(req, {"time": nt})
 
 
+@login_required(login_url="/oper/login/")
+def wallets(req):
+    wallets_title = [{"name": "BTC", "value": "BTC"},
+                     {"name": "ETH", "value": "ETH"},
+                     {"name": "Tron USDT", "value": "tron_usdt"},
+                     {"name": "ERC USDT", "value": "erc_usdt"}]
+    return render(req, "oper/wallets.html", context={"titles": wallets_title})
+
+
+def process_wallet_item(item, factory=None):
+    try:
+        if len(item.technical_info) == 0:
+            item.technical_info = factory.get_balance(item.address)
+            item.save()
+    except:
+        traceback.print_exc()
+        pass
+
+    if factory.network != "native" and len(item.ext_info) == 0:
+        item.ext_info = factory.native_balance(item.address)
+        item.save()
+
+    if item.address == factory.default_address:
+        item.ext_info = item.ext_info + ", Адрес выплат"
+
+    return {"id": item.id,
+            "balance": str(item.technical_info),
+            "ext_info": item.ext_info,
+            "account": item.address,
+            "status": item.status,
+            "actions": render_to_string("oper/wallets_menu.html",
+                                        context={"item": item})}
+
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def wallets_list(req, chanel):
+    wallets_title = {"BTC": lambda: PoolAccounts.objects.filter(currency__title="btc"),
+                     "ETH": lambda: PoolAccounts.objects.filter(currency__title="eth"),
+                     "tron_usdt": lambda: PoolAccounts.objects.filter(currency__title="usdt",
+                                                                      currency_provider__title="tron"),
+                     "erc_usdt": lambda: PoolAccounts.objects.filter(currency__title="usdt",
+                                                                     currency_provider__title="erc20")}
+
+    wallets_factories = {
+                         "BTC": lambda: CryptoFactory("btc"),
+                         "ETH": lambda: CryptoFactory("eth"),
+                         "tron_usdt": lambda: CryptoFactory("usdt", network="tron"),
+                         "erc_usdt": lambda: CryptoFactory("usdt", network="erc20"),
+                         }
+
+    if chanel not in wallets_title:
+        return json_500false(req, {"description": "title not supported"})
+
+    res = []
+    factory = wallets_factories[chanel]()
+    context_var, created = context_vars.objects.get_or_create(name=factory.currency + "_" + factory.network + "_forpayment")
+    factory.set_default(context_var.value)
+
+    for i in wallets_title[chanel]():
+        res.append(process_wallet_item(i,  factory))
+
+    return json_true(req, {"data": res})
+
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def wallets_make_withdraw(req, wallet):
+    obj = get_object_or_404(PoolAccounts, pk=wallet)
+    context_obj, created = context_vars.objects.get_or_create(name=obj.currency.title + "_" + obj.currency_provider.title + "_forpayment")
+    context_obj.value = obj.address
+    context_obj.save()
+    return json_true(req)
+
+
+@login_required(login_url="/oper/login/")
+def analytics(req):
+    pass
+
+
+def process_item_invoice(i):
+
+    return {
+            "operator": i.operator.username,
+            "pub_date": i.pub_date,
+            "expire_date": i.expire_date,
+            "amnt": i.sum,
+            "status": i.status,
+            "currency": i.currency.title,
+            "address": i.crypto_payments_details.address,
+            "ext_info": i.crypto_payments_details.ext_info,
+            "actions": render_to_string("oper/invoice_menu.html", context={"item": i})
+
+    }
+
+
+@login_required(login_url="/oper/login/")
+def invoices_api(req, ):
+    res = []
+    for i in Invoice.objects.all().order_by("-pub_date"):
+        res.append(process_item_invoice(i))
+
+    return json_true(req, {"data": res})
+
+
+@login_required(login_url="/oper/login/")
+def invoices_status(req, ):
+    pass
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def wallets_sweep(req, wallet):
+    obj = get_object_or_404(PoolAccounts, pk=wallet)
+    factory = CryptoFactory(obj.currency.title,
+                            obj.currency_provider.title)
+    obj.technical_info = factory.get_balance()
+    obj.save()
+    # TODO
+    return json_true(req)
+
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def wallets_update(req, wallet):
+    obj = get_object_or_404(PoolAccounts, pk=wallet)
+    factory = CryptoFactory(obj.currency.title,
+                            obj.currency_provider.title)
+    obj.technical_info = factory.get_balance()
+
+    if obj.currency_provider.title != "native":
+        obj.ext_info = factory.native_balance(obj.address)
+
+    obj.save()
+    return json_true(req)
+
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def wallets_info(req, wallet):
+    # get the all info of wallet
+    return json_true(req)
+
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def wallets_status(req, status, wallet):
+    obj = get_object_or_404(PoolAccounts, pk=wallet)
+    obj.status = status
+    obj.save()
+    return json_true(req)
+
+
 # TODO add token auth
 @csrf_exempt
 def message_income(req, chat_id):
@@ -150,8 +303,10 @@ def message_income(req, chat_id):
     username = body.get("username", "")
     result = json.loads(obj.history)
     print(result)
+
     if "msgs" not in result:
         result["msgs"] = []
+
     msgs = result["msgs"]
     nt = datetime.now()
     msgs.append({"time": convert2time(nt), "username": username, "text": txt})
@@ -287,7 +442,6 @@ def whole_oper_info(req, order_id):
 @login_required(login_url="/oper/login")
 def show_payment(req, order_id):
     obj = get_object_or_404(Orders, pk=order_id)
-
     return json_true(req, {"trans": json.loads(serializers.serialize("json", [obj.trans]))})
 
 
@@ -336,7 +490,8 @@ def rates_settings(request):
 
 # TODO add IPs permissions
 def login_page(request):
-    return render(request, "oper/authentication-login.html", context=None, content_type=None, status=None, using=None)
+    return render(request, "oper/authentication-login.html",
+                  context=None, content_type=None, status=None, using=None)
 
 
 @login_required

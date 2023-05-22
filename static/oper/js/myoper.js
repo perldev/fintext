@@ -14,6 +14,7 @@ $(function() {
         });
         Main = {
             "chat_interval": 3000,
+            "table":null,
             "start_chat": function(chat_id, messages_container,  message){
                 Main.id_message = "#" + message;
                 Main.id_messages_container = "#" + messages_container;
@@ -100,6 +101,10 @@ $(function() {
 
 
             },
+            "address_list": function(chanel){
+                 $("#wallets").DataTable().ajax.url('/oper/api/wallets/'+chanel+"/").load();
+
+            },
             "subscribe_oper": function(url){
                   var post_action = function(resp){
                         Main.alert(resp["telegram_link"], "Ссылка для подписки на уведомления");
@@ -173,6 +178,8 @@ $(function() {
                     });
 
             },
+
+
             simple_form: function(fields){
                     var res = [];
                     var terms = {
@@ -235,22 +242,25 @@ $(function() {
 
 
         }
-        var api_url = $('#zero_config').data("api-url");
-        var columns = []
-        $('#zero_config thead tr th ').each(function(){
-            columns.push({"data":$(this).data("col")});
+        $('.zero_tables').each(function(){
+                var api_url = $(this).data("api-url");
+                var columns = []
+                 $(this).find('thead tr th ').each(function(){
+                    columns.push({"data":$(this).data("col")});
+                });
+
+                 var table = $(this).DataTable({ajax:api_url,
+                                                columns: columns});
+                 $(this).find("tbody").on('mouseenter', 'td', function () {
+                    var colIdx = table.cell(this).index().column;
+                    $(table.cells().nodes()).removeClass('odd');
+                    $(table.column(colIdx).nodes()).addClass('odd');
+                });
+
         });
 
-        var table = $('#zero_config').DataTable({
-                                           ajax:api_url,
-                                           columns: columns
-                   });
 
-         $('#zero_config tbody').on('mouseenter', 'td', function () {
-            var colIdx = table.cell(this).index().column;
 
-            $(table.cells().nodes()).removeClass('odd');
-            $(table.column(colIdx).nodes()).addClass('odd');
-        });
+
 
 });

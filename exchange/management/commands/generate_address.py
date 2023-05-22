@@ -34,11 +34,17 @@ class Command(BaseCommand):
         factory = CryptoFactory(c.title, network)
         for i in range(0, options["count"][0]):
             respj = factory.generate_address()
-            obj = CryptoAccounts.objects.using("security").create(address=respj["address"], raw_data=json.dumps(respj))
-            PoolAccounts.objects.create(currency=c,
-                                        address=obj.address,
-                                        currency_provider=currency_provider,
-                                        ext_info=str(uuid4()))
+            obj = CryptoAccounts.objects.using("security").create(address=respj["address"],
+                                                                  raw_data=json.dumps(respj))
+            d = PoolAccounts.objects.create(currency=c,
+                                            address=obj.address,
+                                            technical_info="0",
+                                            currency_provider=currency_provider,)
+
+            if factory.network != "native":
+                d.ext_info = "0"
+
+                d.save()
 
 
 

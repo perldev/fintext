@@ -12,7 +12,9 @@ urlpatterns = [
     path("api/delete_rate/<str:from_currency>/<str:to_currency>", views.delete_rate, name="delete_rate"),
     path("to_history_page/<int:deal>/", views.to_history_page, name="to_history_page"),
     path("trans_page/", views.trans_page, name="trans_page"),
-
+    path("analytics/", views.analytics, name="analytics"),
+    path("api/invoices", views.invoices_api, name="invoices_api"),
+    path("api/invoices/status/<str:invoice>/<str:status>/", views.invoices_status, name="invoice_status"),
 
     path("api/telegram_subscribe/", views.telegram_subscribe, name="telegram_subscribe"),
     path("api/telegram_subscribe_callback/<str:token>/", views.telegram_subscribe_callback,
@@ -32,7 +34,11 @@ urlpatterns = [
     path("api/trans/<str:status>/<str:trans_id>/", views.trans_status, name="trans_status"),
     path("api/order/show_payment/<str:order_id>/", views.show_payment, name="show_payment"),
     path("api/order/status/<str:status>/<str:order_id>/", views.order_status, name="oper_order_status"),
-    path("api/get_direction/<str:from_currency>/<str:to_currency>", views.get_direction, name="get_direction"),
-
+    path("wallets", views.wallets, name="wallets"),
+    path("api/wallets/<str:chanel>/", views.wallets_list, name="wallets_api"),
+    path("api/wallets/make_withdraw/<str:wallet>/", views.wallets_make_withdraw, name="wallets_withdraw"),
+    path("api/wallets/sweep/<str:wallet>/", views.wallets_sweep, name="wallets_sweep"),
+    path("api/wallets/update/<str:wallet>/", views.wallets_update, name="wallets_update"),
+    path("api/wallets/status/<str:status>/<str:wallet>/", views.wallets_status, name="wallets_status"),
     path('reset_pwd_request', views.reset_pwd_request, name='reset_pwd_request')
 ]

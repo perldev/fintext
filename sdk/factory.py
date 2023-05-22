@@ -11,12 +11,16 @@ from sdk.eth import get_current_height as heth, get_out_trans_from as outeth, ge
 
 from sdk.erc20 import get_current_height as herc, get_out_trans_from as outerc, get_in_trans_from as inerc, \
     get_sum_from as sumfromerc, get_balance as balanceerc, setup_title_usdt_token as setup_erc20_usdt, \
-    get_prec as get_prec_erc, sweep_address_to as sweep_address_to_erc20, generate_address as generate_address_erc20
-
+    get_prec as get_prec_erc, sweep_address_to as sweep_address_to_erc20, generate_address as generate_address_erc20,\
+    get_native_balance as erc20_native_balance
 
 from sdk.tron import get_current_height as htron, get_out_trans_from as outtron, get_in_trans_from as intron, \
     get_sum_from as sumfromtron, get_balance as balancetron, setup_title_usdt_token as setup_tron_usdt,\
-    get_prec as get_prec_tron, sweep_address_to as sweep_address_to_tron, generate_address as generate_address_tron
+    get_prec as get_prec_tron, sweep_address_to as sweep_address_to_tron, generate_address as generate_address_tron,\
+    get_native_balance as tron_native_balance
+
+
+from decimal import Decimal
 
 
 class CryptoFactory:
@@ -27,7 +31,7 @@ class CryptoFactory:
             network = "native"
 
         self.__network = network
-
+        self.__default_address = None
         self.__dict_call = {
 
             "btc": {
@@ -66,8 +70,9 @@ class CryptoFactory:
                 "get_in_trans_from": inerc,
                 "get_sum_from": sumfromerc,
                 "get_balance": balanceerc,
+                "native_balance":erc20_native_balance,
                 "sweep_address_to": sweep_address_to_erc20,
-                "generate_address":generate_address_erc20
+                "generate_address": generate_address_erc20
 
             }
 
@@ -80,10 +85,25 @@ class CryptoFactory:
                 "get_in_trans_from": intron,
                 "get_sum_from": sumfromtron,
                 "get_balance": balancetron,
+                "native_balance": tron_native_balance,
                 "sweep_address_to": sweep_address_to_tron,
                 "generate_address": generate_address_tron
             }
         self.prec = self.__dict_call[arg]["get_prec"]()
+
+    def set_default(self, addr):
+        self.__default_address = addr
+        return True
+    @property
+    def default_address(self):
+        return self.__default_address
+    @property
+    def currency(self):
+        return self.__currency
+
+    @property
+    def network(self):
+        return self.__network
 
     def get_current_height(self, *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["get_current_height"]
@@ -102,9 +122,14 @@ class CryptoFactory:
         return call_obj(*args, **kwargs)
 
     def get_balance(self,  *args, **kwargs):
+
         call_obj = self.__dict_call[self.__currency]["get_balance"]
-        return call_obj(*args, **kwargs)
-    
+        value = call_obj(*args, **kwargs)
+        if kwargs.get("show_normal", False):
+            return Decimal(value/self.prec)
+        else:
+            return value
+
     def generate_address(self,  *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["generate_address"]
         return call_obj(*args, **kwargs)
@@ -113,6 +138,8 @@ class CryptoFactory:
         call_obj = self.__dict_call[self.__currency]["sweep_address_to"]
         return call_obj(*args, **kwargs)
 
-
+    def native_balance(self,  *args, **kwargs):
+        call_obj = self.__dict_call[self.__currency]["native_balance"]
+        return call_obj(*args, **kwargs)
 
 

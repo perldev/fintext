@@ -32,9 +32,11 @@ CHECKOUT_STATUS_FREE = "wait_checkout"
 CHECKOUT_STATUS_PROCESSING = "processing"
 
 STATUS_ORDER = (
-    ("wait_checkout", u"waiting_checkout"),
+    ("wait_checkout", u"ожидает"),
     ("created", u"создана"),
     ("processing", u"в процессе"),
+    ("processing2", u"в процессе отправки"),
+
     ("wait_secure", u"проверяется"),
     ("user_canceled", u"отменена клиентом"),
     ("canceled", u"отменена оператором"),
@@ -209,8 +211,16 @@ class Invoice(models.Model):
                               max_length=255, 
                               editable=True,
                               default=0)
+
     block_height = models.IntegerField(verbose_name="Высота блока",
                                        default=0)
+
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Опертор",
+                                 related_name="user_checked",
+                                 editable=False,
+                                 on_delete=models.PROTECT,
+                                 null=True,
+                                 blank=True)
 
     pub_date = models.DateTimeField(default=datetime.now, verbose_name="Дата публикации")
 
@@ -245,8 +255,9 @@ class PoolAccounts(models.Model):
                                     verbose_name="Дата публикации")
 
     ext_info = models.CharField(max_length=255,
-                               unique=True,
-                               verbose_name="Внешний ключ идентификации")
+                                blank=True,
+                                null=True,
+                               verbose_name="доп информации по нативной валюте, если это токен usdt")
 
     address = models.CharField(max_length=255,
                                unique=True,
@@ -254,11 +265,12 @@ class PoolAccounts(models.Model):
 
     technical_info = models.CharField(max_length=255,
                                       default="",
-                                      verbose_name="Техническая информация для обработки платежей")
+                                      verbose_name="Техническая информация для обработки платежей, balance tokena")
     
     currency_provider = models.ForeignKey("CurrencyProvider", 
                                           verbose_name="Сеть", 
                                           blank=True,
+
                                           null=True, 
                                           on_delete=models.PROTECT)
 
@@ -281,6 +293,7 @@ class FiatAccounts(models.Model):
 
     def __str__(self):
         return self.card_number
+
 
 class CheckAml(models.Model):
     trans = models.ForeignKey("exchange.Trans",
@@ -354,6 +367,7 @@ class Trans(models.Model):
                                           on_delete=models.PROTECT)
 
     tx_raw = models.TextField(default={})
+
     aml_check = models.TextField(default={})
 
     class Meta:

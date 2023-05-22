@@ -1,0 +1,9 @@
+<button type="button" onclick="Main.one_line_api('/oper/api/wallets/make_withdraw/{{item.id}}/')" class="btn btn-primary btn-sm">Сделать кошлельком выппат</button>
+<button type="button" onclick="Main.one_line_api('/oper/api/wallets/sweep/{{item.id}}/')" class="btn btn-secondary btn-sm">Отправить на кошель выплат</button>
+<button type="button" onclick="Main.one_line_api('/oper/api/wallets/update/{{item.id}}/')" class="btn btn-secondary btn-sm">Актуализировать</button>
+{% if item.status == 'wait_checkout' %}
+<button type="button" onclick="Main.one_line_api('/oper/api/wallets/status/canceled/{{item.id}}/')"  class="btn btn-success btn-sm">Заблокировать</button>
+{% else %}
+<button type="button" onclick="Main.one_line_api('/oper/api/wallets/status/wait_checkout/{{item.id}}/')"  class="btn btn-success btn-sm">Активировать</button>
+{% endif %}
+

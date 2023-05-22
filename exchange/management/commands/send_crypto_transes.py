@@ -18,24 +18,25 @@ class Command(BaseCommand):
 
         transes4send = Trans.objects.filter(debit_credit='out',
                                             currency__title_in=NATIVE_CRYPTO_CURRENCY,
-                                            status="created"
+                                            status="processing",
+                                            order__give_currency__title_in=NATIVE_CRYPTO_CURRENCY
                                             )
         for i in transes4send:
-            i.status = "processing"
+            i.status = "processing2"
             i.save()
 
             order = i.order
-            if not order.give_currency.title in NATIVE_CRYPTO_CURRENCY:
-                print("this is trans that are not affected by this process")
-                continue
-
-            # only for native
-
             factory = CryptoFactory(i.currency.title,
                                     "native")
             invoice = Invoice.objects.get(order=order)
             resp = get_full_data(invoice.crypto_payments_details.address)
+
             txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, i.amnt)
             i.txid = txid
+
+            # save balance for address
+            invoice.crypto_payments_details.technical_info = factory.get_balance(i.crypto_payments_details.address)
+            invoice.crypto_payments_details.save()
+
             i.status = "processed"
             i.save()

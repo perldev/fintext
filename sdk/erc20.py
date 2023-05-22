@@ -169,6 +169,12 @@ def get_sum_from(acc, blockheight=0, blockto="latest"):
     return d / PREC, in_trans
 
 
+def get_native_balance(acc):
+    global ACCESS
+    w3 = ACCESS
+    return Decimal(w3.eth.get_balance(acc)) / PREC
+
+
 def get_balance(acc):
 
     resp = requests.get(API_HOST + "%s/tokenAccounts" % acc,

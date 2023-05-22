@@ -44,7 +44,6 @@ class Command(BaseCommand):
         else:
             print('Trans is already existed')
 
-
         # Step 2. Checking balance
         # Logic of requesting balance until it is replenished
         resp2_status = 422

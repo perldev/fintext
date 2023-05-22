@@ -79,7 +79,7 @@ def sweep_address_to(priv, acc, to, amnt):
 
 def generate_address():
     resp = ACCESS.getnewaddress()
-    resp["address"] = resp["public_key"]
+    resp["address"] = resp["base58check_address"]
     resp["key"] = resp["private_key"]
     return resp
 
@@ -139,6 +139,10 @@ def get_sum_from(acc, blockheight=0, blockto="latest"):
 def get_prec():
     return PREC
 
+
+def get_native_balance(acc):
+    global ACCESS
+    return ACCESS.getbalance(acc)
 
 def get_balance(acc):
     global ACCESS

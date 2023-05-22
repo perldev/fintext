@@ -7,6 +7,7 @@
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
                                 href="{% url 'oper_home' %}" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span
                                     class="hide-menu">Рабочая панель</span></a></li>
+
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
                                 href="{% url 'oper_rate_settings' %}" aria-expanded="false"><i class="fas fa-align-left"></i><span
                                     class="hide-menu">Курсы</span></a></li>
@@ -15,9 +16,16 @@
                                 href="{% url 'trans_page' %}" aria-expanded="false"><i class="fas fa-arrow-right"></i><span
                                     class="hide-menu">Платежи</span></a></li>
 
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{% url 'wallets' %}" aria-expanded="false">
+                            <i class="mdi mdi-border-inside"></i><span class="hide-menu">Кошельки</span></a></li>
+
+
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                                href="{% url 'oper_rate_settings' %}" aria-expanded="false"><i class="mdi mdi-chart-bar"></i><span
+                                href="{% url 'analytics' %}" aria-expanded="false"><i class="mdi mdi-chart-bar"></i><span
                                     class="hide-menu">Аналитика</span></a></li>
+
 
                         <!--
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
