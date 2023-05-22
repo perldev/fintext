@@ -5,6 +5,7 @@ from django.http import HttpResponse
 
 import decimal
 import datetime
+import traceback
 from django.core.cache import cache
 from oper.models import get_telechat_link as oper_get_telechat_link, chat
 import time
@@ -48,6 +49,16 @@ def json_true(req, dictt=None):
 
     return HttpResponse(resp, headers={"Content-Type": "application/json"})
 
+
+def no_fail(function):
+    def wrapper(*args, **kargs):
+        try:
+            return function(*args, **kargs)
+        except:
+            traceback.print_exc()
+            return False
+
+    return wrapper
 
 def convert2time(date):
     return int(time.mktime(date.timetuple()))

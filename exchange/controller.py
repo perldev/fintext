@@ -6,6 +6,7 @@ from exchange.models import Orders, OperTele
 from fintex import settings
 from fintex.settings import NATIVE_CRYPTO_CURRENCY, CRYPTO_CURRENCY
 import requests
+from fintex.common import no_fail
 
 # module that works like a gathering all logic for provide deals
 # SIGNALS HERE
@@ -32,7 +33,8 @@ def invoice_check(sender, instance, **kwargs):
         if instance.status == "payed":
             if order.give_currency.title in NATIVE_CRYPTO_CURRENCY:
                 notify_dispetcher(order, "invoice_payed")
-                pass # here will be command of andrey
+                pass
+                # here will be command of andrey
             else:
                 notify_dispetcher(order, "invoice_payed")
 
@@ -50,10 +52,10 @@ def aml_check(sender, instance, **kwargs):
         return True
 
     if instance.status == "processed":
-        notify_dispetcher(instance.trans.order, "aml_checked")
+        return notify_dispetcher(instance.trans.order, "aml_checked")
 
     if instance.status == "wait_secure":
-        notify_dispetcher(instance.trans.order, "aml_failed")
+        return notify_dispetcher(instance.trans.order, "aml_failed")
 
 
 @receiver(post_save, sender=Trans, dispatch_uid="controller_trans")
@@ -62,7 +64,7 @@ def trans_check(sender, instance, **kwargs):
         return True
 
     if instance.status == "wait_secure":
-        notify_dispetcher(instance.order, "trans_aml_failed")
+        return notify_dispetcher(instance.order, "trans_aml_failed")
 
     # here we are checking all incoming transes for invoice
     if instance.status == "processed" \
@@ -83,6 +85,7 @@ def trans_check(sender, instance, **kwargs):
 
 
 # TODO move to background tasks
+@no_fail
 def notify_dispetcher(order, event):
     txt = order.to_nice_text()
     events_keys = {
@@ -120,6 +123,8 @@ def notify_dispetcher(order, event):
 
         if resp.status_code != 200:
             print("something wrong during subsribing")
+
+    return True
 
 
 @receiver(post_save, sender=Orders, dispatch_uid="tell_subscribers")
