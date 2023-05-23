@@ -267,9 +267,7 @@ def create_invoice(req):
                                              currency=order.take_currency,
                                              amnt=order.amnt_take,
                                              order=order)
-
-                order.status = "processing"
-                order.save
+                order.trans = trans
                 respone_data = {
                     'given_cur': str(order.give_currency),
                     'amount': order.amnt_give,
@@ -285,6 +283,8 @@ def create_invoice(req):
                                              currency=order.take_currency,
                                              amnt=order.amnt_take,
                                              order=order)
+                order.trans = trans
+
                 if order.take_currency.title == 'usdt':
                     currency_provider = CurrencyProvider.objects.get(title=usd_net)
                     trans.currency_provider = currency_provider
@@ -300,7 +300,7 @@ def create_invoice(req):
                 }
             # status of working orders
             order.status = "processing"
-            order.save
+            order.save()
             return json_true(req, {'response': respone_data})
         else:
             respone_data = {

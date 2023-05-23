@@ -107,6 +107,8 @@ class Orders(models.Model):
     rate = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="exchange rate",
                                max_length=255, editable=True)
 
+    trans = models.ForeignKey("Trans", null=True, blank=True,verbose_name="транзакция выплаты",
+                              on_delete=models.PROTECT, )
 
     class Meta:
         verbose_name = 'заявка на обмен'
@@ -115,9 +117,9 @@ class Orders(models.Model):
     def to_nice_text(o):
         invoice = Invoice.objects.get(order=o)
         return str(o.pub_date) + "\n" +\
-               "\nПокупка: " + o.amnt_give + " " + o.give_currency.title +\
-               "\nПродажа:" + o.amnt_take + " " + o.take_currency.title +\
-               "\nОплата: "  + invoice.crypto_payments_details.address + " " + str(invoice.amnt)
+               "\nПокупка: " + str(o.amnt_give) + " " + o.give_currency.title +\
+               "\nПродажа:" + str(o.amnt_take) + " " + o.take_currency.title +\
+               "\nОплата: "  + invoice.crypto_payments_details.address + " " + str(invoice.sum)
 
 
     def __unicode__(o):
