@@ -105,10 +105,13 @@ $(function() {
                  $("#wallets").DataTable().ajax.url('/oper/api/wallets/'+chanel+"/").load();
 
             },
-            "subscribe_oper": function(url){
+            "subscribe_oper": function(){
+
                   var post_action = function(resp){
-                        Main.alert(resp["telegram_link"], "Ссылка для подписки на уведомления");
+                        var li = resp["link"];
+                        Main.alert(`<a target=\"_blank\" href=\"${li}\">${li}</a>`, "Ссылка для подписки на уведомления");
                   };
+                  var url = $(event.target).data("url");
                   Main.one_line_api(url, post_action)
             },
             "alert": function(msg, title){
@@ -148,16 +151,22 @@ $(function() {
             },
             one_line_api: function(url, postaction){
               if(!url){
-                    Main.my_alert("Техническая ошибка, напишите разрабам")
+                    Main.alert("Техническая ошибка, напишите разрабам")
                     return;
               }
               var request = $.ajax({
-                   url: url,
+                   url: url+"?_="+new Date(),
                    method: "GET",
                    dataType: "json"
                 });
                 request.done(function( msg ) {
-                   Main.alert("Ok!");
+                  if(postaction){
+                        postaction(msg)
+
+                  }else{
+                    Main.alert("Ok!");
+                  }
+                  return  true;
                 });
                 request.fail(function( jqXHR, textStatus ) {
                   Main.alert("не могу завершить действие " + url );

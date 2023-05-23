@@ -500,7 +500,7 @@ def rates_settings(request):
     return render(request, "oper/charts.html",
                   context={"directions": directions,
                            "title": "Exchange Operator Cabinet",
-                           "js_version": "3"},
+                           "js_version": "5"},
                   content_type=None,
                   status=None,
                   using=None)
@@ -517,7 +517,7 @@ def test_rate(req):
     d = {}
     code4execute = req.body.decode('utf-8')
 
-    for i in context_vars.objects.all():
+    for i in context_vars.objects.filter(name__startswith="context_"):
         d[i.name] = float(i.value)
 
     # print(eval('sqrt(a)', {'__builtins__': None}, {'a': a, 'sqrt': sqrt}))
@@ -581,7 +581,7 @@ def telegram_subscribe(req):
     if created:
         nw = datetime.now()
         k = str(convert2time(nw))
-        link.tele_link = OPERTELEBOT + "subsribe " + str(convert2time(nw))
+        link.tele_link = OPERTELEBOT + "subsribe-" + str(convert2time(nw))
         link.token = k
 
         link.save()

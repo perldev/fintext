@@ -19,7 +19,7 @@
         //save the state of current
         Calculator.current = [from, to];
         var request = $.ajax({
-                   url: "/oper/api/get_direction/" + from + "/" + to,
+                   url: "/oper/api/get_direction/" + from + "/" + to+"/",
                    method: "GET",
                    dataType: "json"
                 });
@@ -38,12 +38,12 @@
 
     };
     Calculator.test_change = function(){
-               from  = Calculator.current[0];
-               to  = Calculator.current[1];
+               var from  = Calculator.current[0];
+               var to  = Calculator.current[1];
                var code = $("#calc_rate").val();
 
                var request = $.ajax({
-                   'url': "/oper/api/test_rate",
+                   'url': "/oper/api/test_rate/",
                    'data': code, //{action:'x',params:['a','b','c']}
                    'type': 'POST',
                    'processData': false,
@@ -61,11 +61,11 @@
 
     };
     Calculator.save_change = function(){
-               from  = Calculator.current[0];
-               to  = Calculator.current[1];
+               var from  = Calculator.current[0];
+               var to  = Calculator.current[1];
                var code = $("#calc_rate").val();
                var request = $.ajax({
-                   'url': "/oper/api/save_rate/"+from+"/" + to,
+                   'url': "/oper/api/save_rate/"+from+"/" + to +"/",
                    'data': code,
                    'type': 'POST',
                    'processData': false,
@@ -157,7 +157,7 @@
 
     function getDataRates(chanelName, rate_name, callback_handler){
                var request = $.ajax({
-                   url: "/api/oper/getDataRate/" + chanelName + "/" + rate_name,
+                   url: "/api/oper/getDataRate/" + chanelName + "/" + rate_name+"/",
                    method: "GET",
                    dataType: "json",
                   success: function( msg ) {

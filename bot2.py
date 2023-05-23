@@ -496,7 +496,7 @@ def process_text(content_type, chat_type, chat_id, msg):
     if text_msg.startswith("/start"):
         # this also for first start
         try:
-            cmd = re.match("/start ([^ ]+) ([^ ]+)", text_msg)
+            cmd = re.match("/start ([^ -]+)-([^ -]+)", text_msg)
             if cmd:
                 return cmd_from_site(cmd.group(1), cmd.group(2), msg)
 
