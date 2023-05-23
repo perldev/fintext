@@ -184,7 +184,7 @@ def create_exchange_request(req):
                 c = chat.objects.create(deal=order)
                 tele_link = get_telechat_link(order)
                 respone_data["t_link"] = tele_link
-                
+
                 return json_true(req, {'response': respone_data})
 
     else:
@@ -268,11 +268,13 @@ def create_invoice(req):
                                              amnt=order.amnt_take,
                                              order=order)
 
+                order.status = "processing"
+                order.save
                 respone_data = {
                     'given_cur': str(order.give_currency),
                     'amount': order.amnt_give,
                     'payment_details_give': payment_details_give,
-                    'secret_key': str(random_secret_key),
+                    'secret_key': str(random_key),
                     't_link': t_link,
                     'order_id': order.id,
                     'message': 'Ожидаем вашей оплаты'
@@ -296,7 +298,9 @@ def create_invoice(req):
                     'order_id': order.id,
                     'message': 'Ожидаем вашей оплаты'
                 }
-
+            # status of working orders
+            order.status = "processing"
+            order.save
             return json_true(req, {'response': respone_data})
         else:
             respone_data = {
