@@ -196,6 +196,7 @@ def create_invoice(req):
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
         payment_details = body['payment_details']
+        # is_cash - это вывод в гривне на карту или наличными в точке выдачи
         is_cash = int(body['is_cash'])
         usd_net = body['usdt_net']
 
@@ -271,8 +272,10 @@ def create_invoice(req):
                     cashpoint_location = CashPointLocation.objects.get(id=cash_point_if_fiat)
                     payment_details_give = cashpoint_location.title
                     create_cash_invoice(order, cashpoint_location, amnt, currency)
-
-            if is_cash:
+            
+            # если BTC_UAH получать гривну на карту, то is_cash=false и выполняется else
+            if is_cash and order.take_currency.title in FIAT_CURRENCIES:
+                # выполняется при *_FIAT получение гривны в точке выдачи 
                 random_key = generate_pseudo_random(8)
                 cash_point_id = int(payment_details)
                 cash_point_obj = CashPointLocation.objects.get(id=cash_point_id)
@@ -291,8 +294,18 @@ def create_invoice(req):
                     'order_id': order.id,
                     'message': 'Ожидаем вашей оплаты'
                 }
-                print(respone_data)
+            elif not is_cash and order.take_currency.title in FIAT_CURRENCIES:
+                # выполняется при *_FIAT получение гривны на карту 
+                respone_data = {
+                    'given_cur': str(order.give_currency),
+                    'amount': order.amnt_give,
+                    'payment_details_give': payment_details_give,
+                    't_link': t_link,
+                    'order_id': order.id,
+                    'message': 'Ожидаем вашей оплаты'
+                }
             else:
+                # выполняется при FIAT_* и при переводе на карту и при пополнение наличными
                 trans = Trans.objects.create(account=payment_details,
                                              payment_id='',
                                              currency=order.take_currency,

@@ -471,11 +471,9 @@ function sendPaymentDetails(e) {
               `
             } else {
               payment_message = `
-              <p>Вам необходимо внести <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> в пункте приема наличных по адресу: <br><strong>${json['response']['payment_details_give']}</strong></p><br/>
-              <p>Ваш код для проведения операции: <strong>${json['response']['secret_code']}</strong></p>
+              <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
               `
             }
-            console.log(json['response']['is_fiat_card'])
             message_box.innerHTML = `
             <h5>${json['response']['message']}</h5><br>
             ${payment_message}
