@@ -198,8 +198,16 @@ def create_invoice(req):
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
         payment_details = body['payment_details']
+        # is_cash - это вывод в гривне на карту или наличными в точке выдачи
         is_cash = int(body['is_cash'])
         usd_net = body['usdt_net']
+
+        is_fiat_card = False
+        if(body['fiat_pay_method'] == 'card'):
+            is_fiat_card = True
+
+        cash_point_if_fiat = int(body['cash_point'])
+
         if usd_net == "null":
             usd_net = None
 
@@ -242,25 +250,34 @@ def create_invoice(req):
                 last_added_crypto_address.save()
 
             else:
-                asum = order.amnt_give
-                currency_id = order.give_currency_id
-                credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
-                                                                 status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
-                credit_card_number.status = CHECKOUT_STATUS_PROCESSING
-                new_invoice = Invoice(order=order,
-                                      currency=order.give_currency,
-                                      crypto_payments_details_id=credit_card_number.id,
-                                      sum=asum)
-                if order.take_currency.title == 'usdt':
-                    credit_card_number.currency_provider = CurrencyProvider.objects.get(title=usd_net)
-                    order.provider_take = CurrencyProvider.objects.get(title=usd_net)
-                    order.save()
-                credit_card_number.save()
-                payment_details_give = credit_card_number.address
-
-            new_invoice.save()
-
-            if is_cash:
+                if is_fiat_card:
+                    asum = order.amnt_give
+                    currency_id = order.give_currency_id
+                    credit_card_number = PoolAccounts.objects.filter(currency_id=currency_id,
+                                                                    status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
+                    credit_card_number.status = CHECKOUT_STATUS_PROCESSING
+                    new_invoice = Invoice(order=order,
+                                        currency=order.give_currency,
+                                        crypto_payments_details_id=credit_card_number.id,
+                                        sum=asum)
+                    if order.take_currency.title == 'usdt':
+                        credit_card_number.currency_provider = CurrencyProvider.objects.get(title=usd_net)
+                        order.provider_take = CurrencyProvider.objects.get(title=usd_net)
+                        order.save()
+                    credit_card_number.save()
+                    payment_details_give = credit_card_number.address
+                    new_invoice.save()
+                else:
+                    # if fiat payment is cash
+                    amnt = order.amnt_give
+                    currency = Currency.objects.get(id=order.give_currency_id)
+                    cashpoint_location = CashPointLocation.objects.get(id=cash_point_if_fiat)
+                    payment_details_give = cashpoint_location.title
+                    create_cash_invoice(order, cashpoint_location, amnt, currency)
+            
+            # если BTC_UAH получать гривну на карту, то is_cash=false и выполняется else
+            if is_cash and order.take_currency.title in FIAT_CURRENCIES:
+                # выполняется при *_FIAT получение гривны в точке выдачи 
                 random_key = generate_pseudo_random(8)
                 cash_point_id = int(payment_details)
                 cash_point_obj = CashPointLocation.objects.get(id=cash_point_id)
@@ -279,7 +296,18 @@ def create_invoice(req):
                     'order_id': order.id,
                     'message': 'Ожидаем вашей оплаты'
                 }
+            elif not is_cash and order.take_currency.title in FIAT_CURRENCIES:
+                # выполняется при *_FIAT получение гривны на карту 
+                respone_data = {
+                    'given_cur': str(order.give_currency),
+                    'amount': order.amnt_give,
+                    'payment_details_give': payment_details_give,
+                    't_link': t_link,
+                    'order_id': order.id,
+                    'message': 'Ожидаем вашей оплаты'
+                }
             else:
+                # выполняется при FIAT_* и при переводе на карту и при пополнение наличными
                 trans = Trans.objects.create(account=payment_details,
                                              payment_id='',
                                              currency=order.take_currency,
@@ -292,11 +320,21 @@ def create_invoice(req):
                     trans.currency_provider = currency_provider
                     trans.save()
                 
+                secret_code = 'none'
+                if not is_fiat_card:
+                    try:
+                        invoice_with_code = Invoice.objects.get(order=order)
+                        secret_code = str(invoice_with_code.crypto_payments_details).split(",",1)[1]
+                    except:
+                        secret_code = 'none'
+                
                 respone_data = {
+                    'is_fiat_card' : 1 if is_fiat_card else 0,
                     'given_cur': str(order.give_currency),
                     'amount': order.amnt_give,
                     'payment_details_give': payment_details_give,
                     't_link': t_link,
+                    'secret_code': secret_code,
                     'order_id': order.id,
                     'message': 'Ожидаем вашей оплаты'
                 }
