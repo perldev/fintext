@@ -30,7 +30,7 @@ from sdk.functions import validate_credit_card
 from django.http import HttpResponse
 
 
-from controller import tell_update_order as tell_controller_new_order
+from exchange.controller import tell_update_order as tell_controller_new_order
 
 def main(req):
     return render(req, "main.html", {})
