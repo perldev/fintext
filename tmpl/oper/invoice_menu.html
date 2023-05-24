@@ -1,8 +1,13 @@
 
+
+{% if item.status == "created"  or  item.status == "processing" %}
 <button type="button" onclick="Main.one_line_api('/oper/api/invoices/status/canceled/{{item.id}}')"
         class="btn btn-secondary btn-sm">Отменить</button>
 
+{% endif %}
+
+{% if item.status == "wait_secure"  or   item.status == "processing" %}
 <button type="button" onclick="Main.one_line_api('/oper/api/invoices/status/payed/{{item.id}}')"
         class="btn btn-success btn-sm">Провести</button>
-
+{% endif %}
 

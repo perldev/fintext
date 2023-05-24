@@ -7,13 +7,15 @@ from datetime import datetime
 from decimal import Decimal
 import json
 import traceback
+from exchange.controller import tell_invoice_check
 
 
 class Command(BaseCommand):
     help = "Check all invoices"
 
     def handle(self, *args, **options):
-        active_invoices = Invoice.objects.filter(status='created', currency__title_in=CRYPTO_CURRENCY)
+        active_invoices = Invoice.objects.filter(status='created',
+                                                 currency__title_in=CRYPTO_CURRENCY)
         nw = datetime.now()
         for i in active_invoices:
 
@@ -51,8 +53,10 @@ class Command(BaseCommand):
                         traceback.print_exc()
                         continue
 
+                    # next step is checking aml
                     i.status = 'processing'
                     i.save()
+                    tell_invoice_check("check_invoice_process", i)
 
                     i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
                     # update balance in technical info field
@@ -62,6 +66,7 @@ class Command(BaseCommand):
                 if i.expire_date < nw:
                     i.status = 'expired'
                     i.save()
+                    tell_invoice_check("check_invoice_process", i)
                     i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
                     i.crypto_payments_details.save()
 

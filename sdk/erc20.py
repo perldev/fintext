@@ -97,12 +97,14 @@ def get_prec():
 
 
 def get_current_height():
-    global w3
+    global ACCESS
+    w3 = ACCESS
     return w3.eth.get_block_number()
 
 
 def get_out_trans_from(acc, blockheight=0, blockto="latest"):
-    global w3
+    global ACCESS
+    w3 = ACCESS
     if blockto == "latest":
 
         blockto = get_current_height()
@@ -132,7 +134,9 @@ def get_out_trans_from(acc, blockheight=0, blockto="latest"):
 
 
 def get_in_trans_from(self, acc, blockheight=0, blockto="latest"):
-    global w3
+    global ACCESS
+    w3 = ACCESS
+
     if blockto == "latest":
 
         blockto = get_current_height()
@@ -172,6 +176,7 @@ def get_sum_from(acc, blockheight=0, blockto="latest"):
 def get_native_balance(acc):
     global ACCESS
     w3 = ACCESS
+
     return Decimal(w3.eth.get_balance(acc)) / PREC
 
 
@@ -181,6 +186,7 @@ def get_balance(acc):
                         headers=def_headers)
 
     respj = resp.json()
+
     if not "tokenAccounts" in respj:
         raise Exception(resp.text)
 

@@ -13,7 +13,6 @@ from django.core.wsgi import get_wsgi_application
 import traceback
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fintex.settings')
 print("import controller and notify dispetcher")
-from exchange import controller
 
 try:
 

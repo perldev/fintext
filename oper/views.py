@@ -21,6 +21,11 @@ from decimal import Decimal
 import traceback
 from wallet.models import CryptoAccounts
 
+from exchange.controller import tell_update_order as tell_controller_update_order
+from exchange.controller import tell_trans_check as tell_controller_trans_check
+from exchange.controller import tell_invoice_check as tell_controller_invoice_check
+from exchange.controller import tell_aml_check
+
 
 @login_required(login_url="/oper/login/")
 def order_status(req, status, order_id):
@@ -33,6 +38,7 @@ def order_status(req, status, order_id):
     if obj.status in ("created", "processing"):
         obj.status = status
         obj.save()
+        tell_controller_update_order("order_api_status_function", obj)
 
     return json_true(req)
 
@@ -48,6 +54,7 @@ def trans_status(req, status, trans_id):
     if obj.status in ("created", "processing"):
         obj.status = status
         obj.save()
+        tell_controller_trans_check("order_api_status_function", obj)
 
     return json_true(req)
 
@@ -77,7 +84,7 @@ def process_item_trans(i):
 @login_required(login_url="/oper/login/")
 def trans(req):
     res = []
-    for i in Trans.objects.all().order_by("-pub_date"):
+    for i in Trans.objects.all().order_by("-id"):
         res.append(process_item_trans(i))
 
     return json_true(req, {"data": res})
@@ -222,9 +229,12 @@ def analytics(req):
 
 
 def process_item_invoice(i):
+    username = None
+    if i.operator is not None:
+        username = i.operator.username
 
     return {
-            "operator": i.operator.username,
+            "operator": username,
             "pub_date": i.pub_date,
             "expire_date": i.expire_date,
             "amnt": i.sum,
@@ -240,7 +250,7 @@ def process_item_invoice(i):
 @login_required(login_url="/oper/login/")
 def invoices_api(req, ):
     res = []
-    for i in Invoice.objects.all().order_by("-pub_date"):
+    for i in Invoice.objects.all().order_by("-id"):
         res.append(process_item_invoice(i))
 
     return json_true(req, {"data": res})
@@ -255,17 +265,34 @@ def invoices_status(req, status, invoice_id):
     if obj.currency.title in FIAT_CURRENCIES:
         if status in ("payed", "canceled") and obj.status in ("processing", ):
             obj.status = status
+            obj.crypto_payments_details.status = "canceled"
+            obj.crypto_payments_details.save()
             obj.save()
+            tell_controller_invoice_check("oper_api_invoice_status", obj)
             return json_true(req)
         return json_500false(req, {"description": "Это действие уже невозможно"})
 
     if obj.currency.title in CRYPTO_CURRENCY:
-        if status in ("payed", "canceled") and obj.status in ("created", "wait_secure"):
+        if status in ("payed", "canceled") and obj.status in ("wait_secure",):
             obj.status = status
             obj.save()
+            tell_controller_invoice_check("oper_api_invoice_status", obj)
             return json_true(req)
 
         return json_500false(req, {"description": "Это действие уже невозможно"})
+
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def get2work(req, order_id):
+    obj = get_object_or_404(Orders, pk=order_id)
+    if obj.operator is not None:
+        return json_500false(req, {"description":
+                                       "Это действие уже невозможно сделка в работу  у %s" % obj.operator.username})
+
+    obj.operator = req.user
+    obj.save()
+    return json_true(req)
 
 
 @csrf_exempt
@@ -403,6 +430,7 @@ def process_item(i):
 
     invoice = Invoice.objects.get(order=i)
 
+
     return {"id": i.id,
             "buy": str(i.amnt_give) + " " + i.give_currency.title,
             "sell": str(i.amnt_take) + " " + i.take_currency.title,
@@ -467,7 +495,7 @@ def show_payment(req, order_id):
 def oper_orders(request):
 
     res = []
-    for i in Orders.objects.all().order_by("id"):
+    for i in Orders.objects.all().order_by("-id"):
         try:
             result_dict = process_item(i)
         except:
@@ -581,7 +609,7 @@ def telegram_subscribe(req):
     if created:
         nw = datetime.now()
         k = str(convert2time(nw))
-        link.tele_link = OPERTELEBOT + "subsribe-" + str(convert2time(nw))
+        link.tele_link = OPERTELEBOT + "subsribe_" + str(convert2time(nw))
         link.token = k
 
         link.save()

@@ -1,7 +1,13 @@
+{% if item.status != "processed" and  item.status != "canceled" %}
+
 <button type="button" onclick="Main.show_trans_info({{item.id}})" class="btn btn-primary btn-sm">Выплатить</button>
 <button type="button" onclick="Main.one_line_api('/oper/api/order/status/canceled/{{item.id}}')" class="btn btn-secondary btn-sm">Отменить</button>
+<button type="button" onclick="Main.one_line_api('/oper/api/order/get2work/{{item.id}}/')" class="btn btn-secondary btn-sm">Взять в работу</button>
+
 <button type="button" onclick="Main.one_line_api('/oper/api/order/status/processed/{{item.id}}')"  class="btn btn-success btn-sm">Завершить</button>
 <button type="button" onclick="Main.alert('{{telechat_link}}')"  class="btn btn-light btn-sm">Chat link</button>
+
+{% endif %}
 
 {% if connected %}
     <a target="_blank" href="{{chat_link}}"  class="btn btn-link btn-sm text-decoration-none">To chat</a>

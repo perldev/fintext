@@ -49,7 +49,7 @@ def get_rate(from_currency, to_currency):
     direction = rates_direction.objects.get(give_currency=cur1, take_currency=cur2)
     code4execute = direction.raw_data
     d = {}
-    for i in context_vars.objects.all():
+    for i in context_vars.objects.filter(name__startswith="context"):
         d[i.name] = float(i.value)
 
     d = eval(code4execute, {'__builtins__': None}, d)

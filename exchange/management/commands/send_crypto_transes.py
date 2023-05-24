@@ -8,7 +8,7 @@ from datetime import datetime
 from decimal import Decimal
 import json
 import traceback
-
+from exchange.controller import tell_trans_check
 
 class Command(BaseCommand):
     help = "check out transes for send checking order and invoice here should be transes only" \
@@ -30,8 +30,16 @@ class Command(BaseCommand):
                                     "native")
             invoice = Invoice.objects.get(order=order)
             resp = get_full_data(invoice.crypto_payments_details.address)
+            try:
+                txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, i.amnt)
+            except:
+                i.status = "failed"
+                i.save()
+                var = traceback.format_exc()
+                tell_trans_check("send_crypto_transes_deal", i, error=var)
+                continue
 
-            txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, i.amnt)
+
             i.txid = txid
 
             # save balance for address
@@ -40,3 +48,5 @@ class Command(BaseCommand):
 
             i.status = "processed"
             i.save()
+            tell_trans_check("send_crypto_transes_deal", i)
+

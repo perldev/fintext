@@ -169,7 +169,13 @@ $(function() {
                   return  true;
                 });
                 request.fail(function( jqXHR, textStatus ) {
-                  Main.alert("не могу завершить действие " + url );
+                   try {
+                            var a = JSON.parse(jqXHR.responseText);
+                            Main.alert(a["description"]);
+                        } catch(e) {
+                              Main.alert("не могу завершить действие " + url );
+                        }
+
                 });
             },
             whole_order_info: function(order_id, view_id){

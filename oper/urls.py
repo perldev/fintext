@@ -36,6 +36,9 @@ urlpatterns = [
     path("api/message_income/<str:chat_id>/", views.message_income, name="message_income"),
 
     path("api/trans/<str:status>/<str:trans_id>/", views.trans_status, name="trans_status"),
+
+    path("api/order/get2work/<str:order_id>/", views.get2work, name="show_payment"),
+
     path("api/order/show_payment/<str:order_id>/", views.show_payment, name="show_payment"),
     path("api/order/status/<str:status>/<str:order_id>/", views.order_status, name="oper_order_status"),
     path("wallets", views.wallets, name="wallets"),

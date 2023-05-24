@@ -9,6 +9,7 @@ import traceback
 from django.core.cache import cache
 from oper.models import get_telechat_link as oper_get_telechat_link, chat
 import time
+import fintex.settings
 
 
 def get_fromcache(k):
@@ -52,11 +53,14 @@ def json_true(req, dictt=None):
 
 def no_fail(function):
     def wrapper(*args, **kargs):
-        try:
+        if fintex.settings.DEBUG:
+            try:
+                return function(*args, **kargs)
+            except:
+                traceback.print_exc()
+                return False
+        else:
             return function(*args, **kargs)
-        except:
-            traceback.print_exc()
-            return False
 
     return wrapper
 

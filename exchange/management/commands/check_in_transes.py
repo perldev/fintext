@@ -9,6 +9,8 @@ import json
 import traceback
 import requests
 import hashlib
+from exchange.controller import tell_aml_check, tell_trans_check
+
 
 AML_ACCESSTOKEN = None
 AML_ACCESSID = None
@@ -55,7 +57,6 @@ class Command(BaseCommand):
             try:
                 aml_trans.aml_check = resp.text
                 aml_trans.status = "processed"
-
                 js = resp.json()
                 if not js["result"]:
                     raise BaseException("some error during security check")
@@ -67,12 +68,15 @@ class Command(BaseCommand):
 
                     aml_trans.result = js["data"]["riskscore"]
                     aml_trans.save()
-
+                    tell_aml_check("aml_check_process", aml_trans)
                     trans.save()
+                    tell_trans_check("aml_check_process", trans)
+
             except:
-                aml_trans.status = "wait_secure"
+                aml_trans.status = "failed"
                 aml_trans.aml_check = resp.text
                 aml_trans.save()
+                tell_aml_check("aml_check_process", aml_trans)
 
                 print(resp.text)
                 traceback.print_exc()

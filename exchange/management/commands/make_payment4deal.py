@@ -9,6 +9,8 @@ from datetime import datetime
 from decimal import Decimal
 import json
 import traceback
+from exchange.controller import tell_trans_check
+
 
 
 class Command(BaseCommand):
@@ -36,18 +38,24 @@ class Command(BaseCommand):
                 # TODO tell about this to dispetcher
                 return
             resp = get_full_data(address4)
+
             try:
                 txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, i.amnt)
             except:
-                i.status = "wait_secure"
+                i.status = "failed"
                 i.save()
+                var = traceback.format_exc()
+                tell_trans_check("make_payment4deal", i, error=var)
                 continue
 
             i.txid = txid
+            i.status = "processed"
+            i.save()
+            tell_trans_check("make_payment4deal", i)
+
             # save balance for address
             crypto_payments_details = PoolAccounts.objects.get(address=address4)
             crypto_payments_details.technical_info = factory.get_balance(address4)
             crypto_payments_details.save()
 
-            i.status = "processed"
-            i.save()
+

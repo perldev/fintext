@@ -30,6 +30,8 @@ from sdk.functions import validate_credit_card
 from django.http import HttpResponse
 
 
+from controller import tell_update_order as tell_controller_new_order
+
 def main(req):
     return render(req, "main.html", {})
 
@@ -301,6 +303,7 @@ def create_invoice(req):
             # status of working orders
             order.status = "processing"
             order.save()
+            tell_controller_new_order("front_page", order)
             return json_true(req, {'response': respone_data})
         else:
             respone_data = {
