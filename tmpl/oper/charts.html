@@ -44,6 +44,36 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit USDT/UAH</h5>
+                                <div id="real-timewhitebit_usdt_uah" style="height:100px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit ETH/UAH</h5>
+                                <div id="real-timewhitebit_eth_uah" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit BTC/UAH</h5>
+                                <div id="real-timewhitebit_btc_uah" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                  <div class="row">
                     <div class="col-12 d-flex no-block align-items-center">
                         <h4 class="page-title">Контекстные переменные</h4>
@@ -54,6 +84,10 @@
                     {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_bitstamp_eth_usd" %}
                     {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_kuna_btc_uah" %}
                     {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_btctradeua_btc_uah" %}
+
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_btc_uah" %}
+                    {% include "oper/context_var.html" with name="WhiteBit USDT/UAH" id="context_whitebit__usdt_uah" %}
+                    {% include "oper/context_var.html" with name="WhiteBit ETH/UAH" id="context_whitebit__eth_uah" %}
 
                 </div>
                  <div class="row">

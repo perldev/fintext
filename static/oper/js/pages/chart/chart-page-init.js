@@ -187,8 +187,11 @@
     //setup plots from different stocks
     let plots = [{"name":"bitstamp", "val":"btc_usd", "plot":{}},
                  {"name":"bitstamp", "val":"eth_usd", "plot": {}},
-                  {"name":"kuna", "val":"btc_uah", "plot": {}},
-                 {"name":"btctradeua", "val": "btc_uah", "plot": {}}
+                 {"name":"kuna", "val":"btc_uah", "plot": {}},
+                 {"name":"btctradeua", "val": "btc_uah", "plot": {}},
+                 {"name":"whitebit", "val": "btc_uah", "plot": {}},
+                 {"name":"whitebit", "val": "usdt_uah", "plot": {}},
+                 {"name":"whitebit", "val": "eth_uah", "plot": {}}
                 ];
 
     if(true){
@@ -204,40 +207,54 @@
                              );
 
             //        for(var k in plots){
-                getDataRates(plots[0]["name"],
-                             plots[0]["val"],
+                getDataRates(plots[1]["name"],
+                             plots[1]["val"],
                              function(result){
                                     create_plot(plots[0]["plot"],
                                                 plots[0]["name"],
                                                 plots[0]["val"], result)
                              }
                              );
-                getDataRates(plots[1]["name"],
-                             plots[1]["val"],
+                getDataRates(plots[2]["name"],
+                             plots[2]["val"],
                              function(result){
                                     create_plot(plots[1]["plot"],
                                                 plots[1]["name"],
                                                 plots[1]["val"], result)
                              }
                              );
-                getDataRates(plots[2]["name"],
-                             plots[2]["val"],
+                getDataRates(plots[3]["name"],
+                             plots[3]["val"],
                              function(result){
                                     create_plot(plots[2]["plot"],
                                                 plots[2]["name"],
                                                 plots[2]["val"], result)
                              }
                              );
-                getDataRates(plots[3]["name"],
-                             plots[3]["val"],
+                getDataRates(plots[4]["name"],
+                             plots[4]["val"],
                              function(result){
                                     create_plot(plots[3]["plot"],
                                                 plots[3]["name"],
                                                 plots[3]["val"], result)
                              }
                              );
-
-
+                getDataRates(plots[5]["name"],
+                             plots[5]["val"],
+                             function(result){
+                                    create_plot(plots[3]["plot"],
+                                                plots[3]["name"],
+                                                plots[3]["val"], result)
+                             }
+                );
+                getDataRates(plots[6]["name"],
+                             plots[6]["val"],
+                             function(result){
+                                    create_plot(plots[3]["plot"],
+                                                plots[3]["name"],
+                                                plots[3]["val"], result)
+                             }
+                );
         //}
     }else{
         create_plot("bitstamp", "btc_usd");

@@ -22,8 +22,8 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 import decimal
 from datetime import datetime, timedelta
 
+import requests_async as requests
 import json
-import requests
 import uuid
 import pickle
 import traceback
@@ -310,7 +310,8 @@ def futurecall(context, msg, key):
         return "something going wrong try from the start:("
 
 
-def setup_context_from_site(token, msg):
+async def setup_context_from_site(token, msg):
+    global API_HOST
     print("setup context from site")
     print("=" * 64)
 
@@ -322,9 +323,11 @@ def setup_context_from_site(token, msg):
         "from": msg
     }
 
-    resp = requests.post(API_HOST + "chat_connect2deal",
-                         headers=api_headers,
-                         json=jreq)
+    print("call")
+    print(API_HOST + "chat_connect2deal")
+    resp = await requests.post(API_HOST + "chat_connect2deal",
+                               headers=api_headers,
+                               json=jreq)
     if verbose:
         print(resp.text)
 
@@ -340,8 +343,8 @@ def setup_context_from_site(token, msg):
 
 
 # should from local cache get user settings by chat id
-def setup_context_from_history(chat_id, msg=None):
-    global loop
+async def setup_context_from_history(chat_id, msg=None):
+    global loop, API_HOST
     us = copy.deepcopy(def_settings)
 
     if verbose:
@@ -357,9 +360,9 @@ def setup_context_from_history(chat_id, msg=None):
         return user_settings[chat_id]
     else:
         print("call on btc trade ua")
-        resp = requests.post(API_HOST + "get_deal_from_chat",
-                             headers=api_headers,
-                             params={"chat_id": chat_id})
+        resp = await requests.post(API_HOST + "get_deal_from_chat",
+                                    headers=api_headers,
+                                     params={"chat_id": chat_id})
         res = resp.json()
         print("got response")
         print(res)
@@ -458,7 +461,7 @@ async def new_request(context, msg, params=None):
     inline_answer("new_request_submit", chat_id, "")
 
 
-def start(msg=None):
+async def start(msg=None):
     if verbose:
         print("start callback")
         print("=" * 64)
@@ -474,7 +477,7 @@ def start(msg=None):
         process_chat_member(content_type, chat_type, chat_id, msg)
 
     if content_type == "text":
-        process_text(content_type, chat_type, chat_id, msg)
+        await process_text(content_type, chat_type, chat_id, msg)
 
 
 def process_chat_member(content_type, chat_type, chat_id, msg):
@@ -483,7 +486,7 @@ def process_chat_member(content_type, chat_type, chat_id, msg):
     print(content_type, chat_type, chat_id, msg)
 
 
-def process_text(content_type, chat_type, chat_id, msg):
+async def process_text(content_type, chat_type, chat_id, msg):
     global loop, verbose
 
     # try to identify the user and save his profile
@@ -496,22 +499,23 @@ def process_text(content_type, chat_type, chat_id, msg):
     if text_msg.startswith("/start"):
         # this also for first start
         try:
-            cmd = re.match("/start ([^ -]+)-([^ -]+)", text_msg)
+            cmd = re.match("/start ([^ _]+)_([^ _]+)", text_msg)
             if cmd:
-                return cmd_from_site(cmd.group(1), cmd.group(2), msg)
+                print("it's cmd for calling")
+                return await cmd_from_site(cmd.group(1), cmd.group(2), msg)
 
-            m = re.match("/start ([^ ]+) ", text_msg)
+            m = re.match("/start ([^ ]+)", text_msg)
             if m:
-                context = setup_context_from_site(m.group(1), msg["chat"])
+                context = await setup_context_from_site(m.group(1), msg["chat"])
             else:
                 raise Exception("there is no token")
         except:
             traceback.print_exc()
             print("do not find token try find in history")
-            context = setup_context_from_history(msg["chat"]["id"], msg["chat"])
+            context = await setup_context_from_history(msg["chat"]["id"], msg["chat"])
 
     else:
-        context = setup_context_from_history(msg["chat"]["id"], msg["chat"])
+        context = await setup_context_from_history(msg["chat"]["id"], msg["chat"])
 
     if verbose:
         print(context)
@@ -546,12 +550,12 @@ def process_text(content_type, chat_type, chat_id, msg):
         # default_menu(context, msg)
 
 
-def cmd_from_site(cmd, params, msg):
-    global loop, verbose
+async def cmd_from_site(cmd, params, msg):
+    global loop, verbose, API_HOST
     if cmd == "subsribe":
-        resp = requests.post(API_HOST + "telegram_subscribe_callback/" + params + '/',
-                             json={"username": msg["from"]["username"],
-                                   "telegram_id": msg["from"]["id"]})
+        resp = await requests.post(API_HOST + "telegram_subscribe_callback/" + params + '/',
+                                    json={"username": msg["from"]["username"],
+                                           "telegram_id": msg["from"]["id"]})
         if verbose:
             print(resp.text)
         respj = resp.json()
@@ -560,7 +564,8 @@ def cmd_from_site(cmd, params, msg):
                                          text=respj["description"],
                                         ))
 
-def send_message2us(context, msg):
+async def send_message2us(context, msg):
+    global API_HOST
     if verbose:
         print(msg)
         print(context)
@@ -568,9 +573,9 @@ def send_message2us(context, msg):
                                  context["from"]["first_name"],
                                  context["from"]["last_name"])
 
-    resp = requests.post(API_HOST+"message_income/"+context["token"]+'/',
-                         json={"text": msg["text"],
-                               "username": out_user})
+    resp = await requests.post(API_HOST+"message_income/"+context["token"]+'/',
+                                 json={"text": msg["text"],
+                                       "username": out_user})
     if verbose:
         print(resp.text)
 
@@ -650,51 +655,6 @@ async def inline_await(list_subs):
 def noasno(msg, params):
     ticket_id = params["id"]
     ret = loop.create_task(bot.sendMessage(chat_id, 'NO as No.. but user wait'))
-
-
-def quick_answer(msg, params):
-    global CACHED_TAGS
-    chat_id = params[1]
-    ticket_id = params[0]
-    # inline_answer("confirm_quick_answer", chat_id, params)
-    messages = []
-    keyboards = []
-    tmp = []
-    i = 0
-    ki = 0
-    resp = requests.post("%sdialogs" % (BOARD), data={"token": BOARDTOKEN})
-    CACHED_TAGS = resp.json()
-    for item in CACHED_TAGS["msgs"]:
-        print(item)
-        if "tags" in item:
-            tags = item["tags"]
-            for tag in tags.split("|"):
-                if len(tag) > 0:
-                    d = createtempparams(
-                        {"call": "confirm_quick_answer", "params": [params[0], params[1], item["txt"]]})
-                    tmpbcallbackdata = '{"futurecall":"' + d + '"}'
-                    tmp.append(InlineKeyboardButton(text=tag,
-                                                    callback_data=tmpbcallbackdata))
-                    i += 1
-                    ki += 1
-                    if i > 2:
-                        keyboards.append(tmp)
-                        tmp = []
-                        i = 0
-                        if ki > 8:
-                            loop.create_task(bot.sendMessage(chat_id=chat_id,
-                                                             text="quick answers: ",
-                                                             reply_markup=InlineKeyboardMarkup(
-                                                                 inline_keyboard=keyboards)))
-                            keyboards = []
-                            ki = 0
-
-    if len(tmp) > 0:
-        keyboards.append(tmp)
-
-    loop.create_task(bot.sendMessage(chat_id=chat_id,
-                                     text="quick answers: ",
-                                     reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboards)))
 
 
 def confirm_quick_answer(msg, params):
@@ -830,7 +790,6 @@ class AlertHandle(tornado.web.RequestHandler):
         loop.create_task(bot.sendMessage(chat_id=int(chat_id),
                                          text=msg["text"]),
                          )
-
         self.write("{\"status\": true}")
 
 

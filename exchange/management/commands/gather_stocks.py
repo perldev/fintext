@@ -8,7 +8,6 @@ import json
 import requests
 
 
-
 class Command(BaseCommand):
     help = "Gather stock data"
 
