@@ -24,6 +24,7 @@ let isPaymentDetailsValid = false;
 
 let cashPoints = null;
 let cashPointsDiv = null;
+let cashPointsSelect = null;
 
 
 const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9\.]+/;
@@ -109,13 +110,6 @@ function setGivenCurQnty() {
 
 
 
-
-
-
-
-
-
-
 let Main = {
     "draw_form_crypto": function(resp_obj){
 
@@ -144,6 +138,29 @@ let Main = {
               `
             }
 
+            let fiat_payment_select = `
+              <br>
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Способ оплаты:</label>
+                <div class="col-8">
+                  <div class="form-check" >
+                    <input class="form-check-input" type="radio" onclick="selectCard()" name="cardPayment" id="cardPayment" checked value="cardPayment">
+                    <label class="form-check-label" for="cardPayment">
+                      Перевод на карту
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" onclick="selectCash()" name="cashPayment" id="cashPayment" value="cashPayment" >
+                    <label class="form-check-label" for="cashPayment">
+                      Наличными в пункте оплаты
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <br>
+            `;
+
+
 
            return  `<div class="form-group row">
                 <label class="col-4 col-form-label" for="">Вы отдаете:</label>
@@ -157,7 +174,9 @@ let Main = {
                     ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
                 </div>
               </div>
+
               ${provider_select}
+
               <div class="form-group row">
                 <label for="text" class="col-4 col-form-label">Укажите адрес кошелька ${resp_obj['taken_cur']}</label>
                 <div class="col-8">
@@ -167,14 +186,24 @@ let Main = {
                   <div id="payment-details-error" class="form-text"></div>
                 </div>
               </div>
-                <div class="form-group row">
-                    <div class="col-6 text-start">
-                      <button  class="btn btn-info">Отменить</button>
-                    </div>
-                    <div class="col-6 text-end">
-                      <button onclick="sendPaymentDetails(event)" class="btn btn-success">Отправить</button>
-                    </div>
+
+              ${fiat_payment_select}
+
+              <div class="form-group row" id='cash-points-select-wrapper' style="display:none" >
+                <div class="offset-lg-4 col-lg-8 col-12">
+                  <select class="form-select" id="cash-points-select" aria-label="Выбрать точку обмена">
+                  </select>
                 </div>
+              </div>
+
+              <div class="form-group row">
+                  <div class="col-6 text-start">
+                    <button  class="btn btn-info">Отменить</button>
+                  </div>
+                  <div class="col-6 text-end">
+                    <button onclick="sendPaymentDetails(event)" class="btn btn-success">Отправить</button>
+                  </div>
+              </div>
               `
 
 
@@ -344,6 +373,13 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 } else {
                     isPaymentDetailsValid = true;
                     message_box.innerHTML = Main.draw_form_crypto(json["response"]);
+                    cashPointsSelect = document.getElementById("cash-points-select");
+                    Object.entries(JSON.parse(json["response"]['cash_points'])).forEach(([key, value]) => {
+                      const some_option = document.createElement('option');
+                      some_option.value = key;
+                      some_option.innerHTML = value;
+                      cashPointsSelect.appendChild(some_option);
+                    });
                 }
 
                 errorDiv = document.getElementById("payment-details-error"); 
@@ -390,6 +426,20 @@ function sendPaymentDetails(e) {
       }
     }
 
+    let fiat_pay_method = null;
+    if (document.getElementById("cardPayment")) {
+      if (document.querySelector('input[name="cardPayment"]:checked')) {
+        fiat_pay_method = "card"
+      } else {
+        fiat_pay_method = "cash"
+      }
+    }
+
+    let cash_point = 1;
+    if (document.getElementById("cardPayment")) {
+      cash_point = document.getElementById("cash-points-select").value; 
+    }
+
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     fetch('/api/create_invoice/', {
       method: 'POST',
@@ -400,7 +450,9 @@ function sendPaymentDetails(e) {
       body: JSON.stringify({ 
           'payment_details': payment_details,
           'is_cash': isCash ? '1' : '0',
-          'usdt_net': usdt_net
+          'usdt_net': usdt_net,
+          'fiat_pay_method': fiat_pay_method,
+          'cash_point': cash_point
         })
     })
     .then(response => response.json())
@@ -412,9 +464,21 @@ function sendPaymentDetails(e) {
           `;
         } else {
           if (!isCash) {
+            let payment_message = null;
+            if (json['response']['is_fiat_card'] == 1) {
+              payment_message = `
+              <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+              `
+            } else {
+              payment_message = `
+              <p>Вам необходимо внести <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> в пункте приема наличных по адресу: <br><strong>${json['response']['payment_details_give']}</strong></p><br/>
+              <p>Ваш код для проведения операции: <strong>${json['response']['secret_code']}</strong></p>
+              `
+            }
+            console.log(json['response']['is_fiat_card'])
             message_box.innerHTML = `
             <h5>${json['response']['message']}</h5><br>
-            <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+            ${payment_message}
             <a href="/orders/${json['response']['order_id']}">Страница для отслеживания деталей сделки</a><br/>
             <br/>
             <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
@@ -440,9 +504,6 @@ function sendPaymentDetails(e) {
     });
 
 }
-
-// luhn validation functions 4149499139344160
-
 
 const formatNumber = (number) => number.split("").reduce((seed, next, index) => {
   if (index !== 0 && !(index % 4)) seed += " ";
@@ -532,7 +593,6 @@ function arrSplit(cardArray){
 
 
 // logic of tron/erc select fields
-
 function selectErc() {
   document.getElementById("ercNet1").checked = true;
   document.getElementById("tronNet1").checked = false;
@@ -540,6 +600,18 @@ function selectErc() {
 function selectTron() {
   document.getElementById("ercNet1").checked = false;
   document.getElementById("tronNet1").checked = true;
+}
+
+// logic of cash card select
+function selectCard() {
+  document.getElementById("cashPayment").checked = false;
+  document.getElementById("cardPayment").checked = true;
+  document.getElementById("cash-points-select-wrapper").style.display = "none";
+}
+function selectCash() {
+  document.getElementById("cashPayment").checked = true;
+  document.getElementById("cardPayment").checked = false;
+  document.getElementById("cash-points-select-wrapper").style.display = "block";
 }
 
 
