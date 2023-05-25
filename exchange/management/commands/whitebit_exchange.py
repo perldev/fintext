@@ -33,7 +33,6 @@ class Command(BaseCommand):
                 resp1_status = int(resp1.status_code)
             time.sleep(3)
 
-
         # Creating Trans with address from prev step if it's not existed
         order_transes = Trans.objects.filter(order=order, currency=give_currency)
         if not order_transes:

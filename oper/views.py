@@ -430,7 +430,6 @@ def process_item(i):
 
     invoice = Invoice.objects.get(order=i)
 
-
     return {"id": i.id,
             "buy": str(i.amnt_give) + " " + i.give_currency.title,
             "sell": str(i.amnt_take) + " " + i.take_currency.title,

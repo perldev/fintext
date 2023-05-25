@@ -54,6 +54,7 @@ def get_deal_status(order):
             "payment2client": changing_status,
             "last_status": last_status}
 
+
 def common_tell(sender, instance, **kwargs):
     pass
 
@@ -108,7 +109,7 @@ def tell_trans_check(sender, instance, **kwargs):
 
     if instance.debit_credit == "in":
         if instance.status == "wait_secure":
-            ### invoice should be put to wait_secure
+            # invoice should be put to wait_secure
             instance.order.invoice.status = "wait_secure"
             instance.order.invoice.save()
             return notify_dispetcher(instance.order, "trans_aml_failed")
