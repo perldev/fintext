@@ -245,7 +245,6 @@ def create_invoice(req):
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
                 last_added_crypto_address.status = CHECKOUT_STATUS_PROCESSING
-
                 # last_added_crypto_address.technical_info = factory.get_balance()
                 last_added_crypto_address.save()
                 new_invoice.save()
@@ -288,6 +287,7 @@ def create_invoice(req):
                                              payment_id=random_key,
                                              currency=order.take_currency,
                                              amnt=order.amnt_take,
+                                             debit_credit="out",
                                              order=order)
                 order.trans = trans
                 respone_data = {
@@ -315,6 +315,7 @@ def create_invoice(req):
                                              payment_id='',
                                              currency=order.take_currency,
                                              amnt=order.amnt_take,
+                                             debit_credit="out",
                                              order=order)
                 order.trans = trans
 

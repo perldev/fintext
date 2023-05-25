@@ -344,7 +344,7 @@ class Trans(models.Model):
                                           null=True,
                                           blank=True)
     
-    debet_credit = models.CharField(max_length=255,
+    debit_credit = models.CharField(max_length=255,
                                     choices=DEBIT_CREDIT,
                                     verbose_name="дебет/кредит",
                                     null=True,
