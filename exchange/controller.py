@@ -13,7 +13,46 @@ from fintex.common import no_fail
 
 
 def get_deal_status(order):
-    return "wait_invoice"
+    #pattern = {invoice_wait: ("processed", "wait"), invoice_check: ("wait", "processing", "processed", "aml_failed"),
+    #changing: ("wait", processed, processing, "failed"), payment2client: ("wait", "processing", "processed"),
+    #last_status: ("wait", "processed", "failed", "canceled", "processing")}
+
+    obj = Orders.objects.get(id=order)
+    last_status = obj.status
+    payment2client_status = obj.trans.status
+    if payment2client_status == "created":
+        payment2client_status = "wait"
+
+    invoice_status = obj.invoice.status
+
+    invoice_check_status = "wait"
+    if invoice_status == "created":
+        invoice_status = "wait"
+
+    if invoice_status == "processing":
+        invoice_check_status = "processing"
+        invoice_status = "processed"
+
+    if invoice_status == "wait_secure":
+        invoice_check_status = "aml_failed"
+        invoice_status = "processed"
+
+    if invoice_status == "payed":
+        invoice_check_status = "processed"
+        invoice_status = "processed"
+
+    changing_status = "wait"
+    if invoice_status == "processed" and invoice_check_status == "processed" and payment2client_status == "wait":
+        changing_status = "processing"
+
+    if invoice_status == "processed" and invoice_check_status == "processed" and payment2client_status != "wait":
+        changing_status = "processed"
+
+    return {"invoice_wait": invoice_status,
+            "invoice_check": invoice_check_status,
+            "changing": changing_status,
+            "payment2client": changing_status,
+            "last_status": last_status}
 
 def common_tell(sender, instance, **kwargs):
     pass
@@ -69,6 +108,9 @@ def tell_trans_check(sender, instance, **kwargs):
 
     if instance.debit_credit == "in":
         if instance.status == "wait_secure":
+            ### invoice should be put to wait_secure
+            instance.order.invoice.status = "wait_secure"
+            instance.order.invoice.save()
             return notify_dispetcher(instance.order, "trans_aml_failed")
 
         # here we are checking all incoming transes for invoice
