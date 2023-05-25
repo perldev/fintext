@@ -310,7 +310,7 @@ def create_invoice(req):
                     'message': 'Ожидаем вашей оплаты'
                 }
             else:
-                # выполняется при FIAT_* и при переводе на карту и при пополнение наличными
+                # выполняется при FIAT_* и при переводе на карту и при пополнении наличными
                 trans = Trans.objects.create(account=payment_details,
                                              payment_id='',
                                              currency=order.take_currency,
@@ -332,6 +332,7 @@ def create_invoice(req):
                     except:
                         secret_code = 'none'
                 
+                print('FIAT: ' + str(is_fiat_card))
                 respone_data = {
                     'is_fiat_card' : 1 if is_fiat_card else 0,
                     'given_cur': str(order.give_currency),

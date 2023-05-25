@@ -471,7 +471,7 @@ function sendPaymentDetails(e) {
               `
             } else {
               payment_message = `
-              <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+              <p>Вам необходимо совершить оплату наличными в сумме <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> в нашем пункте по адресу:<br><strong>${json['response']['payment_details_give']}</strong></p><br/>
               `
             }
             message_box.innerHTML = `
