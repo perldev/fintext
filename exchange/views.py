@@ -11,7 +11,6 @@ import random
 
 
 from datetime import datetime, timedelta as dt
-from datetime import timedelta
 import json
 from django.core import serializers
 from oper.models import rates_direction
@@ -59,7 +58,7 @@ def stock_24_hour_rate_history(req, chanel, ticker):
 def get_rate(req, currency_from, currency_to):
     try:
         current_time = datetime.now()
-        expire_time = current_time + timedelta(minutes=15)
+        expire_time = current_time + dt(minutes=15)
         req.session['expire_deal_time'] = datetime.timestamp(current_time)
         currency_pair = currency_from.lower() + '_' + currency_to.lower()
 
@@ -242,6 +241,7 @@ def create_invoice(req):
                                       currency_id=currency_id,
                                       crypto_payments_details_id=last_added_crypto_address.id,
                                       sum=asum,
+                                      expire_date=datetime.now() + dt(hours=2),
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
                 last_added_crypto_address.status = CHECKOUT_STATUS_PROCESSING
@@ -257,9 +257,10 @@ def create_invoice(req):
                                                                     status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
                     credit_card_number.status = CHECKOUT_STATUS_PROCESSING
                     new_invoice = Invoice(order=order,
-                                        currency=order.give_currency,
-                                        crypto_payments_details_id=credit_card_number.id,
-                                        sum=asum)
+                                          currency=order.give_currency,
+                                          crypto_payments_details_id=credit_card_number.id,
+                                          sum=asum,
+                                          expire_date=datetime.now() + dt(hours=2))
                     if order.take_currency.title == 'usdt':
                         credit_card_number.currency_provider = CurrencyProvider.objects.get(title=usd_net)
                         order.provider_take = CurrencyProvider.objects.get(title=usd_net)
@@ -273,7 +274,8 @@ def create_invoice(req):
                     currency = Currency.objects.get(id=order.give_currency_id)
                     cashpoint_location = CashPointLocation.objects.get(id=cash_point_if_fiat)
                     payment_details_give = cashpoint_location.title
-                    create_cash_invoice(order, cashpoint_location, amnt, currency)
+                    invoice = create_cash_invoice(order, cashpoint_location, amnt, currency)
+                    order.invoice = invoice
             
             # если BTC_UAH получать гривну на карту, то is_cash=false и выполняется else
             if is_cash and order.take_currency.title in FIAT_CURRENCIES:
@@ -324,7 +326,7 @@ def create_invoice(req):
                 if not is_fiat_card:
                     try:
                         invoice_with_code = Invoice.objects.get(order=order)
-                        secret_code = str(invoice_with_code.crypto_payments_details).split(",",1)[1]
+                        secret_code = str(invoice_with_code.crypto_payments_details).split(",", 1)[1]
                     except:
                         secret_code = 'none'
                 
@@ -390,7 +392,7 @@ def create_cash_invoice(order, cashpoint_location, amnt, currency):
                                      currency=currency,
                                      sum=amnt,
                                      order=order,
-                                     expire_date=datetime.now() + timedelta(days=1))
+                                     expire_date=datetime.now() + dt(days=1))
     return invoice
 
 

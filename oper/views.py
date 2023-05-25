@@ -256,7 +256,9 @@ def invoices_api(req, ):
     return json_true(req, {"data": res})
 
 
-# only for cash invoices
+# TODO add time_extending to invoice
+
+
 @csrf_exempt
 @login_required(login_url="/oper/login/")
 def invoices_status(req, status, invoice_id):
@@ -276,6 +278,7 @@ def invoices_status(req, status, invoice_id):
         if status in ("payed", "canceled") and obj.status in ("wait_secure",):
             obj.status = status
             obj.save()
+
             tell_controller_invoice_check("oper_api_invoice_status", obj)
             return json_true(req)
 
@@ -419,10 +422,15 @@ def process_item(i):
     # rewrite this
     connected = True
     d = None
-    d = chat.objects.get(deal=i)
-    if d.telegram_id is None:
+    try:
+        d = chat.objects.get(deal=i)
+        if d.telegram_id is None:
+            connected = False
+        connected = True
+    except:
+        traceback.print_exc()
         connected = False
-    connected = True
+
     username = ""
 
     if i.operator is not None:
@@ -438,7 +446,7 @@ def process_item(i):
             "client_info": "Ukraine",
             # TODO add invoice of payment
             "client_payed": invoice.status,
-            "client_get": i.trans.status,
+            "client_get": i.trans.status if i.trans else None,
             "client_telegram_connected": connected,
             "status": i.status,
             "rate": i.rate,
@@ -455,10 +463,15 @@ def whole_oper_info(req, order_id):
     i = get_object_or_404(Orders, pk=order_id)
     connected = True
     d = None
-    d = chat.objects.get(deal=i)
-    if d.telegram_id is None:
+    try:
+        d = chat.objects.get(deal=i)
+        if d.telegram_id is None:
+            connected = False
+        connected = True
+    except:
+        traceback.print_exc()
         connected = False
-    connected = True
+
     username = ""
 
     if i.operator is not None:
@@ -475,8 +488,8 @@ def whole_oper_info(req, order_id):
                                 # TODO add invoice of payment
                                 "client_payed": invoice.status,
                                 "invoice_address": invoice.crypto_payments_details.address,
-                                "trans_info": i.trans.account + " " + i.trans.payment_id,
-                                "client_get": i.trans.status,
+                                "trans_info": i.trans.account + " " + i.trans.payment_id if i.trans else None,
+                                "client_get": i.trans.status if i.trans else None,
                                 "client_telegram_connected": connected,
                                 "status": i.status,
                                 "rate": i.rate,

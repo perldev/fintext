@@ -14,17 +14,25 @@ class Command(BaseCommand):
     help = "Check all invoices"
 
     def handle(self, *args, **options):
-        active_invoices = Invoice.objects.filter(status='created',
-                                                 currency__title_in=CRYPTO_CURRENCY)
+        active_invoices = Invoice.objects.filter(status='created')
         nw = datetime.now()
         for i in active_invoices:
 
+            if i.currency.title not in CRYPTO_CURRENCY:
+                continue
+
+            print("=" * 64)
+            print("check invoice")
+            print("%s %s -> %s %s expiring at %s" %
+                  (i.pub_date, i.crypto_payments_details.address, i.sum, i.currency.title, i.expire_date))
+
             factory = CryptoFactory(i.currency.title,
-                                    active_invoices.crypto_payments_details.currency_provider.title)
+                                    i.crypto_payments_details.currency_provider.title)
             new_balance = factory.get_balance(i.crypto_payments_details.address)
 
             # tricky, because we should remember this during sweeping to the cold
             # we doing checking the balance in order to avoid more weighty checking the list of transactions
+            # very tricky logic
 
             if Decimal(new_balance) > Decimal(i.crypto_payments_details.technical_info):
 
@@ -68,6 +76,7 @@ class Command(BaseCommand):
                     i.save()
                     tell_invoice_check("check_invoice_process", i)
                     i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
+                    i.crypto_payments_details.technical_info = new_balance
                     i.crypto_payments_details.save()
 
     

@@ -8,14 +8,12 @@ from fintex.settings import NATIVE_CRYPTO_CURRENCY, CRYPTO_CURRENCY
 import requests
 from fintex.common import no_fail
 
+from exchange.models import CHECKOUT_STATUS_FREE
 # module that works like a gathering all logic for provide deals
 # SIGNALS HERE
 
 
 def get_deal_status(order):
-    #pattern = {invoice_wait: ("processed", "wait"), invoice_check: ("wait", "processing", "processed", "aml_failed"),
-    #changing: ("wait", processed, processing, "failed"), payment2client: ("wait", "processing", "processed"),
-    #last_status: ("wait", "processed", "failed", "canceled", "processing")}
 
     obj = Orders.objects.get(id=order)
     last_status = obj.status
@@ -64,6 +62,10 @@ def tell_invoice_check(sender, instance, **kwargs):
 
     # if invoice is payed we check weather we change it on whitebit
     order = instance.order
+    # in any case free the pool account if forgot about this in logic
+    instance.crypto_payments_details.status = CHECKOUT_STATUS_FREE
+    instance.crypto_payments_details.save()
+
     if instance.status == "processing":
         notify_dispetcher(order, "invoice_checking")
         return True
@@ -75,15 +77,23 @@ def tell_invoice_check(sender, instance, **kwargs):
     if instance.status == "payed":
         if order.give_currency.title in NATIVE_CRYPTO_CURRENCY:
             notify_dispetcher(order, "invoice_payed")
+
             pass
             # here will be command of andrey
         else:
             notify_dispetcher(order, "invoice_payed")
+            # changing trans to client in processing for further working
+            order.trans.status = "processing"
+            order.save()
 
     if instance.status in ("canceled", "expired"):
         instance.order.status = "canceled"
+        instance.order.trans.status = "canceled"
+        instance.order.trans.save()
         instance.order.save()
+
         notify_dispetcher(order, "invoice_unpayed")
+
 
     return True
 
@@ -100,8 +110,23 @@ def tell_aml_check(sender, instance, **kwargs):
 
 @no_fail
 def tell_trans_check(sender, instance, **kwargs):
+    if sender == "send_crypto_transes_deal":
+        # auto make order processed
+        if instance.status == "processed":
+            order = Orders.objects.get(trans=instance)
+            order.status == "processed"
+            order.save()
+            tell_update_order("exchange_controller", order)
 
-    if instance.status == "failed" :
+    if sender == "order_api_status_function":
+        # auto make order processed
+        if instance.debit_credit == "out" and instance.status == "processed":
+            order = Orders.objects.get(trans=instance)
+            order.status == "processed"
+            order.save()
+            tell_update_order("exchange_controller", order)
+
+    if instance.status == "failed":
         return notify_dispetcher(instance.order,
                                  "trans_out_failed",
                                  error=sender + " \n" + kwargs["error"],
@@ -161,7 +186,7 @@ def notify_dispetcher(order, event, **kwargs):
         "aml_checked": "Входящии платежи по сделке прошли проверку aml",
         "aml_failed": "Входящии платежи по сделке НЕ прошли проверку aml",
         "invoice_wait_secure": "Проверьте входящии платежи по сделке в кабинете оператора",
-
+        "deal_pocessed": "Сделка завершена"
     }
 
     msg = None
@@ -183,12 +208,20 @@ def tell_update_order(sender, instance, **kwargs):
         for oper in OperTele.objects.filter(status="processing"):
             tell_subscriber(oper, instance)
 
+    if instance.status == "processed":
+        notify_dispetcher(instance.order, "deal_pocessed")
+        return  True
+        # notify dispetcher
+
     if instance.status == "canceled":
         # disable all operations
-        Trans.objects.filter(order=instance, status="created").update(status="canceled")
+        Trans.objects.filter(order=instance,
+                             status="created",
+                             debit_credit='out').update(status="canceled")
         Invoice.objects.filter(order=instance).update(status="canceled")
 
         return True
+
 
 def raw_send(oper_list, txt):
     for oper in oper_list:
@@ -200,6 +233,7 @@ def raw_send(oper_list, txt):
             print("something wrong during subsribing")
 
     return True
+
 
 # TODO maybe rewritten in separate process
 @no_fail

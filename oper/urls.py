@@ -18,7 +18,7 @@ urlpatterns = [
     path("trans_page/", views.trans_page, name="trans_page"),
     path("analytics/", views.analytics, name="analytics"),
     path("api/invoices", views.invoices_api, name="invoices_api"),
-    path("api/invoices/status/<str:invoice>/<str:status>/", views.invoices_status, name="invoice_status"),
+    path("api/invoices/status/<str:status>/<str:invoice_id>/", views.invoices_status, name="invoice_status"),
 
     path("api/telegram_subscribe/", views.telegram_subscribe, name="telegram_subscribe"),
     path("api/telegram_subscribe_callback/<str:token>/", views.telegram_subscribe_callback,

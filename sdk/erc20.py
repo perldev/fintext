@@ -23,6 +23,8 @@ API_HOST = "https://api.blockchain.info/v2/eth/data/account/"
 def_headers = {"Content-Type": "application/json"}
 PREC = 10 ** 6
 
+verbose = True
+
 INFURA_KEY = None
 try:
     from private_settings import INFURA_KEY as INF
@@ -181,9 +183,18 @@ def get_native_balance(acc):
 
 
 def get_balance(acc):
+    global verbose
+    url = API_HOST + "%s/tokenAccounts" % acc
+    resp = requests.get(url, headers=def_headers)
+    if resp.status_code == 404:
+        return Decimal("0.0")
 
-    resp = requests.get(API_HOST + "%s/tokenAccounts" % acc,
-                        headers=def_headers)
+    if resp.status_code != 200:
+        raise Exception(resp.text)
+
+    if verbose:
+        print(url)
+        print(resp.text)
 
     respj = resp.json()
 
