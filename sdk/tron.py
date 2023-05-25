@@ -35,6 +35,7 @@ METHOD_TRANSFER = 'transfer(address,uint256)'
 DEFAULT_FEE_LIMIT = 1_000_000  # 1 TRX
 
 PREC = 1_000_000
+verbose = True
 
 
 def address_to_parameter(addr):
@@ -97,7 +98,7 @@ def get_out_trans_from(acc, blockheight=0, blockto="latest"):
     for trans in resp["data"]:
         if trans["from"] == acc:
             result.append({"hash": trans["transaction_id"],
-                            "value": trans["value"],
+                            "value": int(trans["value"]),
                             "addr": acc,
                            "to": trans["to"],
                            "raw": json.dumps(trans),
@@ -106,8 +107,8 @@ def get_out_trans_from(acc, blockheight=0, blockto="latest"):
     return result
 
 
-def get_in_trans_from(self, acc, blockheight=0, blockto="latest"):
-    global ACCESS, TOKEN_CONTRACT
+def get_in_trans_from(acc, blockheight=0, blockto="latest"):
+    global ACCESS, TOKEN_CONTRACT, verbose
     if blockto == "latest":
         blockto = get_current_height()
 
@@ -116,10 +117,13 @@ def get_in_trans_from(self, acc, blockheight=0, blockto="latest"):
 
     resp = ACCESS.get_trc20_trasactions4account(TOKEN_CONTRACT, acc)
     result = []
+    if verbose:
+        print(resp)
+
     for trans in resp["data"]:
         if trans["to"] == acc:
             result.append({"hash": trans["transaction_id"],
-                           "value": trans["value"],
+                           "value": int(trans["value"]),
                            "addr": acc,
                            "from": trans["from"],
                            "raw": json.dumps(trans),

@@ -24,6 +24,7 @@ except:
     pass
 
 
+
 class Command(BaseCommand):
     help = "Check incoming on transes on risk"
 
@@ -45,9 +46,10 @@ class Command(BaseCommand):
             def_risk_accepted = float(def_risk_accepted.value)
 
             signature = trans.txid + ":" + AML_ACCESSTOKEN + ":" + AML_ACCESSID
+            print(signature)
             params = {"direction": "deposit",
                       "hash": trans.txid,
-                      "address": trans["account"],
+                      "address": trans.account,
                       "asset": asset,
                       "accessId": AML_ACCESSID,
                       "token": generate_token(signature)

@@ -66,7 +66,9 @@ def trans_page(req):
 
 
 def process_item_trans(i):
-    return {"id": i.id,
+    return {
+            "pk":i.id,
+            "id": i.id,
             "amnt": str(i.amnt),
             "account": i.account,
             "currency": i.currency.title,
@@ -84,7 +86,7 @@ def process_item_trans(i):
 @login_required(login_url="/oper/login/")
 def trans(req):
     res = []
-    for i in Trans.objects.all().order_by("-id"):
+    for i in Trans.objects.all().order_by("id"):
         res.append(process_item_trans(i))
 
     return json_true(req, {"data": res})
@@ -234,6 +236,8 @@ def process_item_invoice(i):
         username = i.operator.username
 
     return {
+            "id": i.id,
+            "pk": i.id,
             "operator": username,
             "pub_date": i.pub_date,
             "expire_date": i.expire_date,
@@ -250,7 +254,7 @@ def process_item_invoice(i):
 @login_required(login_url="/oper/login/")
 def invoices_api(req, ):
     res = []
-    for i in Invoice.objects.all().order_by("-id"):
+    for i in Invoice.objects.all().order_by("id"):
         res.append(process_item_invoice(i))
 
     return json_true(req, {"data": res})
@@ -439,6 +443,7 @@ def process_item(i):
     invoice = Invoice.objects.get(order=i)
 
     return {"id": i.id,
+            "pk": i.id,
             "buy": str(i.amnt_give) + " " + i.give_currency.title,
             "sell": str(i.amnt_take) + " " + i.take_currency.title,
             "pub_date": date_to_str(i.pub_date),
@@ -480,6 +485,7 @@ def whole_oper_info(req, order_id):
     invoice = Invoice.objects.get(order=i)
     return json_true(req, {"order":
                                {"id": i.id,
+                                "pk": i.id,
                                 "buy": str(i.amnt_give) + " " + i.give_currency.title,
                                 "sell": str(i.amnt_take) + " " + i.take_currency.title,
                                 "pub_date": date_to_str(i.pub_date),

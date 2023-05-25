@@ -59,6 +59,10 @@ def common_tell(sender, instance, **kwargs):
 
 @no_fail
 def tell_invoice_check(sender, instance, **kwargs):
+    print("tell invoice check ")
+    print(sender)
+    print(instance)
+    print(kwargs)
 
     # if invoice is payed we check weather we change it on whitebit
     order = instance.order
@@ -77,7 +81,6 @@ def tell_invoice_check(sender, instance, **kwargs):
     if instance.status == "payed":
         if order.give_currency.title in NATIVE_CRYPTO_CURRENCY:
             notify_dispetcher(order, "invoice_payed")
-
             pass
             # here will be command of andrey
         else:
@@ -85,15 +88,14 @@ def tell_invoice_check(sender, instance, **kwargs):
             # changing trans to client in processing for further working
             order.trans.status = "processing"
             order.save()
+        return True
 
     if instance.status in ("canceled", "expired"):
         instance.order.status = "canceled"
         instance.order.trans.status = "canceled"
         instance.order.trans.save()
         instance.order.save()
-
         notify_dispetcher(order, "invoice_unpayed")
-
 
     return True
 
@@ -116,15 +118,15 @@ def tell_trans_check(sender, instance, **kwargs):
             order = Orders.objects.get(trans=instance)
             order.status == "processed"
             order.save()
-            tell_update_order("exchange_controller", order)
+            return tell_update_order("exchange_controller", order)
 
     if sender == "order_api_status_function":
         # auto make order processed
         if instance.debit_credit == "out" and instance.status == "processed":
             order = Orders.objects.get(trans=instance)
-            order.status == "processed"
+            order.status = "processed"
             order.save()
-            tell_update_order("exchange_controller", order)
+            return tell_update_order("exchange_controller", order)
 
     if instance.status == "failed":
         return notify_dispetcher(instance.order,
@@ -159,23 +161,29 @@ def tell_trans_check(sender, instance, **kwargs):
 # TODO move to background tasks
 @no_fail
 def notify_dispetcher(order, event, **kwargs):
+    print("="*64)
+    print("notify dispetcher")
+    print(order)
+    print(event)
+    print(kwargs)
+    # gather operators of subscribed
     oper_list = None
-
     if order.operator is not None:
         oper = OperTele.objects.get(user=order.operator)
         oper_list = [oper]
     else:
         oper_list = OperTele.objects.filter(status="processing")
 
+    # create nice text of the deal
     txt = order.to_nice_text()
     error = kwargs.get("error", False)
-
-    if not error:
-        msg = None
+    # if error existed finish here
+    if error:
+        msg = ""
         msg = msg + "\n Error during process operation %s" % event
         msg = msg + error + " \n\n" + txt
-
         return raw_send(oper_list, txt)
+
 
 
     events_keys = {
@@ -186,7 +194,7 @@ def notify_dispetcher(order, event, **kwargs):
         "aml_checked": "Входящии платежи по сделке прошли проверку aml",
         "aml_failed": "Входящии платежи по сделке НЕ прошли проверку aml",
         "invoice_wait_secure": "Проверьте входящии платежи по сделке в кабинете оператора",
-        "deal_pocessed": "Сделка завершена"
+        "deal_processed": "Сделка завершена"
     }
 
     msg = None
@@ -209,8 +217,8 @@ def tell_update_order(sender, instance, **kwargs):
             tell_subscriber(oper, instance)
 
     if instance.status == "processed":
-        notify_dispetcher(instance.order, "deal_pocessed")
-        return  True
+        notify_dispetcher(instance.order, "deal_processed")
+        return True
         # notify dispetcher
 
     if instance.status == "canceled":
@@ -225,7 +233,7 @@ def tell_update_order(sender, instance, **kwargs):
 
 def raw_send(oper_list, txt):
     for oper in oper_list:
-        telegram_id = oper.telegram_id
+        telegram_id = oper.tele_id
         resp = requests.post(settings.BOTAPI + "alert/%s" % str(telegram_id),
                              json={"text": txt})
 

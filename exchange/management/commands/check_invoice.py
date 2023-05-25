@@ -8,6 +8,7 @@ from decimal import Decimal
 import json
 import traceback
 from exchange.controller import tell_invoice_check
+import pytz
 
 
 class Command(BaseCommand):
@@ -16,6 +17,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         active_invoices = Invoice.objects.filter(status='created')
         nw = datetime.now()
+        print("start working %s" % nw)
+        utc = pytz.UTC
+
         for i in active_invoices:
 
             if i.currency.title not in CRYPTO_CURRENCY:
@@ -31,7 +35,7 @@ class Command(BaseCommand):
             new_balance = factory.get_balance(i.crypto_payments_details.address)
 
             # tricky, because we should remember this during sweeping to the cold
-            # we doing checking the balance in order to avoid more weighty checking the list of transactions
+            # we do checking the balance in order to avoid more weighty checking the list of transactions
             # very tricky logic
 
             if Decimal(new_balance) > Decimal(i.crypto_payments_details.technical_info):
@@ -70,13 +74,15 @@ class Command(BaseCommand):
                     # update balance in technical info field
                     i.crypto_payments_details.technical_info = new_balance
                     i.crypto_payments_details.save()
+                    continue
 
-                if i.expire_date < nw:
+                if utc.localize(i.expire_date) < nw:
                     i.status = 'expired'
                     i.save()
-                    tell_invoice_check("check_invoice_process", i)
                     i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
                     i.crypto_payments_details.technical_info = new_balance
                     i.crypto_payments_details.save()
+                    tell_invoice_check("check_invoice_process", i)
+
 
     

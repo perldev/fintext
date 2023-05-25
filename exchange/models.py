@@ -116,11 +116,10 @@ class Orders(models.Model):
 
     def to_nice_text(o):
         invoice = Invoice.objects.get(order=o)
-        return str(o.pub_date) + "\n" +\
+        return "#" + str(o.id) +" " + str(o.pub_date) + "\n" +\
                "\nПокупка: " + str(o.amnt_give) + " " + o.give_currency.title +\
                "\nПродажа:" + str(o.amnt_take) + " " + o.take_currency.title +\
                "\nОплата: "  + invoice.crypto_payments_details.address + " " + str(invoice.sum)
-
 
     def __unicode__(o):
         return str(o.id) + " " + str(o.pub_date) + " " + o.give_currency.title + " " + o.take_currency.title
