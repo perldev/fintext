@@ -248,6 +248,7 @@ def create_invoice(req):
 
                 # last_added_crypto_address.technical_info = factory.get_balance()
                 last_added_crypto_address.save()
+                new_invoice.save()
 
             else:
                 if is_fiat_card:
@@ -274,8 +275,8 @@ def create_invoice(req):
                     currency = Currency.objects.get(id=order.give_currency_id)
                     cashpoint_location = CashPointLocation.objects.get(id=cash_point_if_fiat)
                     payment_details_give = cashpoint_location.title
-                    invoice = create_cash_invoice(order, cashpoint_location, amnt, currency)
-                    order.invoice = invoice
+                    create_cash_invoice(order, cashpoint_location, amnt, currency)
+
             
             # если BTC_UAH получать гривну на карту, то is_cash=false и выполняется else
             if is_cash and order.take_currency.title in FIAT_CURRENCIES:
