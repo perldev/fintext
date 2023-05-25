@@ -12,6 +12,9 @@ from fintex.common import no_fail
 # SIGNALS HERE
 
 
+def get_deal_status(order):
+    return "wait_invoice"
+
 def common_tell(sender, instance, **kwargs):
     pass
 
