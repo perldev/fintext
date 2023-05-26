@@ -1,6 +1,7 @@
 
 function getStatus() {
-    fetch(`/api/get_order_status/116`)
+    let orderId = window.location.href.split('orders/')[1]
+    fetch(`/api/get_order_status/${orderId}`)
     .then(response => response.json())
     .then(response => {
         let counter = 1;
