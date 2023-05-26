@@ -810,6 +810,14 @@ h6 {
     line-height: 58px;
     z-index: 5
 }
+.steps .step.failed .step-icon {
+    border-color: red;
+    background-color: red;
+    color: #fff;
+}
+.steps .step.failed .step-icon-wrap::before, .steps .step.failed .step-icon-wrap::after {
+    background-color: red;
+}
 .steps .step .step-title {
     margin-top: 16px;
     margin-bottom: 0;

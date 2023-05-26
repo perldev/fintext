@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/create_invoice/", views.create_invoice, name="create_invoice"),
     path("api/check/<int:id_invoice>", views.check_invoices, name="api_check_invoices"),
     path("api/create_exchange_request/", views.create_exchange_request, name="api_create_exchange_request"),
+    path("api/get_order_status/<int:pk>", views.order_status, name="api_order_status"),
     path('orders/<int:pk>', views.order_details, name='order_details'),
     path('oper/', include('oper.urls')), #new
     path('admin/', admin.site.urls),
