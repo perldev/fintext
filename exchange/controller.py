@@ -7,6 +7,7 @@ from fintex import settings
 from fintex.settings import NATIVE_CRYPTO_CURRENCY, CRYPTO_CURRENCY
 import requests
 from fintex.common import no_fail
+import traceback
 
 from exchange.models import CHECKOUT_STATUS_FREE
 # module that works like a gathering all logic for provide deals
@@ -21,7 +22,15 @@ def get_deal_status(order):
     if payment2client_status == "created":
         payment2client_status = "wait"
 
-    invoice_status = obj.invoice.status
+    invoice = None
+
+    try:
+        invoice = Invoice.objects.get(order=obj)
+    except :
+        traceback.print_exc()
+        raise Exception("")
+
+    invoice_status = invoice.status
 
     invoice_check_status = "wait"
     if invoice_status == "created":
