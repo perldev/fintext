@@ -1,3 +1,5 @@
+import traceback
+
 from django.db import models
 import fintex.settings as settings
 from datetime import datetime
@@ -13,7 +15,14 @@ import hashlib
 import hmac
 import json
 import time
-from private_settings import WHITEBIT_API_KEY, WHITEBIT_SECRET_KEY
+WHITEBIT_API_KEY, WHITEBIT_SECRET_KEY = (None, None)
+
+try:
+    from private_settings import WHITEBIT_API_KEY as wpubkey, WHITEBIT_SECRET_KEY as wprivkey
+    WHITEBIT_API_KEY = wpubkey
+    WHITEBIT_SECRET_KEY = wprivkey
+except:
+    traceback.print_exc()
 
 
 STATUS_INVOICE = (

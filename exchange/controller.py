@@ -112,6 +112,7 @@ def tell_aml_check(sender, instance, **kwargs):
 
 @no_fail
 def tell_trans_check(sender, instance, **kwargs):
+
     if sender == "send_crypto_transes_deal":
         # auto make order processed
         if instance.status == "processed":
