@@ -1,0 +1,184 @@
+{% extends 'oper/base.html' %}
+
+{% block content%}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-0">Настройки</h5>
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Название</th>
+                                        <th scope="col">Описание</th>
+
+                                        <th scope="col">Значение</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3">
+                                            AML Bot
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">aml_access_id</span>
+                                        </td>
+                                        <td>
+                                            <code>Публичный</code>
+                                        </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{aml_access_id}}" name="aml_access_id" width="100"> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">aml_access_token</span>
+                                        </td>
+                                        <td>
+                                            <code>Приватный</code>
+                                        </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{aml_access_token}}" name="aml_access_token" width="100"> </td>
+
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">riskbtc</span>
+                                        </td>
+                                         <td>
+                                            <code>Допустимый AML риск сети btc</code>
+                                        </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{riskbtc}}" name="riskbtc" width="100"> </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">risketh</span>
+                                        </td>
+                                         <td>
+                                            <code>Допустимый AML риск сети eth</code>
+                                        </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{risketh}}" name="risketh" width="100"> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">risktron</span>
+                                        </td>
+                                         <td>
+                                            <code>Допустимый AML риск сети tron</code>
+                                        </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{risktron}}" name="risktron" width="100"> </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                           Биржа WhiteBit
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">white_bit_api_key</span>
+                                        </td>
+                                        <td>
+                                            <code>Публичный</code>
+                                        </td>
+                                        <td>
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{white_bit_api_key}}" name="white_bit_api_key" width="100">
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">white_bit_api_private</span>
+                                        </td>
+                                        <td>
+                                            <code>Приватный</code>
+                                        </td>
+                                          <td>
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{white_bit_api_private}}"
+                                                   name="white_bit_api_private" width="100">
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                        АПИ  чтения блокчейнов
+                                        </td>
+                                    </tr>
+                                   <tr>
+                                        <td>
+                                            <span class="badge bg-primary">infura_key</span>
+                                        </td>
+                                        <td>
+                                            <code>ключ infura</code>
+                                        </td>
+                                          <td>
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{infura_key}}"
+                                                   name="infura_key" width="100">
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">tron_key</span>
+                                        </td>
+                                        <td>
+                                            <code>ключ tron grid</code>
+                                        </td>
+                                           <td>
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{tron_key}}"
+                                                   name="tron_key" width="100">
+
+                                        </td>
+
+
+                                    </tr>
+                                      <tr>
+                                        <td colspan="3">
+                                        TelegramBot token
+                                        </td>
+                                    </tr>
+
+                                   <tr>
+                                        <td>
+                                            <span class="badge bg-primary">telegram_bot_token</span>
+                                        </td>
+                                        <td>
+                                            <code>токен telegram бота</code>
+                                        </td>
+                                           <td>
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{telegram_bot_token}}"
+                                                   name="telegram_bot_token" width="100">
+
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script src="/static/oper/assets/libs/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="/static/oper/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
+    <script src="/static/oper/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/static/oper/assets/extra-libs/sparkline/sparkline.js"></script>
+    <!--Wave Effects -->
+    <script src="/static/oper/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="/static/oper/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="/static/oper/js/custom.min.js"></script>
+    
+
+{% endblock %}
