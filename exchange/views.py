@@ -31,6 +31,9 @@ from django.http import HttpResponse
 
 from exchange.controller import tell_update_order as tell_controller_new_order
 
+from exchange.controller import get_deal_status
+
+
 def main(req):
     return render(req, "main.html", {})
 
@@ -411,9 +414,16 @@ def order_details(request, pk):
     order = Orders.objects.get(pk=pk)
     context = {
         'order': order,
-        "t_link": get_telechat_link(order)
+        "t_link": get_telechat_link(order),
     }
     return render(request, "order-details.html", context)
+
+
+def order_status(request, pk):
+    order = Orders.objects.get(pk=pk)
+    status_data = json.dumps(get_deal_status(order.id))
+    response = HttpResponse(status_data, content_type='application/json charset=utf-8')
+    return response
 
 
 def req_to_whitebit_api(request):
