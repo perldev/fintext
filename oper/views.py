@@ -44,6 +44,65 @@ def order_status(req, status, order_id):
 
 
 @login_required(login_url="/oper/login/")
+def settings(req):
+    if not req.user.is_superuser:
+        return json_500false(req)
+
+    avalible_settings = {
+        "riskbtc": True,
+        "risketh": True,
+        "riskerc20": True,
+        "risktron": True,
+        "riskusdt": True,
+        "telegram_bot_token": True,
+        "infura_key": True,
+        "tron_key": True,
+        "aml_access_id": True,
+        "aml_access_token": True,
+        "white_bit_api_key": True,
+        "white_bit_api_private": True,
+    }
+    for i in avalible_settings.keys():
+        obj, created = context_vars.objects.using("security").get_or_create(name=i)
+        avalible_settings[i] = obj.value
+
+    return render(req, "oper/settings.html", context={"vars": avalible_settings})
+
+
+@login_required(login_url="/oper/login/")
+def settings_edit(req):
+    if not req.user.is_superuser:
+
+        return json_500false(req)
+
+    avalible_settings = {
+        "riskbtc": True,
+        "risketh": True,
+        "riskerc20": True,
+        "risktron": True,
+        "riskusdt": True,
+        "telegram_bot_token": True,
+        "infura_key": True,
+        "tron_key": True,
+        "aml_access_id": True,
+        "aml_access_token": True,
+        "white_bit_api_key": True,
+        "white_bit_api_private": True,
+    }
+    name = req.POST.get("name", False)
+    value = req.POST.get("val", False)
+    if name not in avalible_settings:
+        return json_500false(req, {"description": "no name"})
+
+    if not value:
+        return json_500false(req, {"description": "no val"})
+
+    context_vars.objects.using("security").filter(name=name).update(value=value)
+
+    return json_true(req)
+
+
+@login_required(login_url="/oper/login/")
 def trans_status(req, status, trans_id):
     obj = get_object_or_404(Trans, pk=trans_id)
     obj.operator = req.user
@@ -269,7 +328,7 @@ def invoices_status(req, status, invoice_id):
     obj = get_object_or_404(Invoice, pk=invoice_id)
 
     if obj.currency.title in FIAT_CURRENCIES:
-        if status in ("payed", "canceled") and obj.status in ("processing", ):
+        if status in ("payed", "canceled") and obj.status in ("created",  ):
             obj.status = status
             obj.crypto_payments_details.status = "canceled"
             obj.crypto_payments_details.save()

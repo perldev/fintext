@@ -5,7 +5,8 @@ let avaliable_pairs = [
     'eth_uah',
     'usdt_uah',
     'uah_usdt',
-    'usdt_btc'
+    'usdt_btc',
+    "usd_usdt"
 ]
 
 let main_rate = 0;

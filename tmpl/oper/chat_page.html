@@ -60,7 +60,11 @@
     <script src="/static/oper/assets/extra-libs/multicheck/datatable-checkbox-init.js"></script>
     <script src="/static/oper/assets/extra-libs/multicheck/jquery.multicheck.js"></script>
     <script src="/static/oper/assets/extra-libs/DataTables/datatables.min.js"></script>
-    <script>
+
+
+{% endblock %}
+{% block custom_scipts_after_all_load %}
+ <script>
        let chat_id = "{{chat_obj.uuid}}";
        let username = "{{username}}";
         $(function() {
@@ -70,5 +74,4 @@
         });
 
     </script>
-
-{% endblock %}
+{% endblock  %}

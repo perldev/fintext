@@ -273,9 +273,40 @@ $(function() {
                 });
 
         });
+        $(".edit_vals").each(function(){
+               var api_url = $(this).data("url");
+                var postaction = $(this).data("post_action");
+                $(this).on("keyup", function(){
+                   var val = $(this).val();
+                   var name = $(this).attr("name");
+
+                   var request = $.ajax({
+                                        url: api_url+"?_="+new Date(),
+                                        method: "POST",
+                                        dataType: "json",
+                                        data:{"val":val, "name":name}
+                                    });
+                   request.done(function( msg ) {
+                      if(postaction){
+                            let functionObj = window[postaction];
+                            functionObj(msg)
+                      }else{
+                        Main.alert("Ok!");
+                      }
+                      return  true;
+                    });
+                    request.fail(function( jqXHR, textStatus ) {
+                       try {
+                                var a = JSON.parse(jqXHR.responseText);
+                                Main.alert(a["description"]);
+                            } catch(e) {
+                                  Main.alert("не могу завершить действие " + url );
+                            }
+
+                    });
+                   });
+                });
 
 
-
-
-
-});
+        }
+        );

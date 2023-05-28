@@ -216,6 +216,14 @@
                                 <img src="/static//assets/images/users/1.jpg" alt="user" class="rounded-circle" width="31">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end user-dd animated" aria-labelledby="navbarDropdown">
+
+                                {% if request.user.is_superuser %}
+                                 <a class="dropdown-item" href="{% url 'oper_settings'%}">
+                                     <i class="ti-user me-1 ms-1"></i>
+                                    Настройки системы</a>
+
+                                {% endif %}
+
                                 <a class="dropdown-item" href="javascript:void(0)"><i class="ti-user me-1 ms-1"></i>
                                     Настроить двухфакторную</a>
                                 <!--<a class="dropdown-item" href="javascript:void(0)"><i class="ti-wallet me-1 ms-1"></i>
@@ -308,8 +316,8 @@
     <!-- ============================================================== -->
     {% block scripts %} {% endblock %}
     {% include "oper/modal.html" %}
-    <script src="/static/oper/js/myoper.js?version=7"></script>
-
+    <script src="/static/oper/js/myoper.js?version=8"></script>
+    {% block custom_scipts_after_all_load%} {%endblock%}
 
 </body>
 

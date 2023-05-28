@@ -26,9 +26,9 @@ def get_deal_status(order):
 
     try:
         invoice = Invoice.objects.get(order=obj)
-    except :
-        traceback.print_exc()
-        raise Exception("")
+    except:
+        error_var = traceback.format_exc()
+        raise Exception(error_var)
 
     invoice_status = invoice.status
 

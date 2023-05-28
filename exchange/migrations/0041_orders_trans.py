@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='orders',
             name='trans',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='exchange.trans', verbose_name='транзакция выплаты'),
+            field=models.ForeignKey(blank=True, null=True,
+                                    on_delete=django.db.models.deletion.PROTECT, to='exchange.trans', verbose_name='транзакция выплаты'),
         ),
     ]

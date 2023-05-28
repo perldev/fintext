@@ -546,7 +546,7 @@ async def process_text(content_type, chat_type, chat_id, msg):
         loop.create_task(obj_flow(context, msg))
     else:
         print("send message to us")
-        send_message2us(context, msg)
+        await send_message2us(context, msg)
         # default_menu(context, msg)
 
 
