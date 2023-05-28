@@ -186,7 +186,7 @@ $(function() {
                                     dataType: "json"
                                 });
                     request.done(function( msg ) {
-                        $(view_id).html(Main.simple_form(msg["order"]));
+                        $(view_id).html(Main.simple_form(msg["order"], ["pk"]));
                     });
                     request.fail(function( jqXHR, textStatus ) {
                         Main.alert("не могу получить данные для ордеру");
@@ -195,7 +195,7 @@ $(function() {
             },
 
 
-            simple_form: function(fields){
+            simple_form: function(fields, except){
                     var res = [];
                     var terms = {
                         "account": "Адрес/Cчет",
@@ -218,11 +218,14 @@ $(function() {
                     }
                     for(var key in fields){
                         var name = key;
+                        if(name in except){
+                            continue;
+                        }
                         if(key in terms){
                             name = terms[key]
                         }
                         var s = `<div class="form-group row">
-                <label class="col-4 col-form-label" for="">${name}</label>
+                <label class="col-4 col-form-label" for=""><strong>${name}</strong></label>
                 <div class="col-8">
                     ${fields[key]}
                 </div>
@@ -265,7 +268,9 @@ $(function() {
                 });
 
                  var table = $(this).DataTable({ajax:api_url,
-                                                columns: columns});
+                                                columns: columns,
+                                                order: [[0, 'desc']],
+                                                });
                  $(this).find("tbody").on('mouseenter', 'td', function () {
                     var colIdx = table.cell(this).index().column;
                     $(table.cells().nodes()).removeClass('odd');

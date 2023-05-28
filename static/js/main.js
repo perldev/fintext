@@ -1,13 +1,5 @@
 
-let avaliable_pairs = [
-    'btc_uah',
-    'uah_btc',
-    'eth_uah',
-    'usdt_uah',
-    'uah_usdt',
-    'usdt_btc',
-    "usd_usdt"
-]
+let avaliable_pairs = [];
 
 let main_rate = 0;
 let rate_message = document.getElementById("rate-message");

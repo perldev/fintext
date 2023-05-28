@@ -35,12 +35,16 @@ class Command(BaseCommand):
 
             if amnt_sweep < i.amnt:
                 print("i cannot provide a payment")
+                i.status = "processing"
+                i.save()
                 # TODO tell about this to dispetcher
                 return
-            resp = get_full_data(address4)
 
+            resp = get_full_data(address4)
             try:
+
                 txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, i.amnt)
+
             except:
                 i.status = "failed"
                 i.save()

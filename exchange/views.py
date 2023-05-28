@@ -35,7 +35,13 @@ from exchange.controller import get_deal_status
 
 
 def main(req):
-    return render(req, "main.html", {})
+    l = list(Currency.objects.all())
+    rates4Andrey = []
+    for i in l:
+        for j in l:
+            if i != j:
+                rates4Andrey.append(i.title + "_" + j.title)
+    return render(req, "main.html", {"allrates": rates4Andrey})
 
 
 # TODO add permissions only for opers
@@ -90,6 +96,7 @@ def create_exchange_request(req):
         rate = float(body['rate'])
         amount = float(body['amount'])
         cashPoints = CashPointLocation.objects.all()
+
         cashPointsDict = {}
         for i in cashPoints:
             cashPointsDict[i.id] = i.title
