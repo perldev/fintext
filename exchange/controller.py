@@ -96,7 +96,7 @@ def tell_invoice_check(sender, instance, **kwargs):
             notify_dispetcher(order, "invoice_payed")
             # changing trans to client in processing for further working
             order.trans.status = "processing"
-            order.save()
+            order.trans.save()
         return True
 
     if instance.status in ("canceled", "expired"):
