@@ -64,8 +64,12 @@ def generate_address():
 
 
 # TODO calculate this more accurate
-def get_normal_fee( prev_out_index):
+def get_normal_fee(prev_out_index):
     return 230 * 240
+
+
+def estimate_fee(*kargs, **kwargs):
+    return 230*240
 
 
 def sweep_address_to(wif_priv, acc, amnt, destination):
@@ -142,7 +146,7 @@ def get_sum_from(acc, blockheight=0):
     return d/PREC, in_trans
 
 
-def get_balance(acc):
+def get_balance(acc, *kargs, **kwargs):
     resp = requests.get("https://blockchain.info/balance?active=%s" % acc, headers=def_headers)
     respj = resp.json()
     return respj[acc]["final_balance"]

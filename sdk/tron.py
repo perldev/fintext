@@ -75,7 +75,7 @@ def get_current_height():
 
 
 def sweep_address_to(priv, acc, to, amnt):
-    return ACCESS.transfer_of_contract(acc, to, int(amnt*PREC),  private_key=priv)
+    return ACCESS.transfer_of_contract(acc, to, amnt,  private_key=priv)
 
 
 def generate_address():

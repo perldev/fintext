@@ -1,12 +1,14 @@
 
 from sdk.btc import get_current_height, get_out_trans_from, get_in_trans_from, get_sum_from, \
     get_balance, get_prec as  get_prec_btc, \
-    sweep_address_to as sweep_address_to_btc, generate_address as generate_address_btc
+    sweep_address_to as sweep_address_to_btc, generate_address as generate_address_btc,\
+    estimate_fee as estimate_fee_btc
 
 
 from sdk.eth import get_current_height as heth, get_out_trans_from as outeth, get_in_trans_from as ineth, \
     get_sum_from as sumfrometh, get_balance as balanceeth, get_prec as get_prec_eth,\
-    sweep_address_to as sweep_address_to_eth, setup_eth_access, generate_address as generate_address_eth
+    sweep_address_to as sweep_address_to_eth, setup_eth_access, generate_address as generate_address_eth,\
+    estimate_fee as estimate_fee_eth
 
 
 from sdk.erc20 import get_current_height as herc, get_out_trans_from as outerc, get_in_trans_from as inerc, \
@@ -36,6 +38,7 @@ class CryptoFactory:
 
             "btc": {
                 "get_prec": get_prec_btc,
+                "estimate_fee": estimate_fee_btc,
                 "get_current_height": get_current_height,
                 "get_out_trans_from": get_out_trans_from,
                 "get_in_trans_from": get_in_trans_from,
@@ -47,15 +50,14 @@ class CryptoFactory:
             },
             "eth": {
                 "get_prec": get_prec_eth,
+                "estimate_fee": estimate_fee_eth,
                 "get_current_height": heth,
                 "get_out_trans_from": outeth,
                 "get_in_trans_from": ineth,
                 "get_sum_from": sumfrometh,
                 "get_balance": balanceeth,
-                "sweep_address_to": sweep_address_to_erc20,
-                "generate_address": generate_address_erc20
-
-
+                "sweep_address_to": sweep_address_to_eth,
+                "generate_address": generate_address_eth
             },
         }
         if arg == "eth":
@@ -70,7 +72,7 @@ class CryptoFactory:
                 "get_in_trans_from": inerc,
                 "get_sum_from": sumfromerc,
                 "get_balance": balanceerc,
-                "native_balance":erc20_native_balance,
+                "native_balance": erc20_native_balance,
                 "sweep_address_to": sweep_address_to_erc20,
                 "generate_address": generate_address_erc20
 
@@ -129,6 +131,15 @@ class CryptoFactory:
             return Decimal(value/self.prec)
         else:
             return value
+
+    def estimate_fee(self, *args, **kwargs):
+        call_obj = self.__dict_call[self.__currency]["estimate_fee"]
+        value = call_obj(*args, **kwargs)
+        if kwargs.get("show_normal", False):
+            return Decimal(value/self.prec)
+        else:
+            return value
+
 
     def generate_address(self,  *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["generate_address"]

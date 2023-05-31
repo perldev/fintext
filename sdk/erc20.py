@@ -68,7 +68,7 @@ def get_normal_fee( prev_out_index):
 
 def generate_address():
     new_addr = Account.create()
-    return {"address": new_addr.address, "key": str(new_addr.key)}
+    return {"address": new_addr.address, "key": Web3.to_hex(new_addr.key)}
 
 
 def sweep_address_to(private_key, acc, destination, amnt):
@@ -78,7 +78,7 @@ def sweep_address_to(private_key, acc, destination, amnt):
     account = Account.from_key(private_key)
     w3.middleware_onion.add(construct_sign_and_send_raw_middleware(account))
     account = Account.from_key(private_key)
-    tx_hash = contract.functions.transfer(destination, amnt*PREC).transact({'from': account.address})
+    tx_hash = contract.functions.transfer(destination, amnt).transact({'from': account.address})
     return tx_hash
 
 

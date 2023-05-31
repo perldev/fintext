@@ -2,8 +2,22 @@ from django.db import models
 from datetime import datetime
 from fintex import settings
 from exchange.models import Currency, STATUS_ORDER, Orders
-import uuid
 
+import uuid
+import json
+
+STATUS = (
+    ("wait_checkout", u"ожидает"),
+    ("created", u"создана"),
+    ("processing", u"в процессе"),
+    ("processing2", u"в процессе отправки"),
+
+    ("wait_secure", u"проверяется"),
+    ("user_canceled", u"отменена клиентом"),
+    ("canceled", u"отменена оператором"),
+    ("processed", u"проведена"),
+    ("failed", u"неуспешна"),
+)
 
 class chat(models.Model):
     uuid = models.UUIDField(verbose_name="uuid of page for quick connect",
@@ -41,6 +55,26 @@ class context_vars(models.Model):
 
 def get_telechat_link(chat):
     return settings.TELEBOT + str(chat.uuid)
+
+
+def create_task(name, params, key, status="processing"):
+    task = simple_task(command_name=name, command_params=json.dumps(params),
+                       ext_key=key, status=status)
+    task.save()
+    return task
+
+
+class simple_task(models.Model):
+
+    command_name = models.CharField(verbose_name="Name", unique=True, max_length=255)
+    command_params = models.TextField(verbose_name="params", unique=True, max_length=255)
+    status = models.CharField(max_length=40, choices=STATUS, default='created', verbose_name="Статус")
+    history = models.TextField(default="")
+    ext_key = models.CharField(max_length=255, unique=True, blank=False)
+
+    class Meta:
+        verbose_name = 'Задача на исполнение'
+        verbose_name_plural = 'Задачи на исполнение'
 
 
 def get_rate(from_currency, to_currency):

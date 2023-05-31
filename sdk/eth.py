@@ -17,7 +17,7 @@ API_HOST = "https://api.blockchain.info/v2/eth/data/account/"
 def_headers = {"Content-Type": "application/json"}
 PREC = 10 ** 18
 ACCESS = None
-
+verbose = True
 INFURA_KEY = None
 try:
    from private_settings import INFURA_KEY as INF
@@ -41,7 +41,7 @@ def get_current_height():
 
 
 def get_out_trans_from(acc, blockheight=0):
-
+    acc = acc.upper()
     resp1 = requests.get(API_HOST + "%s/internalTransactions?page=0&size=20" % acc,
                          headers=def_headers)
 
@@ -65,7 +65,7 @@ def get_out_trans_from(acc, blockheight=0):
 
             if trans["from"] == acc:
                 result.append({"hash": trans["transactionHash"],
-                               "value": trans["value"],
+                               "value": int(trans["value"]),
                                "addr": acc,
                                "to": trans["to"],
                                "raw": json.dumps(trans),
@@ -86,11 +86,11 @@ def get_out_trans_from(acc, blockheight=0):
             if int(trans["blockNumber"]) < blockheight:
                 continue
 
-            if trans["from"] == acc:
-                result.append({"hash": trans["hash"],
-                               "value": trans["value"],
+            if trans["from"].upper() == acc:
+                result.append({"hash": trans["hash"].upper(),
+                               "value": int(trans["value"]),
                                "addr": acc,
-                               "to": trans["to"],
+                               "to": trans["to"].upper(),
                                "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
@@ -99,10 +99,16 @@ def get_out_trans_from(acc, blockheight=0):
 
 def get_normal_fee():
     global ACCESS
-    return ACCESS.eth.generate_gas_price()
+    return ACCESS.eth.gas_price
 
 
-def sweep_address_to(priv, acc, to, amnt, gas=2000000):
+def estimate_fee(*kargs, **kwargs):
+    global ACCESS
+    gas = ACCESS.eth.gas_price
+    return gas*25000
+
+
+def sweep_address_to(priv, acc, to, amnt, gas=25000):
 
     global ACCESS
     w3 = ACCESS
@@ -110,18 +116,21 @@ def sweep_address_to(priv, acc, to, amnt, gas=2000000):
         gasPrice = get_normal_fee()
         key = priv
         nonce = w3.eth.get_transaction_count(acc)
+        #print(amnt)
         legacy_transaction = {
             # Note that the address must be in checksum format or native bytes:
             'to': to,
-            'value': amnt*PREC-gas*gasPrice,
+            'value': amnt,
             'gas': gas,
             'gasPrice': gasPrice,
             'nonce': nonce,
             'chainId': 1
         }
+
         signed = Account.sign_transaction(legacy_transaction, key)
+        #print(signed)
         w3.eth.sendRawTransaction(signed["rawTransaction"])
-        return signed["hash"]
+        return Web3.to_hex(signed["hash"])
     except:
         traceback.print_exc()
         return False
@@ -129,18 +138,21 @@ def sweep_address_to(priv, acc, to, amnt, gas=2000000):
 
 def generate_address():
     new_addr = Account.create()
-    return {"address": new_addr.address, "key": str(new_addr.key)}
+    return {"address": new_addr.address, "key":  Web3.to_hex(new_addr.key)}
 
 
-def get_in_trans_from(self,
+def get_in_trans_from(
                       acc,
                       blockheight=0):
-
     resp1 = requests.get(API_HOST + "%s/internalTransactions?page=0&size=20" % acc,
                          headers=def_headers)
 
     resp2 = requests.get(API_HOST + "%s/wallet" % acc,
                          headers=def_headers)
+    acc = acc.upper()
+    if verbose:
+        print(resp2.text)
+        print(resp1.text)
 
     respj1 = resp1.json()
     respj2 = resp2.json()
@@ -162,7 +174,7 @@ def get_in_trans_from(self,
 
             if trans["to"] == acc:
                 result.append({"hash": trans["transactionHash"],
-                               "value": trans["value"],
+                               "value": int(trans["value"]),
                                "addr": acc,
                                "from": trans["from"],
                                "raw": json.dumps(trans),
@@ -170,6 +182,8 @@ def get_in_trans_from(self,
 
     if "accountTransactions" in respj2:
         for trans in respj2["accountTransactions"]:
+            if verbose:
+                print(trans)
 
             if "blockNumber" not in trans:
                 continue
@@ -183,11 +197,11 @@ def get_in_trans_from(self,
             if int(trans["blockNumber"]) < blockheight:
                 continue
 
-            if trans["to"] == acc:
+            if trans["to"].upper() == acc:
                 result.append({"hash": trans["hash"],
-                               "value": trans["value"],
+                               "value": int(trans["value"]),
                                "addr": acc,
-                               "from": trans["from"],
+                               "from": trans["from"].upper(),
                                "raw": json.dumps(trans),
                                "block_height": trans["blockNumber"]})
 
@@ -202,7 +216,7 @@ def get_sum_from(acc, blockheight=0):
     return d / PREC, in_trans
 
 
-def get_balance(acc):
+def get_balance(acc, *kargs, **kwargs):
     global ACCESS
     w3 = ACCESS
     return Decimal(w3.eth.get_balance(acc))/PREC

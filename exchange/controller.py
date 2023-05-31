@@ -8,8 +8,8 @@ from fintex.settings import NATIVE_CRYPTO_CURRENCY, CRYPTO_CURRENCY
 import requests
 from fintex.common import no_fail
 import traceback
-
-from exchange.models import CHECKOUT_STATUS_FREE
+from oper.models import create_task
+from exchange.models import CHECKOUT_STATUS_FREE, WhitebitDeals
 # module that works like a gathering all logic for provide deals
 # SIGNALS HERE
 
@@ -90,8 +90,11 @@ def tell_invoice_check(sender, instance, **kwargs):
     if instance.status == "payed":
         if order.give_currency.title in NATIVE_CRYPTO_CURRENCY:
             notify_dispetcher(order, "invoice_payed")
+            create_task("whitebit_exchange", {"order_id": order.id}, "controller_order_%i" % order.id)
+            notify_dispetcher(order, "create_task_onwhitebitexchange")
+
             pass
-            # here will be command of andrey
+
         else:
             notify_dispetcher(order, "invoice_payed")
             # changing trans to client in processing for further working
@@ -120,14 +123,37 @@ def tell_aml_check(sender, instance, **kwargs):
 
 @no_fail
 def tell_whitebit_finished(sender, instance, **kwargs):
-    pass
+    if instance.status == "processed":
+        notify_dispetcher(instance.order, "sold_on_whitebit")
+        notify_dispetcher_about_whitebit(instance, "sold_info_whitebit")
+        order = instance.order
+        order.trans.status = "processing"
+        order.trans.save()
+    else:
+        notify_dispetcher(instance.order, "failed_on_whitebit")
+
+
+
+
+
+
 
 
 
 @no_fail
 def tell_trans_check(sender, instance, **kwargs):
 
+
+    if instance.status == "failed":
+        return notify_dispetcher(instance.order,
+                                 "trans_out_failed",
+                                 error=sender + " \n" + kwargs["error"],
+                                 )
     if sender == "send_crypto_transes_deal":
+        return
+
+
+    if sender == "make_payment4deal":
         # auto make order processed
         if instance.status == "processed":
             order = Orders.objects.get(trans=instance)
@@ -142,12 +168,6 @@ def tell_trans_check(sender, instance, **kwargs):
             order.status = "processed"
             order.save()
             return tell_update_order("exchange_controller", order)
-
-    if instance.status == "failed":
-        return notify_dispetcher(instance.order,
-                                 "trans_out_failed",
-                                 error=sender + " \n" + kwargs["error"],
-                                 )
 
     if instance.debit_credit == "in":
         if instance.status == "wait_secure":
@@ -175,6 +195,37 @@ def tell_trans_check(sender, instance, **kwargs):
 
 # TODO move to background tasks
 @no_fail
+def notify_dispetcher_about_whitebit(wdeal, event):
+    print("=" * 64)
+    print("notify dispetcher about whitebit")
+    print(wdeal)
+    print(event)
+    order = wdeal.order
+    # gather operators of subscribed
+    oper_list = None
+    if order.operator is not None:
+        oper = OperTele.objects.get(user=order.operator)
+        oper_list = [oper]
+    else:
+        oper_list = OperTele.objects.filter(status="processing")
+
+    # create nice text of the deal
+    txt = wdeal.to_nice_text()
+    events_keys = {
+        "sold_info_whitebit": "Информации о клиринге по сделке на whitebit"
+    }
+
+    msg = None
+    if event not in events_keys:
+        msg = "Не расспознанное событие по сделке %s" % event
+    else:
+        msg = events_keys[event]
+
+    txt = msg + " \n\n" + txt
+    return raw_send(oper_list, txt)
+
+
+@no_fail
 def notify_dispetcher(order, event, **kwargs):
     print("="*64)
     print("notify dispetcher")
@@ -190,7 +241,12 @@ def notify_dispetcher(order, event, **kwargs):
         oper_list = OperTele.objects.filter(status="processing")
 
     # create nice text of the deal
-    txt = order.to_nice_text()
+    if isinstance(order, Orders):
+        txt = order.to_nice_text()
+
+
+
+    # may be error
     error = kwargs.get("error", False)
     # if error existed finish here
     if error:
@@ -209,7 +265,8 @@ def notify_dispetcher(order, event, **kwargs):
         "aml_checked": "Входящии платежи по сделке прошли проверку aml",
         "aml_failed": "Входящии платежи по сделке НЕ прошли проверку aml",
         "invoice_wait_secure": "Проверьте входящии платежи по сделке в кабинете оператора",
-        "deal_processed": "Сделка завершена"
+        "deal_processed": "Сделка завершена",
+        "sold_info_whitebit": "Информации о клиринге по сделке на whitebit"
     }
 
     msg = None
