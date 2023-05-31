@@ -16,9 +16,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         active_invoices = Invoice.objects.filter(status='created')
-        nw = datetime.now()
-        print("start working %s" % nw)
         utc = pytz.UTC
+        nw = utc.localize(datetime.now())
+        print("start working %s" % nw)
 
         for i in active_invoices:
 
@@ -43,9 +43,11 @@ class Command(BaseCommand):
                 actual_sum, transes = factory.get_sum_from(i.crypto_payments_details.address,
                                                            i.block_height)
 
+                print(actual_sum)
+                print(transes)
                 # data_from_api = get_in_trans_from(str(i.crypto_payments_details), i.block_height)
                 # TODO TO FACTORY
-                if i.sum >= actual_sum:
+                if i.sum >= actual_sum and transes:
                     # if could not save the transes that is mean that we could contact to developer
                     try:
                         for trans in transes:

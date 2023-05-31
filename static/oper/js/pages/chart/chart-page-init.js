@@ -15,8 +15,10 @@
     });
 
 
-    Calculator.exchange_change = function(from, to){
+    Calculator.exchange_change = function(event, from, to){
         //save the state of current
+        $(".calc_buttons").removeClass("btn-primary");
+        $(event.target).addClass("btn-primary");
         Calculator.current = [from, to];
         var request = $.ajax({
                    url: "/oper/api/get_direction/" + from + "/" + to+"/",

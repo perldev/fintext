@@ -29,7 +29,6 @@ class Command(BaseCommand):
             factory = CryptoFactory(i.currency.title,
                                     "native")
 
-
             invoice = Invoice.objects.get(order=order)
             resp = get_full_data(invoice.crypto_payments_details.address)
             try:

@@ -1,10 +1,11 @@
 from django.core.management.base import BaseCommand
 from sdk.whitebitcalls import get_address_call, check_balance, sell_currency, check_order
 from exchange.models import Orders, Trans, WhitebitDeals
+
 import time
 from decimal import Decimal
 from datetime import datetime
-
+from exchange.controller import tell_whitebit_finished
 
 class Command(BaseCommand):
     help = "Process of selling crypto on whitebit"
@@ -167,4 +168,8 @@ class Command(BaseCommand):
         whitebit_deal.currency_take = take_currency.title
         whitebit_deal.amnt_take = dict_resp_for_step4['dealMoney']
         whitebit_deal.save()
+
+        tell_whitebit_finished("whitebit_exchange_process",  whitebit_deal)
+
+
 

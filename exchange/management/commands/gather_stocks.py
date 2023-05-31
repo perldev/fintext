@@ -135,7 +135,7 @@ def gather_whitebit(t1, t2):
              rate=sell_rate)
     r.save()
 
-    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s" % (t1, t2))
+    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s" % (t1.lower(), t2.lower()))
     context_var.value = r.rate
     context_var.save()
 

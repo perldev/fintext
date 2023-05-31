@@ -107,9 +107,11 @@
                                         <h6 class="font-medium">Направления:</h6>
                                         {% for i in directions %}
                                             <button
+
                                                     type="button"
-                                                    class="btn btn-outline-info"
-                                                    onclick="Calculator.exchange_change('{{i.from}}', '{{i.to}}')">
+                                                    class="btn btn-outline-info calc_buttons"
+                                                    onclick="Calculator.exchange_change(event, '{{i.from}}', '{{i.to}}')">
+
                                                 {{i.from}} -> {{i.to}}
                                             </button>
 
@@ -163,6 +165,6 @@
     <script src="/static/oper/assets/libs/chart/jquery.flot.pie.min.js"></script>
     <script src="/static/oper/assets/libs/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
     <script src="/static/oper/assets/libs/chart/turning-series.js"></script>
-    <script src="/static/oper/js/pages/chart/chart-page-init.js?js_version={{js_version}}9"></script>
+    <script src="/static/oper/js/pages/chart/chart-page-init.js?js_version={{js_version}}11"></script>
 
 {% endblock %}

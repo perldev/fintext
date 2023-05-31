@@ -621,10 +621,8 @@ def login_page(request):
 def test_rate(req):
     d = {}
     code4execute = req.body.decode('utf-8')
-
     for i in context_vars.objects.filter(name__startswith="context_"):
         d[i.name] = float(i.value)
-
     # print(eval('sqrt(a)', {'__builtins__': None}, {'a': a, 'sqrt': sqrt}))
     d = eval(code4execute, {'__builtins__': None}, d)
     return json_true(req, {"result": d})

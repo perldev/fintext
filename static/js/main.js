@@ -1,5 +1,9 @@
 
+
+
 let avaliable_pairs = [];
+
+
 
 let main_rate = 0;
 let rate_message = document.getElementById("rate-message");
@@ -21,6 +25,7 @@ let cashPointsSelect = null;
 
 
 const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9\.]+/;
+
 given_cur_input.addEventListener("keypress", event => {
   if (!NUMBER_ALLOWED_CHARS_REGEXP.test(event.key)) {
     event.preventDefault();
@@ -33,38 +38,6 @@ taken_cur_input.addEventListener("keypress", event => {
   });
 const CARD_NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
 
-fetch(`/api/get_currency_list`)
-.then(response => response.json())
-.then(json => {
-    Object.entries(json['currencies']).forEach(([key, value]) => {
-        const opt_given = document.createElement('option');
-        const opt_taken = document.createElement('option');
-        opt_given.value = key;
-        opt_given.innerHTML = value;
-        given_cur_select.appendChild(opt_given);
-        opt_taken.value = key;
-        opt_taken.innerHTML = value;
-        if (key === 'uah') {
-            opt_taken.selected = "selected"
-        }
-        taken_cur_select.appendChild(opt_taken);
-      });
-
-    fetch(`/api/get_rate/btc/uah`)
-    .then(response => response.json())
-    .then(json => {
-        main_rate = json['result']['rate'];
-        rate_message.innerHTML = `Курс ${main_rate}`;
-        given_cur_input.value = 1;
-        taken_cur_input.value = given_cur_input.value * main_rate;
-    })
-    .catch(() => {
-        rate_message.innerHTML = `Не могу подгрузить курсы...`;
-    });
-})
-.catch(() => {
-    rate_message.innerHTML = `Не могу подгрузить валюты...`;
-});
 
 
 function ckeckCurrencyPair() {
@@ -104,6 +77,46 @@ function setGivenCurQnty() {
 
 
 let Main = {
+    "on_load": function(){
+
+        fetch(`/api/get_currency_list`)
+        .then(response => response.json())
+        .then(json => {
+            Object.entries(json['currencies']).forEach(([key, value]) => {
+                const opt_given = document.createElement('option');
+                const opt_taken = document.createElement('option');
+                opt_given.value = key;
+                if(opt_given.value == "usdt"){
+                    opt_given.selected = "selected"
+                }
+
+                opt_given.innerHTML = value;
+                given_cur_select.appendChild(opt_given);
+                opt_taken.value = key;
+                opt_taken.innerHTML = value;
+                if (key === 'uah') {
+                    opt_taken.selected = "selected"
+                }
+                taken_cur_select.appendChild(opt_taken);
+              });
+
+            fetch(`/api/get_rate/usdt/uah`)
+            .then(response => response.json())
+            .then(json => {
+                main_rate = json['result']['rate'];
+                rate_message.innerHTML = `Курс ${main_rate}`;
+                given_cur_input.value = 1;
+                taken_cur_input.value = given_cur_input.value * main_rate;
+            })
+            .catch(() => {
+                rate_message.innerHTML = `Не могу подгрузить курсы...`;
+            });
+        })
+        .catch(() => {
+            rate_message.innerHTML = `Не могу подгрузить валюты...`;
+        });
+
+    },
     "draw_form_crypto": function(resp_obj){
 
             let provider_select = '';

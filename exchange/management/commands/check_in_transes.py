@@ -46,7 +46,6 @@ class Command(BaseCommand):
             def_risk_accepted = float(def_risk_accepted.value)
 
             signature = trans.txid + ":" + AML_ACCESSTOKEN + ":" + AML_ACCESSID
-            print(signature)
             params = {"direction": "deposit",
                       "hash": trans.txid,
                       "address": trans.account,

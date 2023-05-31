@@ -118,6 +118,11 @@ def tell_aml_check(sender, instance, **kwargs):
     if instance.status == "failed":
         return notify_dispetcher(instance.trans.order, "aml_error_request")
 
+@no_fail
+def tell_whitebit_finished(sender, instance, **kwargs):
+    pass
+
+
 
 @no_fail
 def tell_trans_check(sender, instance, **kwargs):
@@ -236,12 +241,19 @@ def tell_update_order(sender, instance, **kwargs):
         Trans.objects.filter(order=instance,
                              status="created",
                              debit_credit='out').update(status="canceled")
-        Invoice.objects.filter(order=instance).update(status="canceled")
+        try:
+            i = Invoice.objects.get(order=instance)
+            i.status = "canceled"
+            i.save()
+            tell_invoice_check("exchange_controller", i)
+        except:
+            traceback.print_exc()
 
         return True
 
 
 def raw_send(oper_list, txt):
+
     for oper in oper_list:
         telegram_id = oper.tele_id
         resp = requests.post(settings.BOTAPI + "alert/%s" % str(telegram_id),

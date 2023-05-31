@@ -130,6 +130,11 @@
   {% for i in  allrates %}
     avaliable_pairs.push("{{i}}");
   {%endfor %}
+  document.addEventListener("DOMContentLoaded", function(event) {
+      Main.on_load(event)
+
+  });
+
 
   </script>
 
