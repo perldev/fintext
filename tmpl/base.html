@@ -141,15 +141,12 @@
   <script defer data-lang="{% if request.session.lang %}{{ request.session.lang }}{% else %}uk{% endif %}" src="{% static 'js/main.js' %}?version=3"></script>
   
   <script>
-  {% for i in  allrates %}
-    avaliable_pairs.push("{{i}}");
-  {%endfor %}
-  document.addEventListener("DOMContentLoaded", function(event) {
-      Main.on_load(event)
-
+      document.addEventListener("DOMContentLoaded", function(event) {
+      {% for i in allrates %}
+        avaliable_pairs.push("{{i}}");
+      {% endfor %}
+      Main.on_load(event);
   });
-
-
   </script>
 
 
