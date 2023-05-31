@@ -426,6 +426,14 @@ h6 {
     color: #fff;
 }
 
+.form-lang-select {
+    border: none;
+    margin-left: 15px;
+}
+.form-lang-select:focus {
+    outline: none;
+}
+
 
 
 /*--------------------------------------------------------------

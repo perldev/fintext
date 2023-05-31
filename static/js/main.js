@@ -1,13 +1,29 @@
+function setLang() {
+  let selected_lang = document.getElementById("lang-select").value;
+  let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  fetch('/api/set-lang/', {
+      method: 'POST',
+      headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify({ 
+          'lang': selected_lang,
+       })
+  })
+  .catch(() => {});
+  location.reload();
+}
 
-
+let langJsDict = JSON.parse(document.getElementById('langJsDict').textContent)
+const langData = document.currentScript.dataset;
 
 let avaliable_pairs = [];
 
 
-
 let main_rate = 0;
 let rate_message = document.getElementById("rate-message");
-rate_message.innerHTML = `Загрузка курса...`;
+rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
 let given_cur_input = document.getElementById("given-cur-input");
 let taken_cur_input = document.getElementById("taken-cur-input");
 let given_cur_select = document.getElementById("given-cur-select");
@@ -56,12 +72,12 @@ function ckeckCurrencyPair() {
                 taken_cur_input.value = given_cur_input.value * main_rate;
             })
             .catch(() => {
-                rate_message.innerHTML = `Что-то пошло не так...`;
+                rate_message.innerHTML = `${langJsDict['smth_wrong'][langData.lang]}`;
               });
     } else {
         given_cur_input.disabled = true;
         taken_cur_input.disabled = true;
-        rate_message.innerHTML = `Данная валютная пара не доступна`;
+        rate_message.innerHTML = `${langJsDict['no_pair'][langData.lang]}`;
     }
 }
 
@@ -78,7 +94,6 @@ function setGivenCurQnty() {
 
 let Main = {
     "on_load": function(){
-
         fetch(`/api/get_currency_list`)
         .then(response => response.json())
         .then(json => {
@@ -109,11 +124,11 @@ let Main = {
                 taken_cur_input.value = given_cur_input.value * main_rate;
             })
             .catch(() => {
-                rate_message.innerHTML = `Не могу подгрузить курсы...`;
+                rate_message.innerHTML = `${langJsDict['no_rates'][langData.lang]}`;
             });
         })
         .catch(() => {
-            rate_message.innerHTML = `Не могу подгрузить валюты...`;
+            rate_message.innerHTML = `${langJsDict['no_currencies'][langData.lang]}`;
         });
 
     },
@@ -124,7 +139,7 @@ let Main = {
               provider_select = `
                 <br>
                 <div class="form-group row">
-                  <label class="col-4 col-form-label">Тип сети USDT:</label>
+                  <label class="col-4 col-form-label">${langJsDict['usdt_net'][langData.lang]}</label>
                   <div class="col-8">
                     <div class="form-check">
                       <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
@@ -147,18 +162,18 @@ let Main = {
             let fiat_payment_select = `
               <br>
               <div class="form-group row">
-                <label class="col-4 col-form-label">Способ оплаты:</label>
+                <label class="col-4 col-form-label">${langJsDict['payment_way'][langData.lang]}</label>
                 <div class="col-8">
                   <div class="form-check" >
                     <input class="form-check-input" type="radio" onclick="selectCard()" name="cardPayment" id="cardPayment" checked value="cardPayment">
                     <label class="form-check-label" for="cardPayment">
-                      Перевод на карту
+                      ${langJsDict['card_pay'][langData.lang]}
                     </label>
                   </div>
                   <div class="form-check">
                     <input class="form-check-input" type="radio" onclick="selectCash()" name="cashPayment" id="cashPayment" value="cashPayment" >
                     <label class="form-check-label" for="cashPayment">
-                      Наличными в пункте оплаты
+                    ${langJsDict['cash_pay'][langData.lang]}
                     </label>
                   </div>
                 </div>
@@ -169,13 +184,13 @@ let Main = {
 
 
            return  `<div class="form-group row">
-                <label class="col-4 col-form-label" for="">Вы отдаете:</label>
+                <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
                 <div class="col-8">
                     ${resp_obj['amount']}&nbsp;${resp_obj['given_cur']}
                 </div>
               </div>
               <div class="form-group row">
-                <label for="text1" class="col-4 col-form-label">Вы получаете:</label>
+                <label for="text1" class="col-4 col-form-label">${langJsDict['you_take'][langData.lang]}</label>
                 <div class="col-8">
                     ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
                 </div>
@@ -184,10 +199,10 @@ let Main = {
               ${provider_select}
 
               <div class="form-group row">
-                <label for="text" class="col-4 col-form-label">Укажите адрес кошелька ${resp_obj['taken_cur']}</label>
+                <label for="text" class="col-4 col-form-label">${langJsDict['wal_adr'][langData.lang]} ${resp_obj['taken_cur']}</label>
                 <div class="col-8">
                   <div class="input-group">
-                    <input id="payment-details" name="text" placeholder="адрес валюты" type="text" class="form-control">
+                    <input id="payment-details" name="text" placeholder="${langJsDict['cur_adr'][langData.lang]}" type="text" class="form-control">
                   </div>
                   <div id="payment-details-error" class="form-text"></div>
                 </div>
@@ -197,17 +212,17 @@ let Main = {
 
               <div class="form-group row" id='cash-points-select-wrapper' style="display:none" >
                 <div class="offset-lg-4 col-lg-8 col-12">
-                  <select class="form-select" id="cash-points-select" aria-label="Выбрать точку обмена">
+                  <select class="form-select" id="cash-points-select" aria-label="${langJsDict['choose_loc'][langData.lang]}">
                   </select>
                 </div>
               </div>
 
               <div class="form-group row">
                   <div class="col-6 text-start">
-                    <button  class="btn btn-info">Отменить</button>
+                    <button  class="btn btn-info">${langJsDict['cancel'][langData.lang]}</button>
                   </div>
                   <div class="col-6 text-end">
-                    <button onclick="sendPaymentDetails(event)" class="btn btn-success">Отправить</button>
+                    <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                   </div>
               </div>
               `
@@ -221,7 +236,7 @@ let Main = {
           provider_select = `
             <br>
             <div class="form-group row">
-              <label class="col-4 col-form-label">Тип сети USDT:</label>
+              <label class="col-4 col-form-label">${langJsDict['usdt_net'][langData.lang]}</label>
               <div class="col-8">
                 <div class="form-check">
                   <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
@@ -242,13 +257,13 @@ let Main = {
         }
 
         return  `<div class="form-group row">
-                <label class="col-4 col-form-label" for="">Вы отдаете:</label>
+                <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
                 <div class="col-8">
                     ${resp_obj['amount']}&nbsp;${resp_obj['given_cur']}
                 </div>
               </div>
               <div class="form-group row">
-                <label for="text1" class="col-4 col-form-label">Вы получаете:</label>
+                <label for="text1" class="col-4 col-form-label">${langJsDict['you_take'][langData.lang]}</label>
                 <div class="col-8">
                     ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
                 </div>
@@ -257,18 +272,18 @@ let Main = {
               ${provider_select}
 
               <div class="form-group row">
-                  <label for="text1" class="col-4 col-form-label">Способ получения средств:</label>
+                  <label for="text1" class="col-4 col-form-label">${langJsDict['get_money_way'][langData.lang]}</label>
                   <div class="col-8">
                     <div class="form-check" id="card-form-check" >
                       <input class="form-check-input" type="radio" onclick="selectCreditCard()" name="creditCard" id="creditCard1" checked value="option1" >
                       <label class="form-check-label" for="creditCard1">
-                        Получить средства на карту
+                      ${langJsDict['get_money_card'][langData.lang]}
                       </label>
                     </div>
                     <div class="form-check" >
                       <input class="form-check-input" type="radio" onclick="selectCashPoint()" name="cashPoint" id="cashPoint1" value="option2">
                       <label class="form-check-label" for="cashPoint1">
-                        Получить наличные в точке выдачи
+                      ${langJsDict['get_money_cash'][langData.lang]}
                       </label>
                     </div>
                   </div>
@@ -277,11 +292,11 @@ let Main = {
               <br>
               <div id="creditCardForm" style="display:block">
                 <div class="form-group row">
-                  <label for="text" class="col-4 col-form-label">Укажите номер карты</label>
+                  <label for="text" class="col-4 col-form-label">${langJsDict['card_num'][langData.lang]}</label>
                   <div class="col-8">
                     <div id="payment-details-error" class="form-text"></div>
                     <div class="input-group">
-                      <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" onpaste="cardValidationOnPaste()" placeholder="номер карты получения средства" type="text" class="form-control">
+                      <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" onpaste="cardValidationOnPaste()" placeholder="${langJsDict['card_num_plc'][langData.lang]}" type="text" class="form-control">
                     </div>
                     
                   </div>
@@ -289,27 +304,27 @@ let Main = {
                 <br/>
                 <div class="form-group row">
                     <div class="col-6 text-start">
-                      <button  class="btn btn-info">Отменить</button>
+                      <button  class="btn btn-info">${langJsDict['cancel'][langData.lang]}</button>
                     </div>
                     <div class="col-6 text-end">
-                      <button onclick="sendPaymentDetails(event)" id="btn-send-payment" disabled class="btn btn-success">Отправить</button>
+                      <button onclick="sendPaymentDetails(event)" id="btn-send-payment" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                     </div>
                 </div>
               </div>
               <br>
               <div id="cashPointsForm" style="display:none">
                 <div class="form-group row">
-                  <div class="col-4">Точки выдачи наличных:</div>
+                  <div class="col-4">${langJsDict['cash_points'][langData.lang]}</div>
                   <div class="col-8" id="cash-points-wrapper">
 
                   </div>
                 </div>
                 <div class="form-group row">
                   <div class="col-6 text-start">
-                    <button  class="btn btn-info">Отменить</button>
+                    <button  class="btn btn-info">${langJsDict['cancel'][langData.lang]}</button>
                   </div>
                   <div class="col-6 text-end">
-                    <button onclick="sendPaymentDetails(event)" id="btn-send-cash-point" disabled class="btn btn-success">Отправить</button>
+                    <button onclick="sendPaymentDetails(event)" id="btn-send-cash-point" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                   </div>
                 </div>
               </div>
@@ -397,13 +412,13 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
         })
         .catch(() => {
             let message_box = document.getElementById("exchange-modal-body");
-            message_box.innerHTML = `Что-то пошло не так...`;
+            message_box.innerHTML = `${langJsDict['smth_wrong'][langData.lang]}`;
             spinner.style.display = 'none';
             modal.show();
         });
     } else {
         let message_box = document.getElementById("exchange-modal-body");
-        message_box.innerHTML = '<h5 class="text-center">Вы указали неверные данные!</h5>';
+        message_box.innerHTML = `<h5 class="text-center">${langJsDict['wrong_data'][langData.lang]}</h5>`;
         spinner.style.display = 'none';
         modal.show();
     }
@@ -473,29 +488,29 @@ function sendPaymentDetails(e) {
             let payment_message = null;
             if (json['response']['is_fiat_card'] == 1) {
               payment_message = `
-              <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
+              <p>${langJsDict['mes_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes_part_2'][langData.lang]} <strong>${json['response']['payment_details_give']}</strong></p><br/>
               `
             } else {
               payment_message = `
-              <p>Вам необходимо совершить оплату наличными в сумме <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> в нашем пункте по адресу:<br><strong>${json['response']['payment_details_give']}</strong></p><br/>
+              <p>${langJsDict['mes2_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes2_part_2'][langData.lang]}<br><strong>${json['response']['payment_details_give']}</strong></p><br/>
               `
             }
             message_box.innerHTML = `
             <h5>${json['response']['message']}</h5><br>
             ${payment_message}
-            <a href="/orders/${json['response']['order_id']}">Страница для отслеживания деталей сделки</a><br/>
+            <a href="/orders/${json['response']['order_id']}">${langJsDict['order_page'][langData.lang]}</a><br/>
             <br/>
-            <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
+            <a href="${json['response']['t_link']}">${langJsDict['t_chat'][langData.lang]}</a>
             `;
           } else {
             message_box.innerHTML = `
             <h5>${json['response']['message']}</h5><br>
-            <p>Вам необходимо перечислить <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> по следующим реквизитам <strong>${json['response']['payment_details_give']}</strong></p><br/>
-            <p>Секретный код для получения денег в точке выдачи: <strong>${json['response']['secret_key']}</strong></p>
+            <p>${langJsDict['mes_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes_part_2'][langData.lang]} <strong>${json['response']['payment_details_give']}</strong></p><br/>
+            <p>${langJsDict['secret_key'][langData.lang]} <strong>${json['response']['secret_key']}</strong></p>
             <br/>
-            <a href="/orders/${json['response']['order_id']}">Страница для отслеживания деталей сделки</a><br/>
+            <a href="/orders/${json['response']['order_id']}">${langJsDict['order_page'][langData.lang]}</a><br/>
             <br/>
-            <a href="${json['response']['t_link']}">Открыть чат с оператором в Telegram</a>
+            <a href="${json['response']['t_link']}">${langJsDict['t_chat'][langData.lang]}</a>
             `;
           }
 
@@ -543,18 +558,15 @@ function validateCardNumber(value){
         const typeValidatorInt = parseInt(typeValidatorArr.join(""))
         
         if (typeValidatorArr[0] == 4){
-          console.log('Карта валидна visa');
           var btnSendPayment = document.getElementById('btn-send-payment');
           btnSendPayment.disabled = false;
           return "VISA"
         }else if(typeValidatorInt == 22 || typeValidatorInt == 51 || typeValidatorInt == 52 || typeValidatorInt == 53 || typeValidatorInt == 54){
-          console.log('Карта валидна master');
           var btnSendPayment = document.getElementById('btn-send-payment');
           btnSendPayment.disabled = false;
           return "MASTERCARD";
         }
       } else {
-        console.log('карта не валидна')
         var btnSendPayment = document.getElementById('btn-send-payment');
 
         btnSendPayment.disabled = true;
@@ -657,4 +669,7 @@ function setCashPoint() {
   var btnSendPayment = document.getElementById('btn-send-cash-point');
   btnSendPayment.disabled = false;
 }
+
+
+
 

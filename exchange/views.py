@@ -33,6 +33,8 @@ from exchange.controller import tell_update_order as tell_controller_new_order
 
 from exchange.controller import get_deal_status
 
+from sdk.lang_dict import lang_dict
+from sdk.lang_js_dict import lang_js_dict
 
 def main(req):
     l = list(Currency.objects.all())
@@ -41,7 +43,7 @@ def main(req):
         for j in l:
             if i != j:
                 rates4Andrey.append(i.title + "_" + j.title)
-    return render(req, "main.html", {"allrates": rates4Andrey})
+    return render(req, "main.html", {"allrates": rates4Andrey, 'lang_dict': lang_dict, 'lang_js_dict': lang_js_dict})
 
 
 # TODO add permissions only for opers
@@ -89,6 +91,7 @@ def get_currency_list(req):
 
 def create_exchange_request(req):
     if req.method == 'POST':
+        session_lang = req.session['lang']
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
         given_cur = body['given_cur']
@@ -137,14 +140,14 @@ def create_exchange_request(req):
                     cash_points = {}
                     for i in cash_points_arr:
                         cash_points[i.pk] = i.title
-     
+
                     respone_data = {
                         'given_cur': given_cur,
                         'taken_cur': taken_cur,
                         'amount': amount,
                         'taken_amount': taken_amount,
                         'cash_points': json.dumps(cash_points),
-                        'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
+                        'message_to_user': lang_dict['order_created'][session_lang],
                     }
                     c = chat.objects.create(deal=order)
                     tele_link = get_telechat_link(order)
@@ -153,7 +156,7 @@ def create_exchange_request(req):
                 else:
                     respone_data = {
                         'is_expired': 'true',
-                        'message_to_user': 'Время ожидания истекло, нужно сгенерировать новый курс'
+                        'message_to_user': lang_dict['time_out'][session_lang],
                     }
                     return json_true(req, {'response': respone_data})  
             else:
@@ -189,7 +192,7 @@ def create_exchange_request(req):
                     'amount': amount,
                     'taken_amount': taken_amount,
                     'cash_points': json.dumps(cash_points),
-                    'message_to_user': 'Ваша заявка создана, для завершения заполните данные оплаты'
+                    'message_to_user': lang_dict['order_created'][session_lang]
                 }
                 # CREATE chat for deal
                 c = chat.objects.create(deal=order)
@@ -203,6 +206,7 @@ def create_exchange_request(req):
     
 
 def create_invoice(req):
+    session_lang = req.session['lang']
     if req.method == 'POST':
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
@@ -307,7 +311,7 @@ def create_invoice(req):
                     'secret_key': str(random_key),
                     't_link': t_link,
                     'order_id': order.id,
-                    'message': 'Ожидаем вашей оплаты'
+                    'message': lang_dict['wait_payment'][session_lang]
                 }
             elif not is_cash and order.take_currency.title in FIAT_CURRENCIES:
                 # выполняется при *_FIAT получение гривны на карту 
@@ -317,7 +321,7 @@ def create_invoice(req):
                     'payment_details_give': payment_details_give,
                     't_link': t_link,
                     'order_id': order.id,
-                    'message': 'Ожидаем вашей оплаты'
+                    'message': lang_dict['wait_payment'][session_lang]
                 }
             else:
                 # выполняется при FIAT_* и при переводе на карту и при пополнении наличными
@@ -351,7 +355,7 @@ def create_invoice(req):
                     't_link': t_link,
                     'secret_code': secret_code,
                     'order_id': order.id,
-                    'message': 'Ожидаем вашей оплаты'
+                    'message': lang_dict['wait_payment'][session_lang]
                 }
             # status of working orders
             order.status = "processing"
@@ -422,6 +426,7 @@ def order_details(request, pk):
     context = {
         'order': order,
         "t_link": get_telechat_link(order),
+        'lang_dict': lang_dict
     }
     return render(request, "order-details.html", context)
 
@@ -438,6 +443,17 @@ def req_to_whitebit_api(request):
     data = deal.buy()
     response = HttpResponse(data, content_type='application/json charset=utf-8')
     return response
+
+
+def set_lang(req):
+    if req.method == 'POST':
+        body_unicode = req.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        lang = body['lang']
+        req.session['lang'] = lang
+        return HttpResponse({'message': 'lang is set'}, content_type='application/json charset=utf-8')
+    else:
+        return json_true(req, {'message': 'nothing to return'})
 
 
 

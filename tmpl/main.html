@@ -2,12 +2,12 @@
 {% load static %}
 
 {% block content %}
-    
+{% with lang=request.session.lang %}
     <section class="converter-section">
         <div class="container">
             <div class="row">
                 <div class="col-xl-8 offset-xl-2 col-lg-12 col-12">
-                    <h1 class="text-center">Онлайн обмен криптовалют</h1>
+                    <h1 class="text-center">{% if lang == 'ru' %}{{ lang_dict.exchange_title.ru }}{% elif lang == 'uk' %}{{ lang_dict.exchange_title.uk }}{% endif %}</h1>
 
                     <div class="row converter-info">
                         <div class="col-lg-4 col-4 text-center">
@@ -31,7 +31,7 @@
                                     {% csrf_token %}
                                     <div class="row">
                                         <div class="col-lg-5 col-12 converter-currency-wrapper">
-                                            <span>Вы отдаете:</span>
+                                            <span>{% if lang == 'ru' %}{{ lang_dict.you_give.ru }}{% elif lang == 'uk' %}{{ lang_dict.you_give.uk }}{% endif %}</span>
                                             <div class="row">
                                                 <div class="col-5">
                                                     <select class="form-select" onchange="ckeckCurrencyPair()" id="given-cur-select" aria-label="Default select example">
@@ -44,7 +44,7 @@
                                             <i class="bu bi-arrow-left-right"></i>
                                         </div>
                                         <div class="col-lg-5 col-12 converter-currency-wrapper">
-                                            <span>Вы получаете:</span>
+                                            <span>{% if lang == 'ru' %}{{ lang_dict.you_take.ru }}{% elif lang == 'uk' %}{{ lang_dict.you_take.uk }}{% endif %}</span>
                                             <div class="row">
                                                 <div class="col-5">
                                                     <select class="form-select" onchange="ckeckCurrencyPair()" id="taken-cur-select" aria-label="Default select example">
@@ -61,7 +61,7 @@
                                                 <span><i class="bi bi-info-circle-fill"></i>  Все комиссии уже учтены. <a href="#">Детальнее</a></span>
                                             </div>
                                             <div class="col-lg-6 col-12 text-lg-end text-center">
-                                                <button type="submit" id="btn-exchange" class="btn btn-exchange">Обменять валюту <i class="bi bi-arrow-right"></i></button>
+                                                <button type="submit" id="btn-exchange" class="btn btn-exchange">{% if lang == 'ru' %}{{ lang_dict.exchange_btn.ru }}{% elif lang == 'uk' %}{{ lang_dict.exchange_btn.uk }}{% endif %} <i class="bi bi-arrow-right"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -166,5 +166,5 @@
     </div>
 
     <div class="loading" id="loading">Loading&#8230;</div>
-
+{% endwith %}
 {% endblock %}
