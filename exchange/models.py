@@ -117,8 +117,10 @@ class Orders(models.Model):
     rate = models.DecimalField(decimal_places=10, max_digits=40, verbose_name="exchange rate",
                                max_length=255, editable=True)
 
-    trans = models.ForeignKey("Trans", null=True, blank=True,verbose_name="транзакция выплаты",
+    trans = models.ForeignKey("Trans", null=True, blank=True, verbose_name="транзакция выплаты",
                               on_delete=models.PROTECT, )
+
+    rate_waved = models.BooleanField(default=False, verbose_name="Плавающий курс в сделке")
 
     class Meta:
         verbose_name = 'заявка на обмен'
@@ -415,7 +417,7 @@ class WhitebitDeals(models.Model):
     client_order_id = models.CharField(max_length=255, 
                                        verbose_name="whitebit ID сделки", 
                                        blank=True, 
-                                       null=True)
+                                        null=True)
     order = models.ForeignKey("Orders", 
                               verbose_name="Order",
                               on_delete=models.PROTECT,
@@ -430,6 +432,11 @@ class WhitebitDeals(models.Model):
                               blank=True)
     status = models.CharField(max_length=40, choices=STATUS_WHITEBIT_EXCHANGE, default='processing',
                               verbose_name="Статус", blank=True, null=True)
+
+    def to_nice_text(self):
+        return "Продажа  %s %s  ->  %s %s, \n Цена %s, fee %s " % \
+               (self.currency_give.title, self.amnt_give, self.currency_take.title, self.amnt_take.title,
+                self.price, self.fee)
 
     class Meta:
         verbose_name = u'Whitebit операция'

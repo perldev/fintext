@@ -33,7 +33,9 @@ class Command(BaseCommand):
             factory = CryptoFactory(i.currency.title,
                                     i.crypto_payments_details.currency_provider.title)
             new_balance = factory.get_balance(i.crypto_payments_details.address)
-
+            print("check balance ")
+            print(i.crypto_payments_details.technical_info)
+            print(new_balance)
             # tricky, because we should remember this during sweeping to the cold
             # we do checking the balance in order to avoid more weighty checking the list of transactions
             # very tricky logic
@@ -47,7 +49,7 @@ class Command(BaseCommand):
                 print(transes)
                 # data_from_api = get_in_trans_from(str(i.crypto_payments_details), i.block_height)
                 # TODO TO FACTORY
-                if i.sum >= actual_sum and transes:
+                if  actual_sum >= i.sum and transes:
                     # if could not save the transes that is mean that we could contact to developer
                     try:
                         for trans in transes:
@@ -78,13 +80,14 @@ class Command(BaseCommand):
                     i.crypto_payments_details.save()
                     continue
 
-                if utc.localize(i.expire_date) < nw:
-                    i.status = 'expired'
-                    i.save()
-                    i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
-                    i.crypto_payments_details.technical_info = new_balance
-                    i.crypto_payments_details.save()
-                    tell_invoice_check("check_invoice_process", i)
+            print("check expiring")
+            if i.expire_date < nw:
+               i.status = 'expired'
+               i.save()
+               i.crypto_payments_details.status = CHECKOUT_STATUS_FREE
+               i.crypto_payments_details.technical_info = new_balance
+               i.crypto_payments_details.save()
+               tell_invoice_check("check_invoice_process", i)
 
 
     

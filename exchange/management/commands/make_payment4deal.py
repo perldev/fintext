@@ -42,8 +42,8 @@ class Command(BaseCommand):
 
             resp = get_full_data(address4)
             try:
-
-                txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, i.amnt)
+                amnt2send = int(i.amnt*factory.prec)
+                txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, amnt2send)
 
             except:
                 i.status = "failed"
