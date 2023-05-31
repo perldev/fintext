@@ -33,6 +33,8 @@ from exchange.controller import tell_update_order as tell_controller_new_order
 
 from exchange.controller import get_deal_status
 
+from sdk.lang_dict import lang_dict
+from sdk.lang_js_dict import lang_js_dict
 
 def main(req):
     l = list(Currency.objects.all())
@@ -41,7 +43,7 @@ def main(req):
         for j in l:
             if i != j:
                 rates4Andrey.append(i.title + "_" + j.title)
-    return render(req, "main.html", {"allrates": rates4Andrey})
+    return render(req, "main.html", {"allrates": rates4Andrey, 'lang_dict': lang_dict, 'lang_js_dict': lang_js_dict})
 
 
 # TODO add permissions only for opers
@@ -438,6 +440,17 @@ def req_to_whitebit_api(request):
     data = deal.buy()
     response = HttpResponse(data, content_type='application/json charset=utf-8')
     return response
+
+
+def set_lang(req):
+    if req.method == 'POST':
+        body_unicode = req.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        lang = body['lang']
+        req.session['lang'] = lang
+        return HttpResponse({'message': 'lang is set'}, content_type='application/json charset=utf-8')
+    else:
+        return json_true(req, {'message': 'nothing to return'})
 
 
 
