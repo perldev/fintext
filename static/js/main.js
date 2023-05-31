@@ -1,6 +1,27 @@
 
 
 
+function setLang() {
+  let selected_lang = document.getElementById("lang-select").value;
+  let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  fetch('/api/set-lang/', {
+      method: 'POST',
+      headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify({ 
+          'lang': selected_lang,
+       })
+  })
+  .catch(() => {});
+  location.reload();
+}
+
+
+let langJsDict = JSON.parse(document.getElementById('langJsDict').textContent)
+const langData = document.currentScript.dataset;
+
 let avaliable_pairs = [];
 
 
@@ -61,7 +82,7 @@ function ckeckCurrencyPair() {
     } else {
         given_cur_input.disabled = true;
         taken_cur_input.disabled = true;
-        rate_message.innerHTML = `Данная валютная пара не доступна`;
+        rate_message.innerHTML = `${langJsDict['no_pair'][langData.lang]}`;
     }
 }
 
@@ -657,4 +678,7 @@ function setCashPoint() {
   var btnSendPayment = document.getElementById('btn-send-cash-point');
   btnSendPayment.disabled = false;
 }
+
+
+
 
