@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from exchange import views
+from pages import views as pages_views
 
 urlpatterns = [
     path("", views.main, name="main"),
@@ -34,6 +35,11 @@ urlpatterns = [
     path('orders/<int:pk>', views.order_details, name='order_details'),
     path('oper/', include('oper.urls')), #new
     path('admin/', admin.site.urls),
+
+    # static pages
+    path('exchange/<slug>/', pages_views.exchange_pair, name='exchange_pair'),
+    path('about-us/', pages_views.about_us, name='about_us'),
+
 
     # whitebit api. test urls for now
     path('api/test-call', views.req_to_whitebit_api, name="req_to_whitebit_api"),

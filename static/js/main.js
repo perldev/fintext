@@ -63,7 +63,7 @@ function ckeckCurrencyPair() {
     if (avaliable_pairs.includes(cur_pair)) {
         given_cur_input.disabled = false;
         taken_cur_input.disabled = false;  
-        rate_message.innerHTML = `Загрузка курса...`;
+        rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
         fetch(`/api/get_rate/${given_cur}/${taken_cur}`)
             .then(response => response.json())
             .then(json => {
@@ -93,7 +93,7 @@ function setGivenCurQnty() {
 
 
 let Main = {
-    "on_load": function(){
+    "on_load": function(e, cur1, cur2){
         fetch(`/api/get_currency_list`)
         .then(response => response.json())
         .then(json => {
@@ -101,7 +101,7 @@ let Main = {
                 const opt_given = document.createElement('option');
                 const opt_taken = document.createElement('option');
                 opt_given.value = key;
-                if(opt_given.value == "usdt"){
+                if(opt_given.value == cur1){
                     opt_given.selected = "selected"
                 }
 
@@ -109,13 +109,13 @@ let Main = {
                 given_cur_select.appendChild(opt_given);
                 opt_taken.value = key;
                 opt_taken.innerHTML = value;
-                if (key === 'uah') {
+                if (key === cur2) {
                     opt_taken.selected = "selected"
                 }
                 taken_cur_select.appendChild(opt_taken);
               });
 
-            fetch(`/api/get_rate/usdt/uah`)
+            fetch(`/api/get_rate/${cur1}/${cur2}`)
             .then(response => response.json())
             .then(json => {
                 main_rate = json['result']['rate'];

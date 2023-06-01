@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "exchange.apps.ExchangeConfig",
     "oper.apps.OperConfig",
     "wallet.apps.WalletConfig",
+    'pages.apps.PagesConfig',
     "django.contrib.admin",
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% with lang=request.session.lang %}
+
+    <section style="margin:40px 0px;">
+        <div class="container">
+          
+          <br><br>
+          <div class="row">
+            <div class="col-xl-10 offset-xl-1 col-12">
+                <h1>
+                    {% if lang == 'ru' %}{{ page.title_ru }}{% else %}{{ page.title_uk }}{% endif %}
+                </h1>
+                {% if lang == 'ru' %}{{ page.content_ru|safe }}{% else %}{{ page.content_uk|safe }}{% endif %}
+            </div>
+          </div>
+
+        </div>
+    </section>
+
+{% endwith %}
+{% endblock %}
+
+
+
+
+
