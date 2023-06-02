@@ -127,8 +127,14 @@ def tell_whitebit_finished(sender, instance, **kwargs):
         notify_dispetcher(instance.order, "sold_on_whitebit")
         notify_dispetcher_about_whitebit(instance, "sold_info_whitebit")
         order = instance.order
-        order.trans.status = "processing"
-        order.trans.save()
+        ## only in this case  aND ONLY THIS race condition
+
+        if order.trans.status == "created":
+            order.trans.status = "processing"
+            order.trans.save()
+
+        tell_trans_check("controller_process", order.trans)
+
     else:
         notify_dispetcher(instance.order, "failed_on_whitebit")
 
@@ -142,7 +148,10 @@ def tell_whitebit_finished(sender, instance, **kwargs):
 
 @no_fail
 def tell_trans_check(sender, instance, **kwargs):
-
+    if instance.status == "processing" and sender == "controller_process":
+        return notify_dispetcher(instance.order,
+                                 "trans_ready_to_send",
+                                 )
 
     if instance.status == "failed":
         return notify_dispetcher(instance.order,
@@ -151,7 +160,6 @@ def tell_trans_check(sender, instance, **kwargs):
                                  )
     if sender == "send_crypto_transes_deal":
         return
-
 
     if sender == "make_payment4deal":
         # auto make order processed

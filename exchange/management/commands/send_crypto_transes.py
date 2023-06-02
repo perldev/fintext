@@ -33,10 +33,15 @@ class Command(BaseCommand):
 
             invoice = Invoice.objects.get(order=order)
             resp = get_full_data(invoice.crypto_payments_details.address)
+            res = None
             try:
                 amnt2send = int(i.amnt*factory.prec)
-                txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, amnt2send)
-                print(txid)
+                res = factory.sweep_address_to(resp["key"], resp["address"], i.account, amnt2send)
+                if res:
+                    print(res["txid"])
+                else:
+                    raise Exception("error durng send transaction")
+                        
             except:
                 i.status = "failed"
                 i.save()
@@ -44,7 +49,8 @@ class Command(BaseCommand):
                 tell_trans_check("send_crypto_transes_deal", i, error=var)
                 continue
 
-            i.txid = txid
+            i.txid = res["txid"]
+            i.tx_raw = res["raw"]
             # save balance for address
 
             invoice.crypto_payments_details.technical_info = factory.get_balance(resp["address"])

@@ -129,8 +129,8 @@ def sweep_address_to(priv, acc, to, amnt, gas=25000):
 
         signed = Account.sign_transaction(legacy_transaction, key)
         #print(signed)
-        w3.eth.sendRawTransaction(signed["rawTransaction"])
-        return Web3.to_hex(signed["hash"])
+        w3.eth.send_raw_transaction(signed["rawTransaction"])
+        return {"txid": Web3.to_hex(signed["hash"]),"raw": signed.rawTransaction}
     except:
         traceback.print_exc()
         return False

@@ -10,7 +10,26 @@ from django.core.cache import cache
 from oper.models import get_telechat_link as oper_get_telechat_link, chat
 import time
 import fintex.settings
+from decimal import Decimal
 
+
+def format_numbers10(D):
+
+    if isinstance(D, str) or isinstance(D, float):
+        D = Decimal(D)
+
+    decimal_10 = 10**10
+    D = int(Decimal(D) * decimal_10)/decimal_10
+    return str(D)
+
+def format_numbers4(D):
+
+    if isinstance(D, str) or isinstance(D, float):
+        D = Decimal(D)
+
+    decimal_10 = 10**4
+    D = int(Decimal(D) * decimal_10)/decimal_10
+    return str(D)
 
 def get_fromcache(k):
     return cache.get(k)
