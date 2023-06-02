@@ -20,35 +20,35 @@
                           <div class="step-icon" id="icon-step-1">
                           </div>
                         </div>
-                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.wait_payment2.ru }}{% elif lang == 'uk' %}{{ lang_dict.wait_payment2.uk }}{% endif %}</h4>
+                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.wait_payment2.ru }}{% else %}{{ lang_dict.wait_payment2.uk }}{% endif %}</h4>
                       </div>
                       <div class="step" id="step-2">
                         <div class="step-icon-wrap">
                           <div class="step-icon" id="icon-step-2">
                           </div>
                         </div>
-                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.wait_confirm.ru }}{% elif lang == 'uk' %}{{ lang_dict.wait_confirm.uk }}{% endif %}</h4>
+                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.wait_confirm.ru }}{% else %}{{ lang_dict.wait_confirm.uk }}{% endif %}</h4>
                       </div>
                       <div class="step" id="step-3">
                         <div class="step-icon-wrap">
                           <div class="step-icon" id="icon-step-3">
                           </div>
                         </div>
-                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.check_trans.ru }}{% elif lang == 'uk' %}{{ lang_dict.check_trans.uk }}{% endif %}</h4>
+                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.check_trans.ru }}{% else %}{{ lang_dict.check_trans.uk }}{% endif %}</h4>
                       </div>
                       <div class="step" id="step-4">
                         <div class="step-icon-wrap">
                           <div class="step-icon" id="icon-step-4">
                           </div>
                         </div>
-                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.changing.ru }}{% elif lang == 'uk' %}{{ lang_dict.changing.uk }}{% endif %}</h4>
+                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.changing.ru }}{% else %}{{ lang_dict.changing.uk }}{% endif %}</h4>
                       </div>
                       <div class="step" id="step-5">
                         <div class="step-icon-wrap">
                           <div class="step-icon" id="icon-step-5">
                           </div>
                         </div>
-                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.finished.ru }}{% elif lang == 'uk' %}{{ lang_dict.finished.uk }}{% endif %}</h4>
+                        <h4 class="step-title">{% if lang == 'ru' %}{{ lang_dict.finished.ru }}{% else %}{{ lang_dict.finished.uk }}{% endif %}</h4>
                       </div>
                     </div>
                   </div>
@@ -64,7 +64,7 @@
 
                     <div class="col-xl-8 offset-xl-2 col-12">
                       <br><br>
-                      <h1>{% if lang == 'ru' %}{{ lang_dict.details.ru }}{% elif lang == 'uk' %}{{ lang_dict.details.uk }}{% endif %} #{{ order.pk }}:</h1>
+                      <h1>{% if lang == 'ru' %}{{ lang_dict.details.ru }}{% else %}{{ lang_dict.details.uk }}{% endif %} #{{ order.pk }}:</h1>
                       <br>
 
                       <div class="row">
@@ -79,7 +79,7 @@
                                     <img src="https://img.icons8.com/ios/50/null/purchase-order.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.order_status.ru }}{% elif lang == 'uk' %}{{ lang_dict.order_status.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.order_status.ru }}{% else %}{{ lang_dict.order_status.uk }}{% endif %}</p>
                                     <h5 style="color: #1bbd36;">{{ order.status }}</h5>
                                   </div>
                                 </div>
@@ -89,7 +89,7 @@
                                     <img src="https://img.icons8.com/ios/50/null/wallet--v1.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.you_give.ru }}{% elif lang == 'uk' %}{{ lang_dict.you_give.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.you_give.ru }}{% else %}{{ lang_dict.you_give.uk }}{% endif %}</p>
                                     <h5>{{ order.amnt_give.normalize }} {{ order.give_currency.title }}</h5>
                                   </div>
                                 </div>
@@ -99,7 +99,7 @@
                                     <img src="https://img.icons8.com/ios/50/null/borrow-book.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.you_take.ru }}{% elif lang == 'uk' %}{{ lang_dict.you_take.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.you_take.ru }}{% else %}{{ lang_dict.you_take.uk }}{% endif %}</p>
                                     <h5>{{ order.amnt_take.normalize }} {{ order.take_currency.title }}</h5>
                                   </div>
                                 </div>
@@ -117,13 +117,13 @@
       
                                 <div class="row align-items-center order-info-row">
                                   <div class="col-12">
-                                    <h5>{% if lang == 'ru' %}{{ lang_dict.invoice_details.ru }}{% elif lang == 'uk' %}{{ lang_dict.invoice_details.uk }}{% endif %}</h5><br>
+                                    <h5>{% if lang == 'ru' %}{{ lang_dict.invoice_details.ru }}{% else %}{{ lang_dict.invoice_details.uk }}{% endif %}</h5><br>
                                   </div>
                                   <div class="col-2">
                                     <img src="https://img.icons8.com/ios/50/null/invoice.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.invoice_status.ru }}{% elif lang == 'uk' %}{{ lang_dict.invoice_status.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.invoice_status.ru }}{% else %}{{ lang_dict.invoice_status.uk }}{% endif %}</p>
                                     <h5 style="color: #1bbd36;">{{ order.invoice_order.status }}</h5>
                                   </div>
                                 </div>
@@ -133,7 +133,7 @@
                                     <img src="https://img.icons8.com/fluency-systems-filled/96/null/stack-of-coins.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.invoice_sum.ru }}{% elif lang == 'uk' %}{{ lang_dict.invoice_sum.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.invoice_sum.ru }}{% else %}{{ lang_dict.invoice_sum.uk }}{% endif %}</p>
                                     <h5>{{ order.invoice_order.sum.normalize }} {{ order.invoice_order.currency.title }}</h5>
                                   </div>
                                 </div>
@@ -143,7 +143,7 @@
                                     <img src="https://img.icons8.com/external-wanicon-lineal-wanicon/64/null/external-transfer-money-exchange-wanicon-lineal-wanicon-3.png" />
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.invoice_adr.ru }}{% elif lang == 'uk' %}{{ lang_dict.invoice_adr.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.invoice_adr.ru }}{% else %}{{ lang_dict.invoice_adr.uk }}{% endif %}</p>
                                     <h5>{{ order.invoice_order.crypto_payments_details.address }}</h5>
                                   </div>
                                 </div>
@@ -161,13 +161,13 @@
       
                                 <div class="row align-items-center order-info-row">
                                   <div class="col-12">
-                                    <h5>{% if lang == 'ru' %}{{ lang_dict.trans_details.ru }}{% elif lang == 'uk' %}{{ lang_dict.trans_details.uk }}{% endif %}</h5><br>
+                                    <h5>{% if lang == 'ru' %}{{ lang_dict.trans_details.ru }}{% else %}{{ lang_dict.trans_details.uk }}{% endif %}</h5><br>
                                   </div>
                                   <div class="col-2">
                                     <img src="https://img.icons8.com/external-outline-lafs/64/null/external-ic_transaction-cryptocurrency-and-cryptowallet-outline-lafs.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.trans_status.ru }}{% elif lang == 'uk' %}{{ lang_dict.trans_status.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.trans_status.ru }}{% else %}{{ lang_dict.trans_status.uk }}{% endif %}</p>
                                     <h5 style="color: #1bbd36;">{{ order.trans.status }}</h5>
                                   </div>
                                 </div>
@@ -177,7 +177,7 @@
                                     <img src="https://img.icons8.com/ios/100/null/exchange.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.trans_sum.ru }}{% elif lang == 'uk' %}{{ lang_dict.trans_sum.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.trans_sum.ru }}{% else %}{{ lang_dict.trans_sum.uk }}{% endif %}</p>
                                     <h5>{{ order.trans.amnt.normalize }} {{ order.trans.currency.title }}</h5>
                                   </div>
                                 </div>
@@ -187,7 +187,7 @@
                                     <img src="https://img.icons8.com/dotty/80/null/numbers-input-form.png" class="img-fluid"/>
                                   </div>
                                   <div class="col-10">
-                                    <p>{% if lang == 'ru' %}{{ lang_dict.pay_details.ru }}{% elif lang == 'uk' %}{{ lang_dict.pay_details.uk }}{% endif %}</p>
+                                    <p>{% if lang == 'ru' %}{{ lang_dict.pay_details.ru }}{% else %}{{ lang_dict.pay_details.uk }}{% endif %}</p>
                                     <h5>{{ order.trans.account }}</h5>
                                   </div>
                                 </div>
@@ -221,8 +221,8 @@
                                 <img src="{% static '/images/telegram.svg' %}" alt="" class="img-fluid">
                               </div>
                               <div class="col-12">
-                                <p>{% if lang == 'ru' %}{{ lang_dict.start_chat.ru }}{% elif lang == 'uk' %}{{ lang_dict.start_chat.uk }}{% endif %}</p><br>
-                                <a href="{{t_link}}" class="btn btn-dialog">{% if lang == 'ru' %}{{ lang_dict.start.ru }}{% elif lang == 'uk' %}{{ lang_dict.start.uk }}{% endif %}</a>
+                                <p>{% if lang == 'ru' %}{{ lang_dict.start_chat.ru }}{% else %}{{ lang_dict.start_chat.uk }}{% endif %}</p><br>
+                                <a href="{{t_link}}" class="btn btn-dialog">{% if lang == 'ru' %}{{ lang_dict.start.ru }}{% else %}{{ lang_dict.start.uk }}{% endif %}</a>
                               </div>
                             </div>
                           </div> 

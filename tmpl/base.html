@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Landing</title>
+    <title>Profinef</title>
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
@@ -20,7 +20,7 @@
   <header id="header" class="fixed-top">
     <div class="container d-flex align-items-center">
 
-      <h1 class="logo me-auto"><a href="/"><span>Ua</span>Trust</a></h1>
+      <h1 class="logo me-auto"><a href="/"><span>Pro</span>finef</a></h1>
       <!-- Uncomment below if you prefer to use an image logo -->
       <!-- <a href="index.html" class="logo me-auto me-lg-0"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
 
@@ -28,16 +28,14 @@
         <ul>
           <li><a href="/" class="active">Главная</a></li>
 
-          <li class="dropdown"><a href="#"><span>Курсы валют</span> <i class="bi bi-chevron-down"></i></a>
+          <li class="dropdown"><a href="#"><span>Обмен валют</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
-              <li><a href="#">Купить BTC</a></li>
-              <li><a href="#">Купить ETH</a></li>
-              <li><a href="#">Купить USDT</a></li>
+              <li><a href="{% url 'exchange_pair' 'uah-to-btc' %}">Обмен гривны на Bitcoin</a></li>
+              <li><a href="{% url 'exchange_pair' 'uah-to-eth' %}">Обмен гривны на Ethereum</a></li>
             </ul>
           </li>
 
-          <li><a href="#">Обмен</a></li>
-          <li><a href="#">О нас</a></li>
+          <li><a href="{% url 'about_us' %}">О нас</a></li>
 
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -51,12 +49,12 @@
       <form>
         {% csrf_token %}
         <select class="form-lang-select" onchange="setLang()" id="lang-select">
-          {% if request.session.lang == 'uk' %}
-            <option value="uk" selected>Ua</option>
-            <option value="ru">Ru</option>
-          {% else %}
+          {% if request.session.lang == 'ru' %}
             <option value="uk">Ua</option>
             <option value="ru" selected>Ru</option>
+          {% else %}
+            <option value="uk" selected>Ua</option>
+            <option value="ru">Ru</option>
           {% endif %}
         </select>
       </form>
@@ -141,11 +139,12 @@
   <script defer data-lang="{% if request.session.lang %}{{ request.session.lang }}{% else %}uk{% endif %}" src="{% static 'js/main.js' %}?version=3"></script>
   
   <script>
+      
       document.addEventListener("DOMContentLoaded", function(event) {
       {% for i in allrates %}
         avaliable_pairs.push("{{i}}");
       {% endfor %}
-      Main.on_load(event);
+      Main.on_load(event, '{{cur1}}', '{{cur2}}');
   });
   </script>
 

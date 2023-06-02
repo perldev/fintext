@@ -9,7 +9,6 @@ import traceback
 
 import random
 
-
 from datetime import datetime, timedelta as dt
 import json
 from django.core import serializers
@@ -23,27 +22,35 @@ from fintex.settings import FIAT_CURRENCIES
 import time
 from sdk.btc import get_in_trans_from, get_sum_from, get_current_height
 from sdk.factory import CryptoFactory
-
 from sdk.functions import validate_credit_card
+from sdk.lang_dict import lang_dict
+from sdk.lang_js_dict import lang_js_dict
 
 from django.http import HttpResponse
 
-
 from exchange.controller import tell_update_order as tell_controller_new_order
-
 from exchange.controller import get_deal_status
 
-from sdk.lang_dict import lang_dict
-from sdk.lang_js_dict import lang_js_dict
+from pages.models import PageText
+
 
 def main(req):
     l = list(Currency.objects.all())
     rates4Andrey = []
+    page_content = PageText.objects.get(title_ru='Для главной')
     for i in l:
         for j in l:
             if i != j:
                 rates4Andrey.append(i.title + "_" + j.title)
-    return render(req, "main.html", {"allrates": rates4Andrey, 'lang_dict': lang_dict, 'lang_js_dict': lang_js_dict})
+    context = {
+        "allrates": rates4Andrey,
+        'lang_dict': lang_dict,
+        'lang_js_dict': lang_js_dict,
+        'content': page_content,
+        'cur1': 'usdt',
+        'cur2': 'uah',
+    }
+    return render(req, "main.html", context)
 
 
 # TODO add permissions only for opers
