@@ -65,7 +65,7 @@ class Command(BaseCommand):
         # Creating Trans with address from prev step if it's not existed
         if whitebitdeal.trans is None:
             trans = Trans.objects.create(account=address,
-                                         payment_id='',
+                                         payment_id='whitebit clearing',
                                          currency=order.give_currency,
                                          amnt=amnt_to_sell,
                                          order=order,
@@ -148,14 +148,12 @@ class Command(BaseCommand):
                         print("seems good")
                         break
 
-
         # Step 3. Selling currency
         # Logic of making sell command to whitebit after successing of previous step
         resp3_status = 422
         resp3_error_statuses = [400, 422, 503]
         market = str(give_currency.title.upper()) + '_' + str(take_currency.title.upper())
         amount = amnt_to_sell
-
         uniqueOrderId = whitebitdeal.client_order_id
 
         #check order before
