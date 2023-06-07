@@ -445,12 +445,6 @@ def order_status(request, pk):
     return response
 
 
-def req_to_whitebit_api(request):
-    deal = WhitebitDeals.objects.get(pk=1)
-    data = deal.buy()
-    response = HttpResponse(data, content_type='application/json charset=utf-8')
-    return response
-
 
 def set_lang(req):
     if req.method == 'POST':

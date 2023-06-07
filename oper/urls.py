@@ -4,8 +4,10 @@ from . import views
 urlpatterns = [
     path('', views.oper_home, name='oper_home'),
     path('oper_rate_settings/', views.rates_settings, name='oper_rate_settings'),
+    path('howto_page/', views.howto_page, name='howto_page'),
+
     path('login/', views.login_page, name='login_page'),
-    path('logout/', views.logout, name='logout'),
+    path('logout/', views.logout_view, name='logout'),
     path('try_login/', views.try_login, name='try_login'),
 
     path("api/get_direction/<str:from_currency>/<str:to_currency>/", views.get_direction, name="get_direction_rate"),

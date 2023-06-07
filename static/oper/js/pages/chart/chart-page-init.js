@@ -193,7 +193,10 @@
                  {"name":"btctradeua", "val": "btc_uah", "plot": {}},
                  {"name":"whitebit", "val": "btc_uah", "plot": {}},
                  {"name":"whitebit", "val": "usdt_uah", "plot": {}},
-                 {"name":"whitebit", "val": "eth_uah", "plot": {}}
+                 {"name":"whitebit", "val": "eth_uah", "plot": {}},
+                 {"name":"etherscan21000", "val": "eth_eth", "plot": {}},
+
+
                 ];
 
     if(true){
@@ -207,6 +210,8 @@
                                                 plots[0]["val"], result)
                              }
                              );
+
+
 
             //        for(var k in plots){
                 getDataRates(plots[1]["name"],
@@ -255,6 +260,14 @@
                                     create_plot(plots[6]["plot"],
                                                 plots[6]["name"],
                                                 plots[6]["val"], result)
+                             }
+                );
+                 getDataRates(plots[7]["name"],
+                             plots[7]["val"],
+                             function(result){
+                                    create_plot(plots[7]["plot"],
+                                                plots[7]["name"],
+                                                plots[7]["val"], result)
                              }
                 );
         //}

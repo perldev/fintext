@@ -10,11 +10,13 @@ from sdk.eth import get_current_height as heth, get_out_trans_from as outeth, ge
     sweep_address_to as sweep_address_to_eth, setup_eth_access, generate_address as generate_address_eth,\
     estimate_fee as estimate_fee_eth
 
+import sdk.eth
 
 from sdk.erc20 import get_current_height as herc, get_out_trans_from as outerc, get_in_trans_from as inerc, \
     get_sum_from as sumfromerc, get_balance as balanceerc, setup_title_usdt_token as setup_erc20_usdt, \
     get_prec as get_prec_erc, sweep_address_to as sweep_address_to_erc20, generate_address as generate_address_erc20,\
     get_native_balance as erc20_native_balance
+
 
 from sdk.tron import get_current_height as htron, get_out_trans_from as outtron, get_in_trans_from as intron, \
     get_sum_from as sumfromtron, get_balance as balancetron, setup_title_usdt_token as setup_tron_usdt,\
@@ -25,10 +27,15 @@ from sdk.tron import get_current_height as htron, get_out_trans_from as outtron,
 from decimal import Decimal
 
 
+
+
 class CryptoFactory:
 
     def __init__(self, arg, network="native"):
         self.__currency = arg
+        if self.__currency == "eth":
+            self.__sdk = sdk.eth
+
         if network is None:
             network = "native"
 
@@ -96,9 +103,11 @@ class CryptoFactory:
     def set_default(self, addr):
         self.__default_address = addr
         return True
+
     @property
     def default_address(self):
         return self.__default_address
+
     @property
     def currency(self):
         return self.__currency
@@ -106,6 +115,10 @@ class CryptoFactory:
     @property
     def network(self):
         return self.__network
+
+    def raw_call(self, name, *args, **kwargs):
+        bar = getattr(self.__sdk, name)
+        return bar(*args, **kwargs)
 
     def get_current_height(self, *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["get_current_height"]
@@ -139,7 +152,6 @@ class CryptoFactory:
             return Decimal(value/self.prec)
         else:
             return value
-
 
     def generate_address(self,  *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["generate_address"]

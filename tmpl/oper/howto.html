@@ -1,0 +1,115 @@
+{% extends 'oper/base.html' %}
+
+{% block content%}
+                <!-- ============================================================== -->
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Что видит клиент</h5>
+                                <p>Страницу с выбором валюты и курсом, который подтягивается из админки</p>
+
+                                <p><img class="responsive" src="/static/oper/assets/view_rateonmain.gif"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Управление курсами</h5>
+                                <p>Выбираете валютное направление и создаете ему формул, мы подтягиваем курсы из
+                                    нескольких источников и различные данные их можно использовать при расчете курса</p>
+                                <p><img class="responsive" src="/static/oper/assets/rate_management.gif">
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Работа с клиентом</h5>
+                                <p>Клиенту предлагается для пополнения временный кошелек, и страница оплаты,
+                                    на каждом шаге он может перейти в телеграм чат  с оператором
+                                   <p> <img class="responsive" src="/static/oper/assets/working_with_client.gif">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Оператор начинает работу </h5>
+                                <p>Оператор получает уведомление из бота о новой заявке на обмен, для начала чата ему необходимо выбрать сделку и перейти на страницу чата с пользователем</p>
+                                <p> <img class="responsive" src="/static/oper/assets/working_with_client2.gif">
+
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">управление платежами </h5>
+                                <p>Все оплаты клиентов нам отображаются на странице рабочей панели,</p>
+                                <p>   автоматически отправляется только КРИПТА после проверки, фиатные средства нужно проводить.</p>
+                                  <p>  Это значит, что диспетчер проставляет статус инвойсу оплачено, когда получает уведомление, что деньги принесли, или в наоборот.</p>
+                                   <p> Так же оператор бракует или одобряет сомнительные операции, который не прошли aml проверку, об этом он узнает из уведомлений и
+                                    на странице рабочей панели</p>
+                                <p>
+                                    <img class="responsive" src="/static/oper/assets/payments_management.gif">
+
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Управления кошельками обменника</h5>
+                                <p>Доступные кошельки для работы видны на странице кошельков и их балансы.</p>
+
+                                <p>    Отдельно нужно указать кошелек для выплаты крипты с него будет проходить
+                                    оплаты клиентам, если хватает на нем средства, с этой странице можно пересылать балансы с кошелько приема на кошелек для выплат.</p>
+                                <p>
+                                    <img class="responsive" src="/static/oper/assets/wallet_management.gif">
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- ============================================================== -->
+                <!-- End PAge Content -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Right sidebar -->
+                <!-- ============================================================== -->
+                <!-- .right-sidebar -->
+                <!-- ============================================================== -->
+                <!-- End Right sidebar -->
+                <!-- ============================================================== -->
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script src="/static/oper/assets/libs/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="/static/oper/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
+    <script src="/static/oper/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/static/oper/assets/extra-libs/sparkline/sparkline.js"></script>
+    <!--Wave Effects -->
+    <script src="/static/oper/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="/static/oper/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="/static/oper/js/custom.min.js"></script>
+
+
+{% endblock %}

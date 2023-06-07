@@ -611,6 +611,15 @@ def rates_settings(request):
                   using=None)
 
 
+@login_required(login_url="/oper/login/")
+def howto_page(request):
+    return render(request, "oper/howto.html",
+                  context={},
+                  content_type=None,
+                  status=None,
+                  using=None)
+
+
 # TODO add IPs permissions
 def login_page(request):
     return render(request, "oper/authentication-login.html",

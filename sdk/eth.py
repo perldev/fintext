@@ -9,7 +9,6 @@ import json
 import sys
 import re
 from web3 import Web3, AsyncWeb3
-
 from eth_account import Account
 
 from binascii import hexlify, unhexlify
@@ -105,10 +104,10 @@ def get_normal_fee():
 def estimate_fee(*kargs, **kwargs):
     global ACCESS
     gas = ACCESS.eth.gas_price
-    return gas*25000
+    return gas*21000
 
 
-def sweep_address_to(priv, acc, to, amnt, gas=25000):
+def sweep_address_to(priv, acc, to, amnt, gas=21000):
 
     global ACCESS
     w3 = ACCESS

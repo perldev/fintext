@@ -73,6 +73,16 @@
                             </div>
                         </div>
                     </div>
+                       <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные средняя  комиссия по ETH при цене 21000 за gas</h5>
+                                <div id="real-timeetherscan_eth_eth" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                  <div class="row">
                     <div class="col-12 d-flex no-block align-items-center">
@@ -88,6 +98,7 @@
                     {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_btc_uah" %}
                     {% include "oper/context_var.html" with name="WhiteBit USDT/UAH" id="context_whitebit_usdt_uah" %}
                     {% include "oper/context_var.html" with name="WhiteBit ETH/UAH" id="context_whitebit_eth_uah" %}
+                    {% include "oper/context_var.html" with name="Средняя комиссия ETH при цене  21000" id="context_estimated_eth_fee21000" %}
 
                 </div>
                  <div class="row">

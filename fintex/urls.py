@@ -40,8 +40,4 @@ urlpatterns = [
     path('exchange/<slug>/', pages_views.exchange_pair, name='exchange_pair'),
     path('about-us/', pages_views.about_us, name='about_us'),
 
-
-    # whitebit api. test urls for now
-    path('api/test-call', views.req_to_whitebit_api, name="req_to_whitebit_api"),
-    
 ]

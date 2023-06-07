@@ -7,11 +7,16 @@ import bitstamp.client
 import json
 import requests
 
+from sdk.factory import CryptoFactory
 
 class Command(BaseCommand):
     help = "Gather stock data"
 
     def handle(self, *args, **options):
+        print("gather comission info for ETH")
+
+        gather_eth_comission()
+
         print("gather information from stock")
         print("bitstamp btc_usd")
 
@@ -31,7 +36,26 @@ class Command(BaseCommand):
         gather_whitebit("USDT", "UAH")
         gather_whitebit("ETH", "UAH")
 
-        
+
+def gather_eth_comission():
+    give_currency = Currency.objects.get(title="eth")
+
+    factory = CryptoFactory(give_currency.title,
+                            "native")
+    gas_price = factory.raw_call("get_normal_fee")
+    print(gas_price)
+    r = rate(source="etherscan21000",
+             edit_user_id=1,
+             raw_data=gas_price,
+             give_currency=give_currency,
+             take_currency=give_currency,
+             rate=(21000*gas_price)/factory.prec)
+
+    context_var, created = context_vars.objects.get_or_create(name="context_estimated_eth_fee21000")
+    context_var.value = r.rate
+    context_var.save()
+    r.save()
+
 
 def gather_btctradeua(t1, t2):
     resp = requests.get("https://btc-trade.com.ua/api/ticker/%s_%s" % (t1, t2))
