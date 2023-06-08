@@ -51,7 +51,7 @@ def gather_eth_comission():
              take_currency=give_currency,
              rate=(21000*gas_price)/factory.prec)
 
-    context_var, created = context_vars.objects.get_or_create(name="context_estimated_eth_fee21000")
+    context_var, created = context_vars.objects.get_or_create(name="context_etherscan21000_eth_eth")
     context_var.value = r.rate
     context_var.save()
     r.save()
