@@ -176,6 +176,7 @@
                                 }
 
                             }
+
                             $("#context_"+chanelName+"_"+rate_name).html(last);
                             callback_handler(res);
                  },
