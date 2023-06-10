@@ -98,7 +98,7 @@ def get_currency_list(req):
 
 def create_exchange_request(req):
     if req.method == 'POST':
-        session_lang = req.session['lang']
+        session_lang = req.session.get('lang')
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)
         given_cur = body['given_cur']
@@ -213,7 +213,7 @@ def create_exchange_request(req):
     
 
 def create_invoice(req):
-    session_lang = req.session['lang']
+    session_lang = req.session.get('lang', "uk")
     if req.method == 'POST':
         body_unicode = req.body.decode('utf-8')
         body = json.loads(body_unicode)

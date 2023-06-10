@@ -20,7 +20,7 @@ const langData = document.currentScript.dataset;
 
 let avaliable_pairs = [];
 
-
+let fiat_currency = ["uah", "eur", "usd"]
 let main_rate = 0;
 let rate_message = document.getElementById("rate-message");
 rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
@@ -379,7 +379,7 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 ///!!!!! TODO remove this from here
                 // TODO also
                 message_box_title.innerHTML = json['response']['message_to_user'];
-                if (json['response']['taken_cur'] == 'uah') {
+                if (json['response']['taken_cur'] in  fiat_currency ) {
                     message_box.innerHTML = Main.draw_form(json["response"]);
                     cashPoints = JSON.parse(json["response"]["cash_points"]);
 
