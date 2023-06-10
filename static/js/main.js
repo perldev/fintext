@@ -20,7 +20,7 @@ const langData = document.currentScript.dataset;
 
 let avaliable_pairs = [];
 
-let fiat_currency = ["uah", "eur", "usd"]
+let fiat_currency = {"uah":1, "eur":1, "usd":1}
 let main_rate = 0;
 let rate_message = document.getElementById("rate-message");
 rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
@@ -290,7 +290,9 @@ let Main = {
               </div>
 
               <br>
+
               <div id="creditCardForm" style="display:block">
+
                 <div class="form-group row">
                   <label for="text" class="col-4 col-form-label">${langJsDict['card_num'][langData.lang]}</label>
                   <div class="col-8">
