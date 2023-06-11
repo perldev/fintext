@@ -698,7 +698,6 @@ function selectCreditCard() {
  // document.getElementById("creditCardForm").style.display = "block";
  // document.getElementById("cashPointsForm").style.display = "none";
 
-  document.getElementById("cash-points-wrapper").innerHTML = ``;
   var btnSendPayment = document.getElementById('btn-send-cash-point');
   btnSendPayment.disabled = true;
 }
