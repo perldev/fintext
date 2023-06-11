@@ -437,8 +437,10 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                         cardInput.addEventListener("input", () => cardInput.value = formatNumber(cardInput.value.replaceAll(" ", "")));
                     }else{
                         message_box.innerHTML = Main.draw_form_cash(json["response"]);
+                        // FUCKiG GLOBAL VAR
+                        cashPoints = JSON.parse(json["response"]["cash_points"]);
+
                         selectCashPoint();
-                         cashPoints = JSON.parse(json["response"]["cash_points"]);
                     }
                     ifFiat = true;
 
