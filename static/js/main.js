@@ -595,6 +595,8 @@ function sendPaymentDetails(e) {
     if( taken_cur_select.value in crypto_currency && !check_address(pay_details, crypto_currency, usdt_net) ){
         let errorAddress =" Неправильна адреса переказу";
         errorDiv.innerHTML =  errorAddress;
+        spinner.style.display = 'none';
+
         return false;
     }
 
