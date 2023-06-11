@@ -427,9 +427,7 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 message_box_title.innerHTML = json['response']['message_to_user'];
                 if (json['response']['taken_cur'] in  fiat_currency ) {
                     if(json['response']['taken_cur'] == "uah безнал"){
-
                         message_box.innerHTML = Main.draw_form_card(json["response"]);
-                        selectCreditCard();
                     }else{
                         message_box.innerHTML = Main.draw_form_cash(json["response"]);
                         selectCashPoint();
@@ -692,15 +690,6 @@ function selectCash() {
 
 // logic of payment details select fields.
 
-function selectCreditCard() {
-  //document.getElementById("creditCard1").checked = true;
-  //document.getElementById("cashPoint1").checked = false;
- // document.getElementById("creditCardForm").style.display = "block";
- // document.getElementById("cashPointsForm").style.display = "none";
-
-  var btnSendPayment = document.getElementById('btn-send-cash-point');
-  btnSendPayment.disabled = true;
-}
 
 function selectCashPoint() {
   document.getElementById("cash-points-wrapper").innerHTML = ``
