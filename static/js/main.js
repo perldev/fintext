@@ -132,7 +132,7 @@ let Main = {
         });
 
     },
-    "draw_form_crypto": function(resp_obj){
+    "draw_form_crypto_card": function(resp_obj){
 
             let provider_select = '';
             if (resp_obj['taken_cur'] == "usdt") {
@@ -165,21 +165,81 @@ let Main = {
                 <label class="col-4 col-form-label">${langJsDict['payment_way'][langData.lang]}</label>
                 <div class="col-8">
                   <div class="form-check" >
-                    <input class="form-check-input" type="radio" onclick="selectCard()" name="cardPayment" id="cardPayment" checked value="cardPayment">
+                    <input class="form-check-input" type="radio"   name="cardPayment" id="cardPayment" checked value="cardPayment">
                     <label class="form-check-label" for="cardPayment">
                       ${langJsDict['card_pay'][langData.lang]}
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" onclick="selectCash()" name="cashPayment" id="cashPayment" value="cashPayment" >
-                    <label class="form-check-label" for="cashPayment">
-                    ${langJsDict['cash_pay'][langData.lang]}
                     </label>
                   </div>
                 </div>
               </div>
               <br>
             `;
+
+           return  `<div class="form-group row">
+                <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
+                <div class="col-8">
+                    ${resp_obj['amount']}&nbsp;${resp_obj['given_cur']}
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="text1" class="col-4 col-form-label">${langJsDict['you_take'][langData.lang]}</label>
+                <div class="col-8">
+                    ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
+                </div>
+              </div>
+
+              ${provider_select}
+
+              <div class="form-group row">
+                <label for="text" class="col-4 col-form-label">${langJsDict['wal_adr'][langData.lang]} ${resp_obj['taken_cur']}</label>
+                <div class="col-8">
+                  <div class="input-group">
+                    <input id="payment-details" name="text" placeholder="${langJsDict['cur_adr'][langData.lang]}" type="text" class="form-control">
+                  </div>
+                  <div id="payment-details-error" class="form-text"></div>
+                </div>
+              </div>
+              ${fiat_payment_select}
+              <div class="form-group row">
+                  <div class="col-6 text-start">
+                    <button  class="btn btn-info">${langJsDict['cancel'][langData.lang]}</button>
+                  </div>
+                  <div class="col-6 text-end">
+                    <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
+                  </div>
+              </div>
+              `
+
+
+    },
+    draw_form_crypto_cash: function(resp_obj){
+
+            let provider_select = '';
+
+            if (resp_obj['taken_cur'] == "usdt") {
+              provider_select = `
+                <br>
+                <div class="form-group row">
+                  <label class="col-4 col-form-label">${langJsDict['usdt_net'][langData.lang]}</label>
+                  <div class="col-8">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
+                      <label class="form-check-label" for="ercNet1">
+                        ERC-20
+                      </label>
+                    </div>
+                    <div class="form-check" >
+                      <input class="form-check-input" type="radio" onclick="selectTron()" name="tronNet" id="tronNet1" value="option2">
+                      <label class="form-check-label" for="tronNet1">
+                        TRON
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <br>
+              `
+            }
+
 
 
 
@@ -208,9 +268,7 @@ let Main = {
                 </div>
               </div>
 
-              ${fiat_payment_select}
-
-              <div class="form-group row" id='cash-points-select-wrapper' style="display:none" >
+              <div class="form-group row" id='cash-points-select-wrapper' >
                 <div class="offset-lg-4 col-lg-8 col-12">
                   <select class="form-select" id="cash-points-select" aria-label="${langJsDict['choose_loc'][langData.lang]}">
                   </select>
@@ -439,23 +497,28 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                         message_box.innerHTML = Main.draw_form_cash(json["response"]);
                         // FUCKiG GLOBAL VAR
                         cashPoints = JSON.parse(json["response"]["cash_points"]);
-
                         selectCashPoint();
                     }
                     ifFiat = true;
 
                 } else {
                     isPaymentDetailsValid = true;
+                   if(json['response']['given_cur'] == "uah безнал"){
+                        message_box.innerHTML = Main.draw_form_crypto_card(json["response"]);
+                    }
+                    else{
+                        message_box.innerHTML = Main.draw_form_crypto_cash(json["response"]);
+                        cashPointsSelect = document.getElementById("cash-points-select");
+                         Object.entries(JSON.parse(json["response"]['cash_points'])).forEach(([key, value]) => {
+                          const some_option = document.createElement('option');
+                          some_option.value = key;
+                          some_option.innerHTML = value;
+                          cashPointsSelect.appendChild(some_option);
+                        });
 
-                    message_box.innerHTML = Main.draw_form_crypto(json["response"]);
+                    }
 
-                    cashPointsSelect = document.getElementById("cash-points-select");
-                    Object.entries(JSON.parse(json["response"]['cash_points'])).forEach(([key, value]) => {
-                      const some_option = document.createElement('option');
-                      some_option.value = key;
-                      some_option.innerHTML = value;
-                      cashPointsSelect.appendChild(some_option);
-                    });
+
                 }
 
                 errorDiv = document.getElementById("payment-details-error"); 
@@ -673,17 +736,7 @@ function selectTron() {
   document.getElementById("tronNet1").checked = true;
 }
 
-// logic of cash card select
-function selectCard() {
-  document.getElementById("cashPayment").checked = false;
-  document.getElementById("cardPayment").checked = true;
-  document.getElementById("cash-points-select-wrapper").style.display = "none";
-}
-function selectCash() {
-  document.getElementById("cashPayment").checked = true;
-  document.getElementById("cardPayment").checked = false;
-  document.getElementById("cash-points-select-wrapper").style.display = "block";
-}
+
 
 
 
