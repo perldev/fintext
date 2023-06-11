@@ -21,6 +21,8 @@ const langData = document.currentScript.dataset;
 let avaliable_pairs = [];
 
 let fiat_currency = {"uah":1, "eur":1, "usd":1, "uah безнал":1}
+let crypto_currency = {"usdt":1, "btc":1, "eth":1}
+
 let main_rate = 0;
 let rate_message = document.getElementById("rate-message");
 rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
@@ -165,7 +167,7 @@ let Main = {
                 <label class="col-4 col-form-label">${langJsDict['payment_way'][langData.lang]}</label>
                 <div class="col-8">
                   <div class="form-check" >
-                    <input class="form-check-input" type="radio"   name="cardPayment" id="cardPayment" checked value="cardPayment">
+                    <input class="form-check-input" type="radio" name="cardPayment" id="cardPayment" checked value="cardPayment">
                     <label class="form-check-label" for="cardPayment">
                       ${langJsDict['card_pay'][langData.lang]}
                     </label>
@@ -434,17 +436,9 @@ let Main = {
                 </div>
               </div>
               `
-
-
-
     }
 
-
-
-
 }
-
-
 
 document.getElementById("btn-exchange").addEventListener("click", function(event){
     event.preventDefault()
@@ -541,6 +535,34 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
         modal.show();
     }
   });
+function check_address(address, currency, usdt_net, ){
+     address = address.trim();
+    if(usdt_net == "erc20" || currency == "eth"){
+
+            if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
+                // check if it has the basic requirements of an address
+                return false;
+            } else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) {
+                // If it's all small caps or all all caps, return true
+                return true;
+
+    }
+    if(currency == "btc"){
+
+            if(!/^[13][a-km-zA-HJ-NP-Z0-9]{26,33}$/i.test(address))
+                return false;
+            return true;
+    }
+    if(usdt_net == "tron" ){
+            if(! (address[0]== "T" and address.length==34))
+                return false;
+            return  true
+    }
+
+
+
+}
+
 
 function sendPaymentDetails(e) {
     e.preventDefault();
@@ -565,6 +587,18 @@ function sendPaymentDetails(e) {
       }
     }
 
+    //checking errors of address
+    if( taken_cur_select.value in crypto_currency && !check_address(pay_details, crypto_currency, usdt_net) ){
+        let errorAddress =" Неправильна адреса переказу";
+        $("#payment-details-error").html(errorAddress);
+        return false;
+    }
+
+
+
+
+
+    //
     let fiat_pay_method = null;
     if (document.getElementById("cardPayment")) {
       if (document.querySelector('input[name="cardPayment"]:checked')) {
