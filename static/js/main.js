@@ -449,7 +449,9 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                     cardInput.addEventListener("input", () => cardInput.value = formatNumber(cardInput.value.replaceAll(" ", "")));
                 } else {
                     isPaymentDetailsValid = true;
+
                     message_box.innerHTML = Main.draw_form_crypto(json["response"]);
+
                     cashPointsSelect = document.getElementById("cash-points-select");
                     Object.entries(JSON.parse(json["response"]['cash_points'])).forEach(([key, value]) => {
                       const some_option = document.createElement('option');
@@ -691,10 +693,11 @@ function selectCash() {
 // logic of payment details select fields.
 
 function selectCreditCard() {
-  document.getElementById("creditCard1").checked = true;
-  document.getElementById("cashPoint1").checked = false;
-  document.getElementById("creditCardForm").style.display = "block";
-  document.getElementById("cashPointsForm").style.display = "none";
+  //document.getElementById("creditCard1").checked = true;
+  //document.getElementById("cashPoint1").checked = false;
+ // document.getElementById("creditCardForm").style.display = "block";
+ // document.getElementById("cashPointsForm").style.display = "none";
+
   document.getElementById("cash-points-wrapper").innerHTML = ``;
   var btnSendPayment = document.getElementById('btn-send-cash-point');
   btnSendPayment.disabled = true;
@@ -713,11 +716,11 @@ function selectCashPoint() {
     `
   }
 
-  document.getElementById("creditCard1").checked = false;
-  document.getElementById("cashPoint1").checked = true;
+  //document.getElementById("creditCard1").checked = false;
+  //document.getElementById("cashPoint1").checked = true;
 
-  document.getElementById("creditCardForm").style.display = "none";
-  document.getElementById("cashPointsForm").style.display = "block";
+  //document.getElementById("creditCardForm").style.display = "none";
+  //document.getElementById("cashPointsForm").style.display = "block";
   
 }
 
