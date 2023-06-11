@@ -535,6 +535,7 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
         modal.show();
     }
   });
+
 function check_address(address, currency, usdt_net, ){
      address = address.trim();
     if(usdt_net == "erc20" || currency == "eth"){
@@ -545,6 +546,9 @@ function check_address(address, currency, usdt_net, ){
             } else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) {
                 // If it's all small caps or all all caps, return true
                 return true;
+            }
+            return false;
+
 
     }
     if(currency == "btc"){
