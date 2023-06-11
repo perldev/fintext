@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime
 from fintex import settings
 from exchange.models import Currency, STATUS_ORDER, Orders
-
+import traceback
 import uuid
 import json
 
@@ -84,7 +84,11 @@ def get_rate(from_currency, to_currency):
     code4execute = direction.raw_data
     d = {}
     for i in context_vars.objects.filter(name__startswith="context"):
-        d[i.name] = float(i.value)
+        try:
+            d[i.name] = float(i.value)
+        except:
+            traceback.print_exc()
+
 
     d = eval(code4execute, {'__builtins__': None}, d)
     return d
