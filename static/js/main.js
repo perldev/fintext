@@ -575,8 +575,8 @@ function sendPaymentDetails(e) {
     }
 
     let cash_point = 1;
-    if (document.getElementById("cardPayment")) {
-      cash_point = document.getElementById("cash-points-select").value; 
+    if(isCash) {
+      cash_point = document.getElementById("cash-points-select").value;
     }
 
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
