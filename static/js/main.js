@@ -292,7 +292,7 @@ let Main = {
               </div>
               `
 
-    }
+    },
     "draw_form_card": function(resp_obj){
 
 
