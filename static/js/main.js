@@ -20,7 +20,7 @@ const langData = document.currentScript.dataset;
 
 let avaliable_pairs = [];
 
-let fiat_currency = {"uah":1, "eur":1, "usd":1}
+let fiat_currency = {"uah":1, "eur":1, "usd":1, "uah безнал":1}
 let main_rate = 0;
 let rate_message = document.getElementById("rate-message");
 rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
@@ -229,7 +229,7 @@ let Main = {
 
 
     },
-    "draw_form": function(resp_obj){
+    "draw_form_cash": function(resp_obj){
 
         let provider_select = '';
         if (resp_obj['given_cur'] == "usdt") {
@@ -256,6 +256,7 @@ let Main = {
           `
         }
 
+
         return  `<div class="form-group row">
                 <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
                 <div class="col-8">
@@ -271,7 +272,55 @@ let Main = {
 
               ${provider_select}
 
-              <div class="form-group row">
+
+              <br>
+              <div id="cashPointsForm" >
+                <div class="form-group row">
+                  <div class="col-4">${langJsDict['cash_points'][langData.lang]}</div>
+                  <div class="col-8" id="cash-points-wrapper">
+
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6 text-start">
+                    <button  class="btn btn-info">${langJsDict['cancel'][langData.lang]}</button>
+                  </div>
+                  <div class="col-6 text-end">
+                    <button onclick="sendPaymentDetails(event)" id="btn-send-cash-point" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
+                  </div>
+                </div>
+              </div>
+              `
+
+    }
+    "draw_form_card": function(resp_obj){
+
+
+        let provider_select = '';
+        if (resp_obj['given_cur'] == "usdt") {
+          provider_select = `
+            <br>
+            <div class="form-group row">
+              <label class="col-4 col-form-label">${langJsDict['usdt_net'][langData.lang]}</label>
+              <div class="col-8">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
+                  <label class="form-check-label" for="ercNet1">
+                    ERC-20
+                  </label>
+                </div>
+                <div class="form-check" >
+                  <input class="form-check-input" type="radio" onclick="selectTron()" name="tronNet" id="tronNet1" value="option2">
+                  <label class="form-check-label" for="tronNet1">
+                    TRON
+                  </label>
+                </div>
+              </div>
+            </div>
+            <br>
+          `
+        }
+  /*<div class="form-group row">
                   <label for="text1" class="col-4 col-form-label">${langJsDict['get_money_way'][langData.lang]}</label>
                   <div class="col-8">
                     <div class="form-check" id="card-form-check" >
@@ -288,11 +337,24 @@ let Main = {
                     </div>
                   </div>
               </div>
+              */
 
+        return  `<div class="form-group row">
+                <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
+                <div class="col-8">
+                    ${resp_obj['amount']}&nbsp;${resp_obj['given_cur']}
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="text1" class="col-4 col-form-label">${langJsDict['you_take'][langData.lang]}</label>
+                <div class="col-8">
+                    ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
+                </div>
+              </div>
+
+              ${provider_select}
               <br>
-
-              <div id="creditCardForm" style="display:block">
-
+                <div id="creditCardForm" style="display:block">
                 <div class="form-group row">
                   <label for="text" class="col-4 col-form-label">${langJsDict['card_num'][langData.lang]}</label>
                   <div class="col-8">
@@ -300,7 +362,7 @@ let Main = {
                     <div class="input-group">
                       <input id="payment-details" name="text" maxlength="19" oninput="validateCardNumber(value)" onpaste="cardValidationOnPaste()" placeholder="${langJsDict['card_num_plc'][langData.lang]}" type="text" class="form-control">
                     </div>
-                    
+
                   </div>
                 </div>
                 <br/>
@@ -313,30 +375,12 @@ let Main = {
                     </div>
                 </div>
               </div>
-              <br>
-              <div id="cashPointsForm" style="display:none">
-                <div class="form-group row">
-                  <div class="col-4">${langJsDict['cash_points'][langData.lang]}</div>
-                  <div class="col-8" id="cash-points-wrapper">
-
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <div class="col-6 text-start">
-                    <button  class="btn btn-info">${langJsDict['cancel'][langData.lang]}</button>
-                  </div>
-                  <div class="col-6 text-end">
-                    <button onclick="sendPaymentDetails(event)" id="btn-send-cash-point" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
-                  </div>
-                </div>
-              </div>
-
-
-
-
               `
 
+
+
     }
+
 
 
 
@@ -382,7 +426,17 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 // TODO also
                 message_box_title.innerHTML = json['response']['message_to_user'];
                 if (json['response']['taken_cur'] in  fiat_currency ) {
-                    message_box.innerHTML = Main.draw_form(json["response"]);
+                    if(json['response']['taken_cur'] == "uah безнал"){
+
+                        message_box.innerHTML = Main.draw_form_card(json["response"]);
+                        selectCreditCard();
+                    }else{
+                        message_box.innerHTML = Main.draw_form_cash(json["response"]);
+                        selectCashPoint();
+                    }
+
+
+
                     cashPoints = JSON.parse(json["response"]["cash_points"]);
 
                     ifFiat = true;
