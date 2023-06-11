@@ -104,7 +104,7 @@ def gather_kuna(t1, t2):
     r.save()
     # save context var for rate builder
     #TODO move to decorator
-    context_var, created = context_vars.objects.get_or_create(name="context_kuna_%s_%s_sell" % (t1, t2))
+    context_var, created = context_vars.objects.get_or_create(name="context_kuna_%s_%s" % (t1, t2))
 
     context_var.value = r.rate
     context_var.save()
@@ -113,7 +113,7 @@ def gather_kuna(t1, t2):
     r.give_currency = take_currency
     r.take_currency = give_currency
     r.rate = result[9]
-    context_var, created = context_vars.objects.get_or_create(name="context_kuna_%s_%s_buy" % (t1, t2))
+    context_var, created = context_vars.objects.get_or_create(name="context_kuna_%s_%s" % (t2, t1))
 
     r.save()
 
@@ -166,7 +166,7 @@ def gather_whitebit(t1, t2):
              rate=sell_rate)
     r.save()
 
-    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s_sell" % (t1.lower(), t2.lower()))
+    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s" % (t1.lower(), t2.lower()))
     context_var.value = r.rate
     context_var.save()
 
@@ -175,7 +175,7 @@ def gather_whitebit(t1, t2):
     r.take_currency = give_currency
     r.rate = buy_rate
 
-    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s_buy" % (t1.lower(), t2.lower()))
+    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s" % (t2.lower(), t1.lower()))
     context_var.value = r.rate
     context_var.save()
     r.save()
