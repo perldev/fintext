@@ -48,8 +48,16 @@
                     <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Данные WhiteBit USDT/UAH</h5>
+                                <h5 class="card-title">Данные WhiteBit USDT/UAH продажа</h5>
                                 <div id="real-timewhitebit_usdt_uah" style="height:100px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit USDT/UAH покупка</h5>
+                                <div id="real-timewhitebit_uah_usdt" style="height:100px;"></div>
                             </div>
                         </div>
                     </div>
@@ -57,22 +65,84 @@
                     <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Данные WhiteBit ETH/UAH</h5>
+                                <h5 class="card-title">Данные WhiteBit ETH/UAH продажа</h5>
                                 <div id="real-timewhitebit_eth_uah" style="height:100px;"></div>
 
                             </div>
                         </div>
                     </div>
+                     <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit ETH/UAH покупка</h5>
+                                <div id="real-timewhitebit_uah_eth" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Данные WhiteBit BTC/UAH</h5>
+                                <h5 class="card-title">Данные WhiteBit BTC/UAH продажа</h5>
                                 <div id="real-timewhitebit_btc_uah" style="height:100px;"></div>
 
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit BTC/UAH покупка</h5>
+                                <div id="real-timewhitebit_uah_btc" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                   <!-- USD работа-->
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit ETH/USD продажа</h5>
+                                <div id="real-timewhitebit_eth_usd" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit ETH/USD покупка</h5>
+                                <div id="real-timewhitebit_usd_eth" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit BTC/USD продажа</h5>
+                                <div id="real-timewhitebit_btc_usd" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Данные WhiteBit BTC/USD покупка</h5>
+                                <div id="real-timewhitebit_usd_btc" style="height:100px;"></div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
                        <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
@@ -95,9 +165,22 @@
                     {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_kuna_btc_uah" %}
                     {% include "oper/context_var.html" with name="BitStamp BTC/USD" id="context_btctradeua_btc_uah" %}
 
-                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_btc_uah" %}
-                    {% include "oper/context_var.html" with name="WhiteBit USDT/UAH" id="context_whitebit_usdt_uah" %}
-                    {% include "oper/context_var.html" with name="WhiteBit ETH/UAH" id="context_whitebit_eth_uah" %}
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_btc_uah_sell" %}
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_btc_uah_buy" %}
+
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_eth_uah_sell" %}
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_eth_uah_buy" %}
+
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_btc_usd_sell" %}
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_btc_usd_buy" %}
+
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_eth_usd_sell" %}
+                    {% include "oper/context_var.html" with name="WhiteBit BTC/UAH" id="context_whitebit_eth_usd_buy" %}
+
+
+                    {% include "oper/context_var.html" with name="WhiteBit USDT/UAH" id="context_whitebit_usdt_uah_sell" %}
+                    {% include "oper/context_var.html" with name="WhiteBit USDT/UAH" id="context_whitebit_usdt_uah_buy" %}
+
                     {% include "oper/context_var.html" with name="Средняя комиссия ETH при цене  21000" id="context_etherscan21000_eth_eth" %}
 
                 </div>

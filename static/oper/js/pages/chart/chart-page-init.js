@@ -195,6 +195,20 @@
                  {"name":"whitebit", "val": "btc_uah", "plot": {}},
                  {"name":"whitebit", "val": "usdt_uah", "plot": {}},
                  {"name":"whitebit", "val": "eth_uah", "plot": {}},
+
+                 {"name":"whitebit", "val": "uah_btc", "plot": {}},
+                 {"name":"whitebit", "val": "uah_usdt", "plot": {}},
+                 {"name":"whitebit", "val": "uah_eth", "plot": {}},
+
+                 {"name":"whitebit", "val": "btc_usd", "plot": {}},
+                 {"name":"whitebit", "val": "usd_btc", "plot": {}},
+
+                 {"name":"whitebit", "val": "eth_usd", "plot": {}},
+                 {"name":"whitebit", "val": "usd_eth", "plot": {}},
+
+
+
+
                  {"name":"etherscan21000", "val": "eth_eth", "plot": {}},
 
 

@@ -12,23 +12,20 @@ import traceback
 from exchange.controller import tell_trans_check
 
 
-
 class Command(BaseCommand):
     help = "transaction for out payment accoroding with deal"
 
     def handle(self, *args, **options):
 
         transes4send = Trans.objects.filter(debit_credit='out',
-                                            currency__title_in=NATIVE_CRYPTO_CURRENCY,
                                             status="processing",
-                                            order__take_currency__title_in=NATIVE_CRYPTO_CURRENCY
                                             )
         for i in transes4send:
             i.status = "processing2"
             i.save()
             order = i.order
             factory = CryptoFactory(i.currency.title,
-                                    "native")
+                                    i.currency_provider.title)
             address4 = context_vars.objects.get(name=i.currency.title + "_" + i.currency_provider.title + "_forpayment")
             address4 = address4.value
             amnt_sweep = factory.get_balance(address4, show_normal=True)
