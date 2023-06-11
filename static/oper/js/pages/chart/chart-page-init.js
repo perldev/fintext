@@ -289,66 +289,66 @@
                              }
                 );
                 plot = plots[8];
-                getDataRates(plot["name"],
-                             plot["val"],
+                getDataRates(plots[8]["name"],
+                             plots[8]["val"],
                              function(result){
-                                    create_plot(plot["plot"],
-                                                plot["name"],
-                                                plot["val"], result)
+                                    create_plot(plots[8]["plot"],
+                                                plots[8]["name"],
+                                                plots[8]["val"], result)
                              }
                 );
                  plot = plots[9];
-                getDataRates(plot["name"],
-                             plot["val"],
+                getDataRates(plots[9]["name"],
+                             plots[9]["val"],
                              function(result){
-                                    create_plot(plot["plot"],
-                                                plot["name"],
-                                                plot["val"], result)
+                                    create_plot(plots[9]["plot"],
+                                                plots[9]["name"],
+                                                plots[9]["val"], result)
                              }
                 );
                  plot = plots[10];
-                getDataRates(plot["name"],
-                             plot["val"],
+                getDataRates(plots[10]["name"],
+                             plots[10]["val"],
                              function(result){
-                                    create_plot(plot["plot"],
-                                                plot["name"],
-                                                plot["val"], result)
+                                    create_plot(plots[10]["plot"],
+                                                plots[10]["name"],
+                                                plots[10]["val"], result)
                              }
                 );
                 plot = plots[11];
-                getDataRates(plot["name"],
-                             plot["val"],
+                getDataRates(plots[11]["name"],
+                             plots[11]["val"],
                              function(result){
-                                    create_plot(plot["plot"],
-                                                plot["name"],
-                                                plot["val"], result)
+                                    create_plot(plots[11]["plot"],
+                                                plots[11]["name"],
+                                                plots[11]["val"], result)
                              }
                 );
                 plot = plots[12];
-                getDataRates(plot["name"],
-                             plot["val"],
+                getDataRates(plots[12]["name"],
+                             plots[12]["val"],
                              function(result){
-                                    create_plot(plot["plot"],
-                                                plot["name"],
-                                                plot["val"], result)
+                                    create_plot(plots[12]["plot"],
+                                                plots[12]["name"],
+                                                plots[12]["val"], result)
                              }
                 );
                 plot = plots[13];
-                getDataRates(plot["name"],
-                             plot["val"],
+                getDataRates(plots[13]["name"],
+                             plots[13]["val"],
                              function(result){
-                                    create_plot(plot["plot"],
-                                                plot["name"],
-                                                plot["val"], result)
+                                    create_plot(plots[13]["plot"],
+                                                plots[13]["name"],
+                                                plots[13]["val"], result)
                              }
                 );
                 plot = plots[14];
-                getDataRates(plot["name"],
-                             plot["val"],
+                getDataRates(plots[14]["name"],
+                             plots[14]["val"],
                              function(result){
-                                    create_plot(plot["plot"],
-                                                plot["name"],
-                                                plot["val"], result)
+                                    create_plot(plots[14]["plot"],
+                                                plots[14]["name"],
+                                                plots[14]["val"], result)
                              }
                 );
 
