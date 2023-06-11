@@ -428,23 +428,20 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 if (json['response']['taken_cur'] in  fiat_currency ) {
                     if(json['response']['taken_cur'] == "uah безнал"){
                         message_box.innerHTML = Main.draw_form_card(json["response"]);
+                        cardInput = document.getElementById("payment-details");
+                        cardInput.addEventListener("keypress", event => {
+                        if (!CARD_NUMBER_ALLOWED_CHARS_REGEXP.test(event.key)) {
+                            event.preventDefault();
+                          }
+                        });
+                        cardInput.addEventListener("input", () => cardInput.value = formatNumber(cardInput.value.replaceAll(" ", "")));
                     }else{
                         message_box.innerHTML = Main.draw_form_cash(json["response"]);
                         selectCashPoint();
+                         cashPoints = JSON.parse(json["response"]["cash_points"]);
                     }
-
-
-
-                    cashPoints = JSON.parse(json["response"]["cash_points"]);
-
                     ifFiat = true;
-                    cardInput = document.getElementById("payment-details");
-                    cardInput.addEventListener("keypress", event => {
-                      if (!CARD_NUMBER_ALLOWED_CHARS_REGEXP.test(event.key)) {
-                        event.preventDefault();
-                      }
-                    });
-                    cardInput.addEventListener("input", () => cardInput.value = formatNumber(cardInput.value.replaceAll(" ", "")));
+
                 } else {
                     isPaymentDetailsValid = true;
 
