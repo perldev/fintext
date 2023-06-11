@@ -35,6 +35,8 @@ class Command(BaseCommand):
         gather_whitebit("BTC", "UAH")
         gather_whitebit("USDT", "UAH")
         gather_whitebit("ETH", "UAH")
+        gather_whitebit("BTC", "USD")
+        gather_whitebit("ETH", "USD")
 
 
 def gather_eth_comission():
@@ -81,6 +83,8 @@ def gather_btctradeua(t1, t2):
     r.give_currency = take_currency
     r.take_currency = give_currency
     r.rate = result["sell"]
+    context_var, created = context_vars.objects.get_or_create(name="context_btctradeua_%s_%s" % (t1, t2))
+
     r.save()
 
 
@@ -100,7 +104,8 @@ def gather_kuna(t1, t2):
     r.save()
     # save context var for rate builder
     #TODO move to decorator
-    context_var, created = context_vars.objects.get_or_create(name="context_kuna_%s_%s" % (t1, t2))
+    context_var, created = context_vars.objects.get_or_create(name="context_kuna_%s_%s_sell" % (t1, t2))
+
     context_var.value = r.rate
     context_var.save()
 
@@ -108,6 +113,8 @@ def gather_kuna(t1, t2):
     r.give_currency = take_currency
     r.take_currency = give_currency
     r.rate = result[9]
+    context_var, created = context_vars.objects.get_or_create(name="context_kuna_%s_%s_buy" % (t1, t2))
+
     r.save()
 
 
@@ -159,7 +166,7 @@ def gather_whitebit(t1, t2):
              rate=sell_rate)
     r.save()
 
-    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s" % (t1.lower(), t2.lower()))
+    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s_sell" % (t1.lower(), t2.lower()))
     context_var.value = r.rate
     context_var.save()
 
@@ -167,4 +174,8 @@ def gather_whitebit(t1, t2):
     r.give_currency = take_currency
     r.take_currency = give_currency
     r.rate = buy_rate
+
+    context_var, created = context_vars.objects.get_or_create(name="context_whitebit_%s_%s_buy" % (t1.lower(), t2.lower()))
+    context_var.value = r.rate
+    context_var.save()
     r.save()
