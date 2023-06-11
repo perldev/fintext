@@ -554,9 +554,9 @@ function check_address(address, currency, usdt_net, ){
             return true;
     }
     if(usdt_net == "tron" ){
-            if(! (address[0]== "T" and address.length==34))
-                return false;
-            return  true
+            if(address[0] == "T" && address.length == 34)
+                return true;
+            return  false;
     }
 
 
