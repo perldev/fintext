@@ -671,14 +671,14 @@ function sendPaymentDetails(e) {
       }
     }
 
-    //checking errors of address
-    // if( taken_cur_select.value in crypto_currency && !check_address(pay_details, crypto_currency, usdt_net) ){
-    //     let errorAddress =" Неправильна адреса переказу";
-    //     errorDiv.innerHTML =  errorAddress;
-    //     spinner.style.display = 'none';
+    // checking errors of address
+    if( taken_cur_select.value in crypto_currency && !check_address(pay_details, crypto_currency, usdt_net) ){
+        let errorAddress =" Неправильна адреса переказу";
+        errorDiv.innerHTML =  errorAddress;
+        spinner.style.display = 'none';
 
-    //     return false;
-    // }
+        return false;
+    }
     //
     let fiat_pay_method = null;
     if (document.getElementById("cardPayment")) {
