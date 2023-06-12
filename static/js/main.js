@@ -146,7 +146,7 @@ let Main = {
                     <div class="form-check">
                       <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
                       <label class="form-check-label" for="ercNet1">
-                        ERC-20
+                        ERC-20 ${langJsDict['usdt_fee'][langData.lang]}
                       </label>
                     </div>
                     <div class="form-check" >
@@ -209,6 +209,9 @@ let Main = {
                   <div class="col-6 text-end">
                     <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                   </div>
+                  <div class="col-12">
+                  <h1>draw_form_crypto_card</h1>
+                  </div>
               </div>
               `
 
@@ -227,7 +230,7 @@ let Main = {
                     <div class="form-check">
                       <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
                       <label class="form-check-label" for="ercNet1">
-                        ERC-20
+                        ERC-20 ${langJsDict['usdt_fee'][langData.lang]}
                       </label>
                     </div>
                     <div class="form-check" >
@@ -241,9 +244,6 @@ let Main = {
                 <br>
               `
             }
-
-
-
 
            return  `<div class="form-group row">
                 <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
@@ -283,6 +283,9 @@ let Main = {
                   </div>
                   <div class="col-6 text-end">
                     <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
+                  </div>
+                  <div class="col-12">
+                  <h1>draw_form_crypto_cash</h1>
                   </div>
               </div>
               `
@@ -348,13 +351,15 @@ let Main = {
                   <div class="col-6 text-end">
                     <button onclick="sendPaymentDetails(event)" id="btn-send-cash-point" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                   </div>
+                  <div class="col-12">
+                  <h1>draw_form_cash</h1>
+                  </div>
                 </div>
               </div>
               `
 
     },
     "draw_form_card": function(resp_obj){
-
 
         let provider_select = '';
         if (resp_obj['given_cur'] == "usdt") {
@@ -380,24 +385,6 @@ let Main = {
             <br>
           `
         }
-  /*<div class="form-group row">
-                  <label for="text1" class="col-4 col-form-label">${langJsDict['get_money_way'][langData.lang]}</label>
-                  <div class="col-8">
-                    <div class="form-check" id="card-form-check" >
-                      <input class="form-check-input" type="radio" onclick="selectCreditCard()" name="creditCard" id="creditCard1" checked value="option1" >
-                      <label class="form-check-label" for="creditCard1">
-                      ${langJsDict['get_money_card'][langData.lang]}
-                      </label>
-                    </div>
-                    <div class="form-check" >
-                      <input class="form-check-input" type="radio" onclick="selectCashPoint()" name="cashPoint" id="cashPoint1" value="option2">
-                      <label class="form-check-label" for="cashPoint1">
-                      ${langJsDict['get_money_cash'][langData.lang]}
-                      </label>
-                    </div>
-                  </div>
-              </div>
-              */
 
         return  `<div class="form-group row">
                 <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
@@ -433,10 +420,77 @@ let Main = {
                     <div class="col-6 text-end">
                       <button onclick="sendPaymentDetails(event)" id="btn-send-payment" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                     </div>
+                    <div class="col-12">
+                    <h1>draw_form_card</h1>
+                    </div>
                 </div>
               </div>
               `
-    }
+    },
+    "draw_form_crypto_to_crypto": function(resp_obj){
+      let provider_select = '';
+      if (resp_obj['taken_cur'] == "usdt") {
+        provider_select = `
+          <br>
+          <div class="form-group row">
+            <label class="col-4 col-form-label">${langJsDict['usdt_net'][langData.lang]}</label>
+            <div class="col-8">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
+                <label class="form-check-label" for="ercNet1">
+                  ERC-20 ${langJsDict['usdt_fee'][langData.lang]}
+                </label>
+              </div>
+              <div class="form-check" >
+                <input class="form-check-input" type="radio" onclick="selectTron()" name="tronNet" id="tronNet1" value="option2">
+                <label class="form-check-label" for="tronNet1">
+                  TRON
+                </label>
+              </div>
+            </div>
+          </div>
+          <br>
+        `
+      }
+
+     return  `<div class="form-group row">
+          <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
+          <div class="col-8">
+              ${resp_obj['amount']}&nbsp;${resp_obj['given_cur']}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="text1" class="col-4 col-form-label">${langJsDict['you_take'][langData.lang]}</label>
+          <div class="col-8">
+              ${resp_obj['taken_amount']}&nbsp;${resp_obj['taken_cur']}
+          </div>
+        </div>
+
+        ${provider_select}
+
+        <div class="form-group row">
+          <label for="text" class="col-4 col-form-label">${langJsDict['wal_adr'][langData.lang]} ${resp_obj['taken_cur']}</label>
+          <div class="col-8">
+            <div class="input-group">
+              <input id="payment-details" name="text" placeholder="${langJsDict['cur_adr'][langData.lang]}" type="text" class="form-control">
+            </div>
+            <div id="payment-details-error" class="form-text"></div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-6 text-start">
+              <button  class="btn btn-info">${langJsDict['cancel'][langData.lang]}</button>
+            </div>
+            <div class="col-6 text-end">
+              <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
+            </div>
+            <div class="col-12">
+            <h1>draw_form_crypto_card</h1>
+            </div>
+        </div>
+        `
+      },
 
 }
 
@@ -477,7 +531,7 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 ///!!!!! TODO remove this from here
                 // TODO also
                 message_box_title.innerHTML = json['response']['message_to_user'];
-                if (json['response']['taken_cur'] in  fiat_currency ) {
+                if (json['response']['taken_cur'] in fiat_currency) {
                     if(json['response']['taken_cur'] == "uah безнал"){
                         message_box.innerHTML = Main.draw_form_card(json["response"]);
                         cardInput = document.getElementById("payment-details");
@@ -497,8 +551,11 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
 
                 } else {
                     isPaymentDetailsValid = true;
-                   if(json['response']['given_cur'] == "uah безнал"){
+                    if(json['response']['given_cur'] == "uah безнал"){
                         message_box.innerHTML = Main.draw_form_crypto_card(json["response"]);
+                    }
+                    else if (!(json['response']['taken_cur'] in fiat_currency) && !(json['response']['given_cur'] in fiat_currency)) {
+                      message_box.innerHTML = Main.draw_form_crypto_to_crypto(json["response"]);
                     }
                     else{
                         message_box.innerHTML = Main.draw_form_crypto_cash(json["response"]);
@@ -592,18 +649,13 @@ function sendPaymentDetails(e) {
     }
 
     //checking errors of address
-    if( taken_cur_select.value in crypto_currency && !check_address(pay_details, crypto_currency, usdt_net) ){
-        let errorAddress =" Неправильна адреса переказу";
-        errorDiv.innerHTML =  errorAddress;
-        spinner.style.display = 'none';
+    // if( taken_cur_select.value in crypto_currency && !check_address(pay_details, crypto_currency, usdt_net) ){
+    //     let errorAddress =" Неправильна адреса переказу";
+    //     errorDiv.innerHTML =  errorAddress;
+    //     spinner.style.display = 'none';
 
-        return false;
-    }
-
-
-
-
-
+    //     return false;
+    // }
     //
     let fiat_pay_method = null;
     if (document.getElementById("cardPayment")) {
@@ -615,9 +667,12 @@ function sendPaymentDetails(e) {
     }
 
     let cash_point = 1;
-    if(isCash) {
+
+    let pointsSelection = document.getElementById('cash-points-select')
+    if (pointsSelection !== null) {
       cash_point = document.getElementById("cash-points-select").value;
-    }
+    };
+
 
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     fetch('/api/create_invoice/', {
@@ -644,13 +699,18 @@ function sendPaymentDetails(e) {
         } else {
           if (!isCash) {
             let payment_message = null;
-            if (json['response']['is_fiat_card'] == 1) {
+            if (json['response']['is_fiat_card'] == 1 && json['response']['given_cur'] == "uah безнал") {
               payment_message = `
-              <p>${langJsDict['mes_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes_part_2'][langData.lang]} <strong>${json['response']['payment_details_give']}</strong></p><br/>
+              <p>${langJsDict['mes_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes_part_2'][langData.lang]}<br><strong>${json['response']['payment_details_give']}</strong></p><br/>
               `
-            } else {
+            } else if (json['response']['is_fiat_card'] == 0 && json['response']['given_cur'] != "uah безнал") {
               payment_message = `
-              <p>${langJsDict['mes2_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes2_part_2'][langData.lang]}<br><strong>${json['response']['payment_details_give']}</strong></p><br/>
+              <p>${langJsDict['mes2_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes2_part_2'][langData.lang]} <strong>${json['response']['payment_details_give']}</strong></p><br/>
+              `
+            }
+            else {
+              payment_message = `
+              <p>${langJsDict['mes_part_1'][langData.lang]} <strong>${json['response']['amount']} ${json['response']['given_cur']}</strong> ${langJsDict['mes_part_2'][langData.lang]}<br><strong>${json['response']['payment_details_give']}</strong></p><br/>
               `
             }
             message_box.innerHTML = `

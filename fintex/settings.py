@@ -26,7 +26,7 @@ AUTH_USER_MODEL = "auth.User"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-FIAT_CURRENCIES = ("uah", "usd", )
+FIAT_CURRENCIES = ("uah", "usd", "eur", "uah безнал")
 NATIVE_CRYPTO_CURRENCY = ("btc", "eth", )
 CRYPTO_CURRENCY = ("usdt", "btc", "eth")
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "162.55.95.183", "162.55.95.183:9001"]

@@ -354,6 +354,7 @@ def create_invoice(req):
                         secret_code = 'none'
                 
                 print('FIAT: ' + str(is_fiat_card))
+                print('sadasdasdasdasdadada')
                 respone_data = {
                     'is_fiat_card' : 1 if is_fiat_card else 0,
                     'given_cur': str(order.give_currency),
