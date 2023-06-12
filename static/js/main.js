@@ -452,6 +452,29 @@ let Main = {
           <br>
         `
       }
+      if (resp_obj['given_cur'] == "usdt") {
+        provider_select = `
+          <br>
+          <div class="form-group row">
+            <label class="col-4 col-form-label">${langJsDict['usdt_net'][langData.lang]}</label>
+            <div class="col-8">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" onclick="selectErc()" name="ercNet" id="ercNet1" checked value="option1" >
+                <label class="form-check-label" for="ercNet1">
+                  ERC-20 ${langJsDict['usdt_fee'][langData.lang]}
+                </label>
+              </div>
+              <div class="form-check" >
+                <input class="form-check-input" type="radio" onclick="selectTron()" name="tronNet" id="tronNet1" value="option2">
+                <label class="form-check-label" for="tronNet1">
+                  TRON
+                </label>
+              </div>
+            </div>
+          </div>
+          <br>
+        `
+      }
 
      return  `<div class="form-group row">
           <label class="col-4 col-form-label" for="">${langJsDict['you_give'][langData.lang]}</label>
