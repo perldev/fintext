@@ -209,9 +209,6 @@ let Main = {
                   <div class="col-6 text-end">
                     <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                   </div>
-                  <div class="col-12">
-                  <h1>draw_form_crypto_card</h1>
-                  </div>
               </div>
               `
 
@@ -284,9 +281,6 @@ let Main = {
                   <div class="col-6 text-end">
                     <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
                   </div>
-                  <div class="col-12">
-                  <h1>draw_form_crypto_cash</h1>
-                  </div>
               </div>
               `
 
@@ -350,9 +344,6 @@ let Main = {
                   </div>
                   <div class="col-6 text-end">
                     <button onclick="sendPaymentDetails(event)" id="btn-send-cash-point" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
-                  </div>
-                  <div class="col-12">
-                  <h1>draw_form_cash</h1>
                   </div>
                 </div>
               </div>
@@ -419,9 +410,6 @@ let Main = {
                     </div>
                     <div class="col-6 text-end">
                       <button onclick="sendPaymentDetails(event)" id="btn-send-payment" disabled class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
-                    </div>
-                    <div class="col-12">
-                    <h1>draw_form_card</h1>
                     </div>
                 </div>
               </div>
@@ -507,9 +495,6 @@ let Main = {
             </div>
             <div class="col-6 text-end">
               <button onclick="sendPaymentDetails(event)" class="btn btn-success">${langJsDict['send'][langData.lang]}</button>
-            </div>
-            <div class="col-12">
-            <h1>draw_form_crypto_card</h1>
             </div>
         </div>
         `
