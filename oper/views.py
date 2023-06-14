@@ -25,7 +25,7 @@ from exchange.controller import tell_update_order as tell_controller_update_orde
 from exchange.controller import tell_trans_check as tell_controller_trans_check
 from exchange.controller import tell_invoice_check as tell_controller_invoice_check
 from exchange.controller import tell_aml_check
-
+from wallet.models import get_full_data
 
 @login_required(login_url="/oper/login/")
 def order_status(req, status, order_id):
@@ -364,13 +364,26 @@ def get2work(req, order_id):
 @csrf_exempt
 @login_required(login_url="/oper/login/")
 def wallets_sweep(req, wallet):
-    obj = get_object_or_404(PoolAccounts, pk=wallet)
-    factory = CryptoFactory(obj.currency.title,
-                            obj.currency_provider.title)
-    obj.technical_info = factory.get_balance()
-    obj.save()
-    # TODO
-    return json_true(req)
+        obj = get_object_or_404(PoolAccounts, pk=wallet)
+        factory = CryptoFactory(obj.currency.title,
+                                obj.currency_provider.title)
+        balance2send = factory.get_balance(obj.address)
+
+        resp = get_full_data(obj.address)
+        context_var = context_vars.objects.get(name=factory.currency + "_" + factory.network + "_forpayment")
+
+        try:
+            txid = factory.sweep_address_to(resp["key"], resp["address"], context_var.value, balance2send)
+
+        except:
+            return json_500false(req)
+
+        balance2send = factory.get_balance(obj.address)
+        obj.technical_info = balance2send
+        factory.sweep_address_to()
+        obj.save()
+        # TODO
+        return json_true(req, {"txid": txid})
 
 
 @csrf_exempt

@@ -256,8 +256,8 @@ def create_invoice(req):
                     last_added_crypto_address = PoolAccounts.objects.filter(currency_id=currency_id,
                                                                             status=CHECKOUT_STATUS_FREE).order_by('-pub_date').first()
                 asum = order.amnt_give
-                block_height = 0
-                block_height = 0 # factory.get_current_height()
+
+                block_height = factory.get_current_height()
                 new_invoice = Invoice(order=order,
                                       currency_id=currency_id,
                                       crypto_payments_details_id=last_added_crypto_address.id,
@@ -266,7 +266,7 @@ def create_invoice(req):
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
                 last_added_crypto_address.status = CHECKOUT_STATUS_PROCESSING
-                # last_added_crypto_address.technical_info = factory.get_balance()
+                last_added_crypto_address.technical_info = factory.get_balance()
                 last_added_crypto_address.save()
                 new_invoice.save()
 
