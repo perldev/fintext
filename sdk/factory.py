@@ -142,8 +142,9 @@ class CryptoFactory:
     def get_balance(self,  *args, **kwargs):
 
         call_obj = self.__dict_call[self.__currency]["get_balance"]
+        show_normal = kwargs.pop("show_normal", False)
         value = call_obj(*args, **kwargs)
-        if kwargs.get("show_normal", False):
+        if  show_normal:
             return Decimal(value/self.prec)
         else:
             return value
