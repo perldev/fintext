@@ -126,7 +126,7 @@ def trans_page(req):
 
 def process_item_trans(i):
     return {
-            "pk":i.id,
+            "pk": i.id,
             "id": i.id,
             "amnt": str(i.amnt),
             "account": i.account,
@@ -235,7 +235,7 @@ def process_wallet_item(item, factory=None):
         item.ext_info = item.ext_info + ", Адрес выплат"
 
     return {"id": item.id,
-            "balance": str(item.technical_info),
+            "balance": str(factory.amnt_to_human(item.technical_info)),
             "ext_info": item.ext_info,
             "account": item.address,
             "status": item.status,
@@ -522,6 +522,7 @@ def process_item(i):
             "operator": username,
             "client_info": "Ukraine",
             # TODO add invoice of payment
+            "invoice_id": invoice.id,
             "client_payed": invoice.status,
             "client_get": i.trans.status if i.trans else None,
             "client_telegram_connected": connected,

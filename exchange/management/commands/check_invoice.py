@@ -49,7 +49,7 @@ class Command(BaseCommand):
                 print(transes)
                 # data_from_api = get_in_trans_from(str(i.crypto_payments_details), i.block_height)
                 # TODO TO FACTORY
-                if  actual_sum >= i.sum and transes:
+                if actual_sum >= i.sum and transes:
                     # if could not save the transes that is mean that we could contact to developer
                     try:
                         for trans in transes:
