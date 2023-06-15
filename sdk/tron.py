@@ -159,7 +159,7 @@ def get_native_balance(acc):
 
 def get_balance(acc):
     global ACCESS
-    return Decimal(ACCESS.get_trc20_balance(TOKEN_CONTRACT, acc))/1_000_000
+    return ACCESS.get_trc20_balance(TOKEN_CONTRACT, acc)
 
 
 class CryptoAccountTron(object):

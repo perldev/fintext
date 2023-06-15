@@ -151,8 +151,10 @@ class CryptoFactory:
 
     def estimate_fee(self, *args, **kwargs):
         call_obj = self.__dict_call[self.__currency]["estimate_fee"]
+        show_normal = kwargs.pop("show_normal", False)
         value = call_obj(*args, **kwargs)
-        if kwargs.get("show_normal", False):
+
+        if show_normal:
             return Decimal(value/self.prec)
         else:
             return value

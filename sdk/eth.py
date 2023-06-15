@@ -218,5 +218,5 @@ def get_sum_from(acc, blockheight=0):
 def get_balance(acc, *kargs, **kwargs):
     global ACCESS
     w3 = ACCESS
-    return Decimal(w3.eth.get_balance(acc))/PREC
+    return w3.eth.get_balance(acc)
 

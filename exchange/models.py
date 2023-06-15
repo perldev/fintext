@@ -95,6 +95,7 @@ class Orders(models.Model):
     take_currency = models.ForeignKey("Currency",
                                       related_name="take_currency",
                                       verbose_name="Take currency", on_delete=models.PROTECT,)
+
     provider_take = models.ForeignKey("CurrencyProvider",
                                       related_name="provider_take",
                                       verbose_name="Provider take Currency",

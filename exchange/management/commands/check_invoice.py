@@ -40,10 +40,11 @@ class Command(BaseCommand):
             # we do checking the balance in order to avoid more weighty checking the list of transactions
             # very tricky logic
 
-            if Decimal(new_balance) > Decimal(i.crypto_payments_details.technical_info):
+            if new_balance > Decimal(i.crypto_payments_details.technical_info):
 
                 actual_sum, transes = factory.get_sum_from(i.crypto_payments_details.address,
                                                            i.block_height)
+
 
                 print(actual_sum)
                 print(transes)
@@ -53,7 +54,7 @@ class Command(BaseCommand):
                     # if could not save the transes that is mean that we could contact to developer
                     try:
                         for trans in transes:
-
+                            #PREVENT adding trans with the same txid!!!
                             trans_obj = Trans.objects.create(account=i.crypto_payments_details.address,
                                                              currency=i.currency,
                                                              debit_credit="in",

@@ -211,6 +211,6 @@ def get_balance(acc):
 
     for i in respj["tokenAccounts"]:
         if i["tokenHash"] == TOKEN_CONTRACT:
-            return Decimal(i["balance"])/Decimal(10 ** i["decimals"])
+            return i["balance"]
 
     return Decimal("0.0")
