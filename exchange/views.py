@@ -317,7 +317,7 @@ def create_invoice(req):
                     'payment_details_give': payment_details_give,
                     'secret_key': str(random_key),
                     't_link': t_link,
-                    'order_id': order.id,
+                    'order_id': order.uuid,
                     'message': lang_dict['wait_payment'][session_lang]
                 }
             elif not is_cash and order.take_currency.title in FIAT_CURRENCIES:
@@ -327,7 +327,7 @@ def create_invoice(req):
                     'amount': order.amnt_give,
                     'payment_details_give': payment_details_give,
                     't_link': t_link,
-                    'order_id': order.id,
+                    'order_id': order.uuid,
                     'message': lang_dict['wait_payment'][session_lang]
                 }
             else:
@@ -362,7 +362,7 @@ def create_invoice(req):
                     'payment_details_give': payment_details_give,
                     't_link': t_link,
                     'secret_code': secret_code,
-                    'order_id': order.id,
+                    'order_id': order.uuid,
                     'message': lang_dict['wait_payment'][session_lang]
                 }
             # status of working orders
