@@ -392,7 +392,7 @@ def wallets_update(req, wallet):
     obj = get_object_or_404(PoolAccounts, pk=wallet)
     factory = CryptoFactory(obj.currency.title,
                             obj.currency_provider.title)
-    obj.technical_info = factory.get_balance()
+    obj.technical_info = factory.get_balance(obj.address)
 
     if obj.currency_provider.title != "native":
         obj.ext_info = factory.native_balance(obj.address)
