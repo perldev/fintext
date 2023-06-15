@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 from sdk.btc import get_current_height
 import json
-
+import uuid
 
 # imports for whitebit api calls
 import base64
@@ -86,7 +86,15 @@ class Orders(models.Model):
                              editable=False, on_delete=models.PROTECT,
                              null=True,
                              blank=True,)
+
+    uuid = models.UUIDField(verbose_name="uuid of page for quick connect",
+                            default=uuid.uuid4,
+                            editable=False
+                            )
+
+
     status = models.CharField(max_length=40, choices=STATUS_ORDER, default='created', verbose_name="Статус")
+
     give_currency = models.ForeignKey("Currency", verbose_name="Give Currency",
                                       on_delete=models.PROTECT,
                                       related_name="give_currency", )
