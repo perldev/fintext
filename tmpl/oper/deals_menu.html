@@ -1,6 +1,6 @@
 {% if item.status != "processed" and  item.status != "canceled" %}
 
-<button type="button" onclick="Main.one_line_api('/api/trans/processing/{{item.trans.id>}}/')" class="btn btn-primary btn-sm">Одобрить выплату</button>
+<button type="button" onclick="Main.one_line_api('/api/trans/processing/{{item.trans.id}}/')" class="btn btn-primary btn-sm">Одобрить выплату</button>
 <button type="button" onclick="Main.one_line_api('/api/invoices/status/payed/{{item}}/')" class="btn btn-primary btn-sm">Внес средства</button>
 
 <button type="button" onclick="Main.one_line_api('/oper/api/order/status/canceled/{{item.id}}')" class="btn btn-secondary btn-sm">Отменить</button>
