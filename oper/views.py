@@ -11,7 +11,7 @@ from oper.models import rates_direction, context_vars, chat
 from exchange.models import Currency, Orders, Invoice, Trans, OperTele, PoolAccounts
 from fintex.common import json_500false, json_true, date_to_str, convert2time, get_telechat_link
 from django.template.loader import render_to_string
-
+from fintex.common import format_numbers10
 from fintex.settings import BOTAPI, COMMON_PASSWORD, OPERTELEBOT, FIAT_CURRENCIES, CRYPTO_CURRENCY
 import json
 import requests
@@ -235,7 +235,7 @@ def process_wallet_item(item, factory=None):
         item.ext_info = item.ext_info + ", Адрес выплат"
 
     return {"id": item.id,
-            "balance": str(factory.amnt_to_human(item.technical_info)),
+            "balance": format_numbers10(factory.amnt_to_human(item.technical_info)),
             "ext_info": item.ext_info,
             "account": item.address,
             "status": item.status,
