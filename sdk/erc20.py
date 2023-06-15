@@ -125,6 +125,10 @@ def get_out_trans_from(acc, blockheight=0, blockto="latest"):
         for item in events:
             trans = item["args"]
             if trans["from"] == acc:
+
+                if int(trans["blockNumber"]) < blockheight:
+                    continue
+
                 result.append({"hash": item["transactionHash"],
                                "value": trans["value"],
                                "addr": acc,
@@ -157,6 +161,10 @@ def get_in_trans_from(self, acc, blockheight=0, blockto="latest"):
         for item in events:
             trans = item["args"]
             if trans["to"] == acc:
+
+                if int(trans["blockNumber"]) < blockheight:
+                    continue
+
                 result.append({"hash": item["transactionHash"],
                                "value": trans["value"],
                                "addr": acc,

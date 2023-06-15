@@ -266,7 +266,7 @@ def create_invoice(req):
                                       block_height=block_height)
                 payment_details_give = last_added_crypto_address.address
                 last_added_crypto_address.status = CHECKOUT_STATUS_PROCESSING
-                last_added_crypto_address.technical_info = factory.get_balance()
+                last_added_crypto_address.technical_info = factory.get_balance(last_added_crypto_address.address)
                 last_added_crypto_address.save()
                 new_invoice.save()
 

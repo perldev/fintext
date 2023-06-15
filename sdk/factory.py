@@ -104,6 +104,9 @@ class CryptoFactory:
         self.__default_address = addr
         return True
 
+    def amnt_to_human(self, amnt):
+        return Decimal(amnt/self.prec)
+
     @property
     def default_address(self):
         return self.__default_address

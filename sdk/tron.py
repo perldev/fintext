@@ -71,7 +71,8 @@ def setup_title(token_contract):
 
 def get_current_height():
     global ACCESS
-    return ACCESS.getblockcount()
+    resp = ACCESS.get_latest_block()
+    return resp["block_header"]["raw_data"]["timestamp"]
 
 
 def sweep_address_to(priv, acc, to, amnt):
@@ -97,6 +98,10 @@ def get_out_trans_from(acc, blockheight=0, blockto="latest"):
     result = []
     for trans in resp["data"]:
         if trans["from"] == acc:
+
+            if int(trans["block_timestamp"]) < blockheight:
+                continue
+
             result.append({"hash": trans["transaction_id"],
                             "value": int(trans["value"]),
                             "addr": acc,
@@ -122,6 +127,10 @@ def get_in_trans_from(acc, blockheight=0, blockto="latest"):
 
     for trans in resp["data"]:
         if trans["to"] == acc:
+
+            if int(trans["block_timestamp"]) < blockheight:
+                continue
+
             result.append({"hash": trans["transaction_id"],
                            "value": int(trans["value"]),
                            "addr": acc,
