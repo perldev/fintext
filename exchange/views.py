@@ -429,8 +429,8 @@ def generate_pseudo_random(number_of_items=6):
     return "".join(res)
 
 
-def order_details(request, pk):
-    order = Orders.objects.get(pk=pk)
+def order_details(request, uuid):
+    order = Orders.objects.get(uuid=uuid)
     context = {
         'order': order,
         "t_link": get_telechat_link(order),

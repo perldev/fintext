@@ -61,26 +61,27 @@ const CARD_NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
 function ckeckCurrencyPair() {
     let given_cur = document.getElementById("given-cur-select").value; 
     let taken_cur = document.getElementById("taken-cur-select").value; 
-    let cur_pair = given_cur + '_' + taken_cur;
-    if (avaliable_pairs.includes(cur_pair)) {
-        given_cur_input.disabled = false;
-        taken_cur_input.disabled = false;  
-        rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
-        fetch(`/api/get_rate/${given_cur}/${taken_cur}`)
-            .then(response => response.json())
-            .then(json => {
-                main_rate = json['result']['rate'];
-                rate_message.innerHTML = `Курс ${main_rate}`;
-                taken_cur_input.value = given_cur_input.value * main_rate;
-            })
-            .catch(() => {
-                rate_message.innerHTML = `${langJsDict['smth_wrong'][langData.lang]}`;
-              });
-    } else {
-        given_cur_input.disabled = true;
-        taken_cur_input.disabled = true;
-        rate_message.innerHTML = `${langJsDict['no_pair'][langData.lang]}`;
-    }
+    given_cur_input.disabled = false;
+    taken_cur_input.disabled = false;  
+    rate_message.innerHTML = `${langJsDict['load_rate'][langData.lang]}`;
+    fetch(`/api/get_rate/${given_cur}/${taken_cur}`)
+        .then(response => response.json())
+        .then(json => {
+            main_rate = json['result']['rate'];
+            if(main_rate !== 0) {
+              rate_message.innerHTML = `Курс ${main_rate}`;
+              taken_cur_input.value = given_cur_input.value * main_rate;
+            } else {
+              given_cur_input.disabled = true;
+              taken_cur_input.disabled = true;
+              rate_message.innerHTML = `${langJsDict['no_pair'][langData.lang]}`;
+            }
+        })
+        .catch(() => {
+            given_cur_input.disabled = true;
+            taken_cur_input.disabled = true;
+            rate_message.innerHTML = `${langJsDict['no_pair'][langData.lang]}`;
+          });
 }
 
 function setTakenCurQnty() {
