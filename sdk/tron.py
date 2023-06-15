@@ -168,8 +168,10 @@ class CryptoAccountTron(object):
         currency = "TRX"
         self.__currency = currency
         self.__wallet = None
-        self.__contract = None
-        # HACK install my api key
+        self.__contract = contract
+        if not contract is None:
+            self.__contract = self.get_contract(contract)
+
         tronpy.providers.http.DEFAULT_API_KEYS = [API_KEY]
         self.__access = Tron(network='mainnet')
 
