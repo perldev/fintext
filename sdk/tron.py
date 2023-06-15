@@ -169,11 +169,12 @@ class CryptoAccountTron(object):
         self.__currency = currency
         self.__wallet = None
         self.__contract = contract
+        tronpy.providers.http.DEFAULT_API_KEYS = [API_KEY]
+        self.__access = Tron(network='mainnet')
         if not contract is None:
             self.__contract = self.get_contract(contract)
 
-        tronpy.providers.http.DEFAULT_API_KEYS = [API_KEY]
-        self.__access = Tron(network='mainnet')
+
 
     def walletpassphrase(self, time=20):
         raise Exception("not Implemented")
