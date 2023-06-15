@@ -105,7 +105,7 @@ class CryptoFactory:
         return True
 
     def amnt_to_human(self, amnt):
-        return Decimal(amnt/self.prec)
+        return Decimal(int(amnt)/self.prec)
 
     @property
     def default_address(self):
@@ -144,7 +144,7 @@ class CryptoFactory:
         call_obj = self.__dict_call[self.__currency]["get_balance"]
         show_normal = kwargs.pop("show_normal", False)
         value = call_obj(*args, **kwargs)
-        if  show_normal:
+        if show_normal:
             return Decimal(value/self.prec)
         else:
             return value
