@@ -195,7 +195,7 @@ def get_balance(acc):
     url = API_HOST + "%s/tokenAccounts" % acc
     resp = requests.get(url, headers=def_headers)
     if resp.status_code == 404:
-        return Decimal("0.0")
+        return Decimal("0")
 
     if resp.status_code != 200:
         raise Exception(resp.text)
@@ -213,4 +213,4 @@ def get_balance(acc):
         if i["tokenHash"] == TOKEN_CONTRACT:
             return i["balance"]
 
-    return Decimal("0.0")
+    return Decimal("0")
