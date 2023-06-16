@@ -434,13 +434,14 @@ def order_details(request, uuid):
     context = {
         'order': order,
         "t_link": get_telechat_link(order),
-        'lang_dict': lang_dict
+        'lang_dict': lang_dict,
+        'lang_js_dict': lang_js_dict,
     }
     return render(request, "order-details.html", context)
 
 
-def order_status(request, pk):
-    order = Orders.objects.get(pk=pk)
+def order_status(request, uuid):
+    order = Orders.objects.get(uuid=uuid)
     status_data = json.dumps(get_deal_status(order.id))
     response = HttpResponse(status_data, content_type='application/json charset=utf-8')
     return response

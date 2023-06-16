@@ -80,7 +80,7 @@
                                   </div>
                                   <div class="col-10">
                                     <p>{% if lang == 'ru' %}{{ lang_dict.order_status.ru }}{% else %}{{ lang_dict.order_status.uk }}{% endif %}</p>
-                                    <h5 style="color: #1bbd36;">{{ order.status }}</h5>
+                                    <h5 style="color: #1bbd36;" id="order-status"></h5>
                                   </div>
                                 </div>
                                 <hr>
@@ -124,7 +124,7 @@
                                   </div>
                                   <div class="col-10">
                                     <p>{% if lang == 'ru' %}{{ lang_dict.invoice_status.ru }}{% else %}{{ lang_dict.invoice_status.uk }}{% endif %}</p>
-                                    <h5 style="color: #1bbd36;">{{ order.invoice_order.status }}</h5>
+                                    <h5 style="color: #1bbd36;" id="invoice-status"></h5>
                                   </div>
                                 </div>
                                 <hr>
@@ -168,7 +168,7 @@
                                   </div>
                                   <div class="col-10">
                                     <p>{% if lang == 'ru' %}{{ lang_dict.trans_status.ru }}{% else %}{{ lang_dict.trans_status.uk }}{% endif %}</p>
-                                    <h5 style="color: #1bbd36;">{{ order.trans.status }}</h5>
+                                    <h5 style="color: #1bbd36;" id="trans-status"></h5>
                                   </div>
                                 </div>
                                 <hr>
@@ -227,14 +227,7 @@
                             </div>
                           </div> 
                           
-                          <br>
-                          <div class="row">
-                            <div class="col-12 text-center">
-                              <button class="btn btn-success" onclick="getStatus()">Оновити статус</button>
-                            </div>
-                          </div>
-                          
-
+                        
                         </div>
                       </div>
         
@@ -251,6 +244,17 @@
 
 
 {% block script %}
+  <script>
+      let orderStatusElem = document.getElementById('order-status');
+      let invoiceStatusElem = document.getElementById('invoice-status');
+      let transStatusElem = document.getElementById('trans-status');
+      let orderStatus = '{{ order.status }}';
+      let invoiceStatus = '{{ order.invoice_order.status }}';
+      let transStatus = '{{ order.trans.status }}';
+      orderStatusElem.innerText = `${langJsDict[orderStatus][langData.lang]}`;
+      invoiceStatusElem.innerText = `${langJsDict[invoiceStatus][langData.lang]}`;
+      transStatusElem.innerText = `${langJsDict[transStatus][langData.lang]}`;
+  </script> 
   <script src="{% static 'js/order-details.js' %}"></script> 
 {% endblock %}
 

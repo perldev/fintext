@@ -51,9 +51,7 @@ function getStatus() {
             counter += 1;
         }
     })
-    .catch(() => {
-        console.log('error')
-    });
+    .catch(() => {});
 };
 
 window.onload = getStatus;

@@ -136,7 +136,7 @@
   <script src="{% static 'js/theme-js-for-css.js' %}"></script>
 
   {{ lang_js_dict|json_script:'langJsDict' }}
-  <script defer data-lang="{% if request.session.lang %}{{ request.session.lang }}{% else %}uk{% endif %}" src="{% static 'js/main.js' %}?version=4"></script>
+  <script data-lang="{% if request.session.lang %}{{ request.session.lang }}{% else %}uk{% endif %}" src="{% static 'js/main.js' %}?version=4"></script>
   
   <script>
       
