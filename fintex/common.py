@@ -12,7 +12,7 @@ import time
 import fintex.settings
 from decimal import Decimal
 
-from uuid import uuid4
+from uuid import UUID
 
 def format_numbers10(D):
 
@@ -126,6 +126,9 @@ def jsonencoder(o):
         return str(o)
 
     if isinstance(o, datetime.date):
+        return str(o)
+
+    if isinstance(o, UUID):
         return str(o)
 
     return json.JSONEncoder().default(o)
