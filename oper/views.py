@@ -374,13 +374,11 @@ def wallets_sweep(req, wallet):
 
         try:
             txid = factory.sweep_address_to(resp["key"], resp["address"], context_var.value, balance2send)
-
         except:
             return json_500false(req)
 
         balance2send = factory.get_balance(obj.address)
         obj.technical_info = balance2send
-        factory.sweep_address_to()
         obj.save()
         # TODO
         return json_true(req, {"txid": txid})
