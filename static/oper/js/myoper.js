@@ -103,7 +103,6 @@ $(function() {
             },
             "address_list": function(chanel){
                  $("#wallets").DataTable().ajax.url('/oper/api/wallets/'+chanel+"/").load();
-
             },
             "subscribe_oper": function(){
 
@@ -148,6 +147,10 @@ $(function() {
                 request.fail(function( jqXHR, textStatus ) {
                   Main.alert("не могу изменить статус " );
                 });
+            },
+            update_wallets_list : function(msg){
+                $("#wallets").DataTable().ajax.reload()
+
             },
             one_line_api: function(url, postaction){
               if(!url){
