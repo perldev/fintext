@@ -202,6 +202,7 @@ def post_message(req, chat_id):
         msgs = result["msgs"]
         n = datetime.now()
         nt = convert2time(n)
+
         msgs.append({"time": nt, "username": req.user.username, "text": txt})
         result["msgs"] = msgs
         obj.history = json.dumps(result)
@@ -231,12 +232,15 @@ def process_wallet_item(item, factory=None):
         item.ext_info = factory.native_balance(item.address)
         item.save()
 
+    is_sweep = False
     if item.address == factory.default_address:
         item.ext_info = item.ext_info + ", Адрес выплат"
+        is_sweep = True
 
     return {"id": item.id,
             "balance": format_numbers10(factory.amnt_to_human(item.technical_info)),
             "ext_info": item.ext_info,
+            "is_sweep": is_sweep,
             "account": item.address,
             "status": item.status,
             "actions": render_to_string("oper/wallets_menu.html",
@@ -367,6 +371,7 @@ def wallets_sweep(req, wallet):
         obj = get_object_or_404(PoolAccounts, pk=wallet)
         factory = CryptoFactory(obj.currency.title,
                                 obj.currency_provider.title)
+
         balance2send = factory.get_balance(obj.address)
 
         resp = get_full_data(obj.address)
