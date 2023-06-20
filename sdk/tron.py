@@ -71,7 +71,7 @@ def setup_title(token_contract):
 
 def get_current_height():
     global ACCESS
-    resp = ACCESS.get_latest_block()
+    resp = ACCESS.getblock()
     return resp["block_header"]["raw_data"]["timestamp"]
 
 
