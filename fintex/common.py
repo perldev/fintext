@@ -128,10 +128,7 @@ def jsonencoder(o):
     if isinstance(o, datetime.date):
         return str(o)
 
-    if isinstance(o, uuid4):
-        return str(o)
-
-    return json.JSONEncoder().default(0)
+    return json.JSONEncoder().default(o)
 
 
 
