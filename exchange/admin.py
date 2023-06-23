@@ -18,7 +18,6 @@ class CashPointLocationAdmin(admin.ModelAdmin):
 
 admin.site.register(CashPointLocation, CashPointLocationAdmin)
 
-
 class OrdersAdmin(admin.ModelAdmin):
     list_display = ["id", "user", "status", "expire_date"]
 

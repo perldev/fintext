@@ -58,7 +58,8 @@ def get_telechat_link(chat):
 
 
 def create_task(name, params, key, status="processing"):
-    task = simple_task(command_name=name, command_params=json.dumps(params),
+    task = simple_task(command_name=name,
+                       command_params=json.dumps(params),
                        ext_key=key, status=status)
     task.save()
     return task
@@ -66,8 +67,8 @@ def create_task(name, params, key, status="processing"):
 
 class simple_task(models.Model):
 
-    command_name = models.CharField(verbose_name="Name", unique=True, max_length=255)
-    command_params = models.TextField(verbose_name="params", unique=True, max_length=255)
+    command_name = models.CharField(verbose_name="Name",  max_length=255)
+    command_params = models.TextField(verbose_name="params", max_length=255)
     status = models.CharField(max_length=40, choices=STATUS, default='created', verbose_name="Статус")
     history = models.TextField(default="")
     ext_key = models.CharField(max_length=255, unique=True, blank=False)

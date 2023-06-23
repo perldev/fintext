@@ -21,12 +21,11 @@ from sdk.erc20 import get_current_height as herc, get_out_trans_from as outerc, 
 from sdk.tron import get_current_height as htron, get_out_trans_from as outtron, get_in_trans_from as intron, \
     get_sum_from as sumfromtron, get_balance as balancetron, setup_title_usdt_token as setup_tron_usdt,\
     get_prec as get_prec_tron, sweep_address_to as sweep_address_to_tron, generate_address as generate_address_tron,\
-    get_native_balance as tron_native_balance
+    get_native_balance as tron_native_balance, PREC as trx_prec, DEFAULT_FEE_LIMIT as trx_default_fee_limit,\
+    sendtoaddress as tron_sendtoaddress
 
 
 from decimal import Decimal
-
-
 
 
 class CryptoFactory:
@@ -54,6 +53,14 @@ class CryptoFactory:
                 "sweep_address_to": sweep_address_to_btc,
                 "generate_address": generate_address_btc,
 
+            },
+            "tron": {
+                "get_prec": lambda:  trx_prec,
+                "estimate_fee": lambda: trx_default_fee_limit,
+                "get_current_height": htron,
+                "get_balance": tron_native_balance,
+                "sweep_address_to": tron_sendtoaddress,
+                "generate_address": generate_address_tron
             },
             "eth": {
                 "get_prec": get_prec_eth,

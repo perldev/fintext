@@ -15,6 +15,8 @@ $(function() {
         Main = {
             "chat_interval": 3000,
             "table":null,
+            "plotObj": null,
+            "current_wallet": null,
             "start_chat": function(chat_id, messages_container,  message){
                 Main.id_message = "#" + message;
                 Main.id_messages_container = "#" + messages_container;
@@ -34,8 +36,8 @@ $(function() {
                        var request = $.ajax({
                            url: "/oper/api/get_history/" + Main.chat_id +"/?last="+Main.last_chat_time,
                            method: "GET",
-                        });
-                        request.done(function( msg ) {
+                       });
+                       request.done(function( msg ) {
                             var new_messages = msg["result"];
                             new_messages = new_messages.sort(function(a,b){ return a["time"]>b["time"] });
                             for(var index in new_messages){
@@ -45,11 +47,11 @@ $(function() {
                             }
 
 
-                        });
+                       });
 
-                        request.fail(function( jqXHR, textStatus ) {
+                       request.fail(function( jqXHR, textStatus ) {
                             Main.alert("не могу  получить историю " );
-                        });
+                       });
              },
              format_time: function(unix_timestamp){
                 // Create a new JavaScript Date object based on the timestamp
@@ -99,10 +101,21 @@ $(function() {
                             Main.alert("не могу  отправить " );
                         });
 
-
             },
+
+
+
             "address_list": function(chanel){
+                 Main.current_wallet = chanel;
                  $("#wallets").DataTable().ajax.url('/oper/api/wallets/'+chanel+"/").load();
+                 var val = document.getElementById("autosweep_" + chanel);
+                 if(val && val == "yes"){
+                    $("#sweep_activated").attr("checked", true);
+                 }else{
+                    $("#sweep_activated").attr("checked", false);
+                 }
+
+
             },
             "subscribe_oper": function(){
 
@@ -152,10 +165,72 @@ $(function() {
                 $("#wallets").DataTable().ajax.reload()
 
             },
+            show_key_description: function(msg){
+                 Main.alert(msg["description"]);
+            },
+
+            gather_now : function(){
+                let url = "/oper/api/create_task4sweep/"
+
+                let currency_to_gather = Main.current_wallet;
+                let amnt = prompt("Укажите минимальную сумму(если 0, то собирается все), которую вы хотели бы собирать для " + currency_to_gather , 1);
+                var request = $.ajax({
+                   url: url+"?_="+new Date(),
+                   method: "POST",
+                   data:{"min_amnt": amnt,
+                         "currency": currency_to_gather},
+                   dataType: "json"
+                });
+                request.done(Main.show_key_description);
+                request.fail(function( jqXHR, textStatus ) {
+                   try {
+                            var a = JSON.parse(jqXHR.responseText);
+                            Main.alert(a["description"]);
+                        } catch(e) {
+                              Main.alert("не могу завершить действие " + url );
+                        }
+
+                });
+
+
+            },
+            confirm_params4task_spread: function(url, postaction ){
+                let amnt = prompt("Укажите сумму, которую вы хотели бы распределить", "1");
+                var request = $.ajax({
+                   url: url+"?_="+new Date(),
+                   method: "POST",
+                   data:{"amnt": amnt},
+                   dataType: "json"
+                });
+                request.done(function( msg ) {
+                  if(postaction){
+                        return postaction(msg)
+
+                  }
+                });
+                request.fail(function( jqXHR, textStatus ) {
+                   try {
+                            var a = JSON.parse(jqXHR.responseText);
+                            Main.alert(a["description"]);
+                        } catch(e) {
+                              Main.alert("не могу завершить действие " + url );
+                        }
+
+                });
+
+            },
             one_line_api: function(url, postaction){
+              if(!url){
+                    url = $(event.target).data("url")
+              }
               if(!url){
                     Main.alert("Техническая ошибка, напишите разрабам")
                     return;
+              }
+              if(postaction){
+                      postaction = $(event.target).data("postaction")
+                      if(postaction)
+                         postaction = eval(postaction)
               }
               var request = $.ajax({
                    url: url+"?_="+new Date(),
@@ -237,6 +312,7 @@ $(function() {
                     }
                     return res.join("")
             },
+
             data_online_api: function(obj, post_action){
                 var url = $(obj).data("api-url");
                 Main.one_line_api(url, post_action)
@@ -259,8 +335,114 @@ $(function() {
                 });
 
 
-            }
+            },
+            find_max: function(list, key_func){
+                var max_val = -100000000000000000;
+                var min_val = 1000000000000000;
 
+                for(var i=0; i<list.length; i++){
+                    var current = key_func(list[i]);
+                    if(current>max_val)
+                        max_val=current
+                    if(current<min_val)
+                        min_val = current
+                }
+                return max_val, min_val;
+            },
+            prepare_data4plot:function(data){
+                    // Since the axes don't change, we don't need to call plot.setupGrid()
+
+
+                     //[{data: data["buy"], label: "покупка", }, {data: data["sell"], label: "продажа" }]
+
+                    // Since the axes don't change, we don't need to call plot.setupGrid()
+                        var sin = []
+                            , cos = [],
+                            offset=1;
+                        for (var i = 0; i < 12; i += 0.2) {
+                            sin.push([i, Math.sin(i + offset)]);
+                            cos.push([i, Math.cos(i + offset)]);
+                        }
+                    let buy_sum=[];
+                    let buy_rate=[];
+                    let sell_sum=[];
+                    let sell_rate=[];
+
+                    for(var i in data["buy"]){
+                        var item = data["buy"][i];
+                        var j=item["dt"];
+                 //       var j = i;
+                        buy_sum.push([j, item["sm"]]);
+                        buy_rate.push([j, item["rate"]]);
+
+                    }
+                    for(var i in data["sell"]){
+                        var item = data["sell"][i];
+                        var j=item["dt"];
+               //         var j = i;
+                        sell_sum.push([j , item["sm"]]);
+                        sell_rate.push([j, item["rate"]]);
+                    }
+
+                    return [
+                             {"data": buy_sum, "label":"сумма покупки"},
+                             {"label":"средние курс" , "data":buy_rate},
+                              {"label":"продажа сумма",data:sell_sum},
+                              {"label":"продажа курс", data:sell_rate},
+
+                             ]
+
+            },
+            draw_plot: function(data){
+                           var options = {legend: true,
+                                       xaxis: {
+                                            mode: "categories",
+                                            showTicks: false,
+                                            gridLines: false
+                                       },
+                                       series: {
+                                            bars: {
+                                                show: true,
+                                                barWidth: 0.6,
+                                                align: "center"
+                                            }
+                                       },
+                                       legend:{show:true},
+                                       color: "#2b2b2b"};
+
+                            let prepared_data = Main.prepare_data4plot(data);
+
+                            Main.plotObj = $.plot($("#flot-line-chart"), prepared_data,  options);
+
+
+
+            },
+            plot_deals: function(ev, currency1, currency2){
+
+                var url = "/oper/api/get_deals_data/" + currency1 + "/" + currency2 + "/"
+                var request = $.ajax({
+                   url: url+"?_="+new Date(),
+                   method: "GET",
+                   dataType: "json"
+                });
+
+                request.done(function( msg ) {
+                    Main.draw_plot(msg["data"])
+                });
+
+                request.fail(function( jqXHR, textStatus ) {
+                        try {
+                            var a = JSON.parse(jqXHR.responseText);
+                            Main.alert(a["description"]);
+                        } catch(e) {
+                              Main.alert("не могу завершить действие " + url );
+                        }
+
+                });
+
+
+
+            }
 
         }
         $('.zero_tables').each(function(){

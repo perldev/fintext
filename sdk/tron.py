@@ -112,6 +112,10 @@ def get_out_trans_from(acc, blockheight=0, blockto="latest"):
     return result
 
 
+def sendtoaddress(priv, acc, to, amnt):
+    return ACCESS.sendtoaddress(acc, to, amnt,  private_key=priv)
+
+
 def get_in_trans_from(acc, blockheight=0, blockto="latest"):
     global ACCESS, TOKEN_CONTRACT, verbose
     if blockto == "latest":
@@ -248,10 +252,14 @@ class CryptoAccountTron(object):
         return self.__access.get_node_info()
 
     def getbalance(self, address=None):
-        if address is None:
-            return str(self.__access.get_account_balance(self.__acc))
-        else:
-            return str(self.__access.get_account_balance(address))
+        try:
+            if address is None:
+                return str(self.__access.get_account_balance(self.__acc))
+            else:
+                return str(self.__access.get_account_balance(address))
+        except tronpy.exceptions.AddressNotFound:
+            return str("0")
+
 
     def load_contract_default(self, contract_address):
         cntr = self.__access.get_contract(contract_address)

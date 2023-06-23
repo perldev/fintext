@@ -32,6 +32,16 @@ def format_numbers4(D):
     D = int(Decimal(D) * decimal_10)/decimal_10
     return str(D)
 
+def format_numbers_universal(D, decimals=8):
+
+    if isinstance(D, str) or isinstance(D, float):
+        D = Decimal(D)
+
+    decimal_10 = 10**decimals
+    D = int(Decimal(D) * decimal_10)/decimal_10
+    return str(D)
+
+
 def get_fromcache(k):
     return cache.get(k)
 
@@ -142,5 +152,12 @@ def json_dumps(diccc=None):
     return json.dumps(diccc, default=jsonencoder)
 
 
+def dictfetchall(cursor):
+    """
+    Return all rows from a cursor as a dict.
+    Assume the column names are unique.
+    """
+    columns = [col[0] for col in cursor.description]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 

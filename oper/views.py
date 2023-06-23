@@ -1,3 +1,5 @@
+import uuid
+
 from django.shortcuts import render, reverse, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -11,21 +13,24 @@ from oper.models import rates_direction, context_vars, chat
 from exchange.models import Currency, Orders, Invoice, Trans, OperTele, PoolAccounts
 from fintex.common import json_500false, json_true, date_to_str, convert2time, get_telechat_link
 from django.template.loader import render_to_string
-from fintex.common import format_numbers10
+from fintex.common import format_numbers10, format_numbers_universal
 from fintex.settings import BOTAPI, COMMON_PASSWORD, OPERTELEBOT, FIAT_CURRENCIES, CRYPTO_CURRENCY
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 # Create your views here.
 import traceback
 from wallet.models import CryptoAccounts
+from oper.models import create_task
 
 from exchange.controller import tell_update_order as tell_controller_update_order
 from exchange.controller import tell_trans_check as tell_controller_trans_check
 from exchange.controller import tell_invoice_check as tell_controller_invoice_check
 from exchange.controller import tell_aml_check
 from wallet.models import get_full_data
+from django.db import connection
+from fintex.common import dictfetchall
 
 @login_required(login_url="/oper/login/")
 def order_status(req, status, order_id):
@@ -209,6 +214,37 @@ def post_message(req, chat_id):
         obj.save()
         return json_true(req, {"time": nt})
 
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def onetimetask(req, task_name):
+    params = req.get.POST.get("params", [])
+    if not params == []:
+        try:
+            params = json.loads(params)
+        except:
+            traceback.print_exc()
+            return json_500false(req)
+
+    ext_key = req.get.POST.get("ext_key", None)
+    create_task(task_name, params, ext_key)
+    return json_true(req)
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def autosweep_manage(req, currency):
+
+    var, created = context_vars.objects.get_or_create(name="autosweep_" + currency)
+    if created:
+        var.value = "yes"
+        var.save()
+    else:
+        if var.value == "yes":
+            var.value = "no"
+        else:
+            var.value = "yes"
+    return json_true(req)
+
+
 
 @login_required(login_url="/oper/login/")
 def wallets(req):
@@ -216,7 +252,13 @@ def wallets(req):
                      {"name": "ETH", "value": "ETH"},
                      {"name": "Tron USDT", "value": "tron_usdt"},
                      {"name": "ERC USDT", "value": "erc_usdt"}]
-    return render(req, "oper/wallets.html", context={"titles": wallets_title})
+
+    contextDict = {"titles": wallets_title}
+    all_vars = list(context_vars.objects.filter(name__startswith="autosweep_"))
+    contextDict["autosweep_vars"] = all_vars
+
+    return render(req, "oper/wallets.html",
+                  context=contextDict)
 
 
 def process_wallet_item(item, factory=None):
@@ -244,8 +286,13 @@ def process_wallet_item(item, factory=None):
             "account": item.address,
             "status": item.status,
             "actions": render_to_string("oper/wallets_menu.html",
-                                        context={"item": item})}
-
+                                        context={"item":
+                                                     {
+                                                      "id": item.id,
+                                                      "status": item.status,
+                                                      "is_sweep": is_sweep}
+                                                     })
+            }
 
 @csrf_exempt
 @login_required(login_url="/oper/login/")
@@ -290,7 +337,85 @@ def wallets_make_withdraw(req, wallet):
 
 @login_required(login_url="/oper/login/")
 def analytics(req):
-    pass
+
+    erc20 = context_vars.objects.get(name="usdt_erc20_balance")
+    tron = context_vars.objects.get(name="usdt_tron_balance")
+
+    btc = context_vars.objects.get(name="btc_balance")
+    eth = context_vars.objects.get(name="eth_balance")
+
+    contextDict = {
+        "btc": format_numbers_universal(btc.value, 8),
+        "eth": format_numbers_universal(eth.value, 8),
+        "usdt_erc20": format_numbers_universal(erc20.value, 8),
+        "usdt_tron": format_numbers_universal(tron.value, 8)
+    }
+    cursor = connection.cursor()
+
+    in_l = cursor.execute("SELECT currency_id as  currency, count(*) as c, sum(amnt) as s "
+                          "FROM exchange_trans WHERE debit_credit='in' AND status='processed' GROUP BY currency")
+
+    out_l = cursor.execute("SELECT currency_id as currency, count(*) as c, sum(amnt) as s "
+                           "FROM exchange_trans WHERE debit_credit='out' AND status='processed' GROUP BY currency")
+
+    currencies = {}
+    for i in Currency.objects.all():
+        currencies[i.id] = i.title
+
+    in_l = dictfetchall(in_l)
+    out_l = dictfetchall(out_l)
+
+    directions = [
+        {"from": "btc", "to": "usd"},
+        {"from": "usd", "to": "usdt"},
+        {"from": "usdt", "to": "eur"},
+        {"from": "eth", "to": "usd"},
+        {"from": "usdt", "to": "uah"},
+
+    ]
+    contextDict["directions"] = directions
+
+    return render(req, "oper/analytics.html",
+                  context=contextDict)
+
+
+@login_required(login_url="/oper/login/")
+def get_deals_data(req, currency1, currency2):
+    cursor = connection.cursor()
+
+    cur1 = Currency.objects.get(title=currency1)
+    cur2 = Currency.objects.get(title=currency2)
+    currency1_id = cur1.id
+    currency2_id = cur2.id
+    from_date = datetime.now() - timedelta(days=30)
+
+    deals_q = "SELECT date(pub_date) as dt, count(*) as c, sum(amnt_give) as sm, " \
+              "avg(rate) as rate FROM exchange_orders " \
+              "WHERE status='processed' and give_currency_id=%i and" \
+              " take_currency_id=%i and pub_date>='%s'" \
+              " GROUP BY  dt ORDER BY dt" % (currency1_id, currency2_id, from_date)
+
+    print(deals_q)
+    cursor.execute(deals_q)
+    deals_buy = dictfetchall(cursor)
+
+    sell_q = "SELECT  date(pub_date) as dt, count(*) as c,"\
+             "sum(amnt_give) as sm, avg(rate) as rate FROM exchange_orders WHERE"\
+             " status='processed' and give_currency_id=%i and take_currency_id=%i and pub_date>='%s'"\
+             " GROUP BY  dt ORDER BY dt" % (currency2_id, currency1_id, from_date)
+
+    print(sell_q)
+    cursor.execute(sell_q)
+    deals_sell = dictfetchall(cursor)
+
+    return json_true(req, {"data": {
+                                    "buy": deals_buy,
+                                    "sell": deals_sell
+                                   }
+                          })
+
+
+
 
 
 def process_item_invoice(i):
@@ -357,12 +482,47 @@ def invoices_status(req, status, invoice_id):
 def get2work(req, order_id):
     obj = get_object_or_404(Orders, pk=order_id)
     if obj.operator is not None:
-        return json_500false(req, {"description":
-                                       "Это действие уже невозможно сделка в работу  у %s" % obj.operator.username})
+        return json_500false(req, {"description": "Это действие уже невозможно сделка в работу  у %s" % obj.operator.username})
 
     obj.operator = req.user
     obj.save()
     return json_true(req)
+
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def spread_out_task(req, id):
+    amnt = Decimal(req.POST.get("amnt"))
+
+    obj = get_object_or_404(PoolAccounts, pk=id)
+    factory = CryptoFactory(obj.currency.title, obj.currency_provider.title)
+    create_task("wallet_spread", {"address": obj.address,
+                                  "currency": obj.currency.title,
+                                  "amnt": format_numbers10(amnt),
+                                  }, str(uuid.uuid4()))
+
+    return json_true(req, {"description": "задача на распределение создана"})
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def create_task4sweep(req):
+    amnt = Decimal(req.POST.get("min_amnt"))
+    currency = req.POST.get("currency")
+    currency_provider = "native"
+    if currency == "tron_usdt":
+        currency = "usdt"
+        currency_provider = "tron"
+
+    if currency == "erc_usdt":
+        currency = "usdt"
+        currency_provider = "erc20"
+
+    create_task("sweep_all_wallets", {"currency": currency,
+                                       "min_amnt": format_numbers10(amnt),
+                                       "currency_provider": currency_provider}, str(uuid.uuid4()))
+
+    return json_true(req, {"description": "задача на распределение создана"})
+
 
 
 @csrf_exempt
@@ -386,7 +546,7 @@ def wallets_sweep(req, wallet):
         obj.technical_info = balance2send
         obj.save()
         # TODO
-        return json_true(req, {"txid": txid})
+        return json_true(req, {"txid": txid, "description": "txid %s" % txid})
 
 
 @csrf_exempt

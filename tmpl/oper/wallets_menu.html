@@ -1,9 +1,27 @@
-<button type="button" onclick="Main.one_line_api('/oper/api/wallets/make_withdraw/{{item.id}}/', Main.update_wallets_list )" class="btn btn-primary btn-sm">Сделать кошлельком выппат</button>
-<button type="button" onclick="Main.one_line_api('/oper/api/wallets/sweep/{{item.id}}/', Main.update_wallets_list)" class="btn btn-secondary btn-sm">Отправить на кошель выплат</button>
-<button type="button" onclick="Main.one_line_api('/oper/api/wallets/update/{{item.id}}/', Main.update_wallets_list)" class="btn btn-secondary btn-sm">Актуализировать</button>
-{% if item.status == 'wait_checkout' %}
-<button type="button" onclick="Main.one_line_api('/oper/api/wallets/status/canceled/{{item.id}}/', Main.update_wallets_list)"  class="btn btn-success btn-sm">Заблокировать</button>
+<button type="button"
+        onclick="Main.one_line_api('/oper/api/wallets/make_withdraw/{{item.id}}/', Main.update_wallets_list )" class="btn btn-primary btn-sm">Сделать кошлельком выппат</button>
+
+{% if  not item.is_sweep %}
+<button type="button"
+        onclick="Main.one_line_api('/oper/api/wallets/sweep/{{item.id}}/', Main.show_key_description)" class="btn btn-secondary btn-sm">Отправить на кошель выплат</button>
 {% else %}
-<button type="button" onclick="Main.one_line_api('/oper/api/wallets/status/wait_checkout/{{item.id}}/', Main.update_wallets_list)"  class="btn btn-success btn-sm">Активировать</button>
+
+<button type="button"
+        onclick="Main.confirm_params4task_spread('/oper/api/spread_out_task/{{item.id}}/', Main.show_key_description)"  class="btn btn-secondary btn-sm">Распределить</button>
+
+{% endif %}
+<button type="button"
+        onclick="Main.one_line_api('/oper/api/wallets/update/{{item.id}}/', Main.update_wallets_list)" class="btn btn-secondary btn-sm">Актуализировать</button>
+
+{%  if item.status != 'canceled' %}
+
+<button type="button"
+        onclick="Main.one_line_api('/oper/api/wallets/status/canceled/{{item.id}}/', Main.update_wallets_list)"  class="btn btn-success btn-sm">Заблокировать</button>
+
+{% else %}
+
+<button type="button"
+        onclick="Main.one_line_api('/oper/api/wallets/status/wait_checkout/{{item.id}}/', Main.update_wallets_list)"  class="btn btn-success btn-sm">Активировать</button>
+
 {% endif %}
 

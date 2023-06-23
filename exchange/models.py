@@ -92,7 +92,6 @@ class Orders(models.Model):
                             editable=False
                             )
 
-
     status = models.CharField(max_length=40, choices=STATUS_ORDER, default='created', verbose_name="Статус")
 
     give_currency = models.ForeignKey("Currency", verbose_name="Give Currency",

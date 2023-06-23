@@ -1,0 +1,88 @@
+{% extends 'oper/base.html' %}
+
+{% block content %}
+
+                <!-- ============================================================== -->
+                <!-- Chart-1 -->
+                <div class="row">
+                    <div class="col-12 d-flex no-block align-items-center">
+                        <h4 class="page-title">Баланс системы:</h4>
+                    </div>
+                 </div>
+                <div class="row">
+                    <h5> На кошельках: </h5>
+
+                    {% include "oper/context_var.html" with  name="BTC" id="btc_balance"  value=btc %}
+                    {% include "oper/context_var.html" with  name="ETH"  id="eth_balance"   value=eth %}
+                    {% include "oper/context_var.html" with  name="USDT TRON"  id="usdt_tron"  value=usdt_tron %}
+                    {% include "oper/context_var.html" with  name="USDT ERC20" id="usdt_erc20" value=usdt_erc20 %}
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Выберите направления</h5>
+                                        {% for i in directions %}
+                                            <button
+                                                    type="button"
+                                                    class="btn btn-outline-info analytic_buttons"
+                                                    onclick="Main.plot_deals(event, '{{i.from}}', '{{i.to}}')">
+                                                {{i.from}} -> {{i.to}}
+                                            </button>
+
+                                        {% endfor %}
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-9">
+                            <div id="flot-line-chart" style="width: 100%;
+                                                          height: 300px;"></div>
+
+                        </div>
+
+
+                </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script src="/static/oper/assets/libs/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="/static/oper/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
+    <script src="/static/oper/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/static/oper/assets/extra-libs/sparkline/sparkline.js"></script>
+    <!--Wave Effects -->
+    <script src="/static/oper/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="/static/oper/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="/static/oper/js/custom.min.js"></script>
+    <!-- this page js -->
+    <script src="/static/oper/assets/libs/chart/matrix.interface.js"></script>
+    <script src="/static/oper/assets/libs/chart/excanvas.min.js"></script>
+    <script src="/static/oper/assets/libs/flot/jquery.flot.js"></script>
+    <script src="/static/oper/assets/libs/flot/jquery.flot.pie.js"></script>
+    <script src="/static/oper/assets/libs/flot/jquery.flot.time.js"></script>
+    <script src="/static/oper/assets/libs/flot/jquery.flot.stack.js"></script>
+    <script src="/static/oper/assets/libs/flot/jquery.flot.categories.js"></script>
+    <script src="/static/oper/assets/libs/flot/jquery.flot.drawSeries.js"></script>
+
+
+    <script src="/static/oper/assets/libs/flot/jquery.flot.crosshair.js"></script>
+    <script src="/static/oper/assets/libs/chart/jquery.peity.min.js"></script>
+    <script src="/static/oper/assets/libs/chart/matrix.charts.js"></script>
+    <script src="/static/oper/assets/libs/chart/jquery.flot.pie.min.js"></script>
+    <script src="/static/oper/assets/libs/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+    <script src="/static/oper/assets/libs/chart/turning-series.js"></script>
+
+
+
+{% endblock %}

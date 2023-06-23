@@ -7,7 +7,7 @@
                         <!-- Column -->
                         <div class="col-md-6 col-lg-2 col-xlg-3">
                             <div class="card card-hover">
-                                <div class="box bg-cyan text-center" onclick="Main.address_list('{{i.value}}')">
+                                <div class="box bg-cyan text-center" onclick="Main.address_list('{{i.value}}')" >
                                     <h1 class="font-light text-white"><i class="mdi mdi-view-dashboard"></i></h1>
                                     <h6 class="text-white" >{{i.name}}</h6>
                                 </div>
@@ -15,12 +15,23 @@
                         </div>
                     {% endfor %}
 
+                    {% for i in autosweep_vars %}
+                        <input type="hidden" value="{{i.value}}" id="{{i.name}}">
+                    {% endfor %}
 
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Адреса</h5>
-                                <h4>*Кошелек для выплат помечен в доп информации "Адресс выплат"</h4>
+                                <h4>*Кошелек для выплат помечен в доп. информации "Адресс выплат"</h4>
+                                <button onclick="Main.gather_now()" class="btn btn-success btn-sm">Собрать сейчас</button>
+
+                                <label for="sweep_activated">Автосбор на кошелек для выплат</label>
+                                <input type="checkbox"
+                                       id="sweep_activated"
+                                       data-url="/oper/api/manage/autosweep/BTC"
+                                       >
+
                                 <div class="table-responsive">
                                     <table id="wallets"
                                            data-api-url="{% url 'wallets_api' chanel='BTC' %}"

@@ -43,6 +43,16 @@ urlpatterns = [
     path("api/post/<str:chat_id>/", views.post_message, name="post_msg"),
     path("api/message_income/<str:chat_id>/", views.message_income, name="message_income"),
 
+    path("api/spread_out_task/<int:id>/", views.spread_out_task, name="spread_out_task"),
+    path("api/create_task4sweep/", views.create_task4sweep, name="create_task4sweep"),
+
+
+    path("api/onetimetask/<str:task_name>/", views.onetimetask, name="onetimetask"),
+    path("api/manage/autosweep/<str:currency>", views.autosweep_manage, name="autosweepmanaging"),
+
+    path("api/get_deals_data/<str:currency1>/<str:currency2>/",
+          views.get_deals_data, name="get_deals_data"),
+
     path("api/trans/<str:status>/<str:trans_id>/", views.trans_status, name="trans_status"),
 
     path("api/order/get2work/<str:order_id>/", views.get2work, name="show_payment"),
