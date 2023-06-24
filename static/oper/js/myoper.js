@@ -16,7 +16,7 @@ $(function() {
             "chat_interval": 3000,
             "table":null,
             "plotObj": null,
-            "current_wallet": null,
+            "current_wallet": "btc",
             "start_chat": function(chat_id, messages_container,  message){
                 Main.id_message = "#" + message;
                 Main.id_messages_container = "#" + messages_container;
@@ -103,16 +103,15 @@ $(function() {
 
             },
 
-
-
             "address_list": function(chanel){
-                 Main.current_wallet = chanel;
+
+                 Main.current_wallet = chanel.toLowerCase();
                  $("#wallets").DataTable().ajax.url('/oper/api/wallets/'+chanel+"/").load();
-                 var val = document.getElementById("autosweep_" + chanel);
-                 if(val && val == "yes"){
-                    $("#sweep_activated").attr("checked", true);
+                 var val = document.getElementById("autosweep_" + Main.current_wallet);
+                 if(val && val.value == "yes"){
+                    $("#sweep_activated").prop("checked", true);
                  }else{
-                    $("#sweep_activated").attr("checked", false);
+                    $("#sweep_activated").prop("checked", false);
                  }
 
 
@@ -168,7 +167,6 @@ $(function() {
             show_key_description: function(msg){
                  Main.alert(msg["description"]);
             },
-
             gather_now : function(){
                 let url = "/oper/api/create_task4sweep/"
 
@@ -271,8 +269,6 @@ $(function() {
                     });
 
             },
-
-
             simple_form: function(fields, except){
                     var res = [];
                     var terms = {
@@ -312,7 +308,26 @@ $(function() {
                     }
                     return res.join("")
             },
+            autosweep_managing: function(ev){
 
+
+                var url = "/oper/api/manage/autosweep/" + Main.current_wallet;
+                var request = $.ajax({
+                   url: url,
+                   method: "GET",
+                   dataType: "json"
+                });
+                request.done(function(msg){
+                    $("#"+msg["name"]).val(msg["value"]);
+                    Main.show_key_description(msg);
+
+                });
+                request.fail(function( jqXHR, textStatus ) {
+                    Main.alert("не могу завершить действие");
+                });
+
+
+            },
             data_online_api: function(obj, post_action){
                 var url = $(obj).data("api-url");
                 Main.one_line_api(url, post_action)

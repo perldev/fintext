@@ -11,6 +11,7 @@ from decimal import Decimal
 
 from sdk.factory import CryptoFactory
 
+# TODO add special for BTC
 
 class Command(BaseCommand):
     help = "simple task wrapper for background execute"
@@ -37,7 +38,9 @@ class Command(BaseCommand):
                     continue
 
                 item.refresh_from_db()
+
                 #possible race condition with invoices
+
                 if item.status == "processing":
                     self.stdout.write("address in work we cannot do this")
                     continue

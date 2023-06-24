@@ -234,15 +234,26 @@ def onetimetask(req, task_name):
 def autosweep_manage(req, currency):
 
     var, created = context_vars.objects.get_or_create(name="autosweep_" + currency)
+    my_msg = ""
     if created:
         var.value = "yes"
+        my_msg = "Автосбор " + currency + " включен "
+
         var.save()
     else:
         if var.value == "yes":
             var.value = "no"
+            my_msg = "Автосбор " + currency + " отключен "
+
         else:
             var.value = "yes"
-    return json_true(req)
+            my_msg = "Автосбор " + currency + " включен "
+
+        var.save()
+
+    return json_true(req, {"description": my_msg,
+                           "name": var.name,
+                           "value": var.value})
 
 
 
@@ -254,7 +265,7 @@ def wallets(req):
                      {"name": "ERC USDT", "value": "erc_usdt"}]
 
     contextDict = {"titles": wallets_title}
-    all_vars = list(context_vars.objects.filter(name__startswith="autosweep_"))
+    all_vars = context_vars.objects.filter(name__startswith="autosweep_")
     contextDict["autosweep_vars"] = all_vars
 
     return render(req, "oper/wallets.html",
@@ -318,6 +329,9 @@ def wallets_list(req, chanel):
     factory = wallets_factories[chanel]()
     context_var, created = context_vars.objects.get_or_create(name=factory.currency + "_" + factory.network + "_forpayment")
     factory.set_default(context_var.value)
+
+
+
 
     for i in wallets_title[chanel]():
         res.append(process_wallet_item(i,  factory))

@@ -29,7 +29,7 @@
                                 <label for="sweep_activated">Автосбор на кошелек для выплат</label>
                                 <input type="checkbox"
                                        id="sweep_activated"
-                                       data-url="/oper/api/manage/autosweep/BTC"
+                                       onclick="Main.autosweep_managing(event)"
                                        >
 
                                 <div class="table-responsive">
@@ -89,7 +89,17 @@
     <script src="/static/oper/assets/extra-libs/multicheck/datatable-checkbox-init.js"></script>
     <script src="/static/oper/assets/extra-libs/multicheck/jquery.multicheck.js"></script>
     <script src="/static/oper/assets/extra-libs/DataTables/datatables.min.js"></script>
+    $( document ).ready(function() {
+         var val = document.getElementById("autosweep_btc");
+         if(val && val.value == "yes"){
+             $("#sweep_activated").prop("checked", true);
+         }else{
+             $("#sweep_activated").prop("checked", false);
+         }
 
+
+
+    });
 
 
 {% endblock %}
