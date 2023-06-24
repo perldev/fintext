@@ -433,6 +433,8 @@ $(function() {
 
             },
             plot_deals: function(ev, currency1, currency2){
+                 $(".analytic_buttons").removeClass("btn-primary");
+                 $(ev.target).addClass("btn-primary");
 
                 var url = "/oper/api/get_deals_data/" + currency1 + "/" + currency2 + "/"
                 var request = $.ajax({
