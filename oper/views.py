@@ -66,6 +66,11 @@ def settings(req):
         "aml_access_token": True,
         "white_bit_api_key": True,
         "white_bit_api_private": True,
+        "cold_address_usdt_erc20": True,
+        "cold_address_usdt_tron": True,
+        "cold_address_btc": True,
+        "cold_address_eth": True,
+
     }
     for i in avalible_settings.keys():
         obj, created = context_vars.objects.using("security").get_or_create(name=i)
@@ -93,6 +98,10 @@ def settings_edit(req):
         "aml_access_token": True,
         "white_bit_api_key": True,
         "white_bit_api_private": True,
+        "cold_address_usdt_erc20": True,
+        "cold_address_usdt_tron": True,
+        "cold_address_btc": True,
+        "cold_address_eth": True,
     }
     name = req.POST.get("name", False)
     value = req.POST.get("val", False)
@@ -102,7 +111,9 @@ def settings_edit(req):
     if not value:
         return json_500false(req, {"description": "no val"})
 
-    context_vars.objects.using("security").filter(name=name).update(value=value)
+    var, created = context_vars.objects.using("security").get_or_create(name=name)
+    var.value = value
+    var.save()
 
     return json_true(req)
 
@@ -265,9 +276,13 @@ def wallets(req):
                      {"name": "ERC USDT", "value": "erc_usdt"}]
 
     contextDict = {"titles": wallets_title}
-    all_vars = context_vars.objects.filter(name__startswith="autosweep_")
-    contextDict["autosweep_vars"] = all_vars
 
+    all_vars = context_vars.objects.filter(name__startswith="autosweep_")
+    colds_vars = context_vars.objects.using("security").filter(name__startswith="cold_address_")
+
+    contextDict["cold_addresses"] = colds_vars
+
+    contextDict["autosweep_vars"] = all_vars
     return render(req, "oper/wallets.html",
                   context=contextDict)
 
@@ -329,7 +344,6 @@ def wallets_list(req, chanel):
     factory = wallets_factories[chanel]()
     context_var, created = context_vars.objects.get_or_create(name=factory.currency + "_" + factory.network + "_forpayment")
     factory.set_default(context_var.value)
-
 
 
 
@@ -427,9 +441,6 @@ def get_deals_data(req, currency1, currency2):
                                     "sell": deals_sell
                                    }
                           })
-
-
-
 
 
 def process_item_invoice(i):
@@ -561,6 +572,47 @@ def wallets_sweep(req, wallet):
         obj.save()
         # TODO
         return json_true(req, {"txid": txid, "description": "txid %s" % txid})
+
+@csrf_exempt
+@login_required(login_url="/oper/login/")
+def create_task2cold(req, currency):
+
+    currency_provider_ = "native"
+    if currency == "tron_usdt":
+        currency = "usdt"
+        currency_provider_ = "tron"
+
+    if currency == "erc_usdt":
+        currency = "usdt"
+        currency_provider_ = "erc20"
+
+    factory = CryptoFactory(currency,
+                            currency_provider_)
+
+    context_var_cold = context_vars.objects.get(name="cold_address_" + factory.currency + "_" + factory.network)
+
+    cold_address = context_var_cold.value
+
+    context_var = context_vars.objects.get(name=factory.currency + "_" + factory.network + "_forpayment")
+
+    obj = get_object_or_404(PoolAccounts, address=context_var.value)
+
+    address2send = context_var.value
+    resp = get_full_data(context_var.value)
+    balance2send = factory.get_balance(address2send)
+    resp = get_full_data(address2send)
+
+    try:
+        txid = factory.sweep_address_to(resp["key"], resp["address"], cold_address, balance2send)
+    except:
+        return json_500false(req)
+
+    balance2send = factory.get_balance(address2send)
+    obj.technical_info = balance2send
+    obj.save()
+    # TODO
+    return json_true(req, {"txid": txid, "description": "txid %s" % txid})
+
 
 
 @csrf_exempt

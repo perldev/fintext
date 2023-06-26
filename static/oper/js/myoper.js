@@ -432,6 +432,47 @@ $(function() {
 
 
             },
+            gather_now2cold:function(ev){
+                var chanel = Main.current_wallet;
+                var cold_address = document.getElementById("cold_address_"+chanel);
+                if(cold_address){
+                    cold_address = cold_address.value
+                }else{
+
+                    Main.alert("Холодный кошелек не настроен");
+                    return ;
+
+                }
+                if(confirm("Собрать всю сумму с кошелька для выплат на холодный адрес " + cold_address+ "?")){
+                        var url = "/oper/api/2cold/" + chanel;
+                        var request = $.ajax({
+                           url: url+"?_="+new Date(),
+                           method: "GET",
+                           dataType: "json"
+                        });
+
+                        request.done(Main.show_key_description);
+
+                        request.fail(function( jqXHR, textStatus ) {
+                                try {
+                                    var a = JSON.parse(jqXHR.responseText);
+                                    Main.alert(a["description"]);
+                                } catch(e) {
+                                      Main.alert("не могу завершить действие " + url );
+                                }
+
+                        });
+
+
+
+
+
+                }
+
+
+
+            },
+
             plot_deals: function(ev, currency1, currency2){
                  $(".analytic_buttons").removeClass("btn-primary");
                  $(ev.target).addClass("btn-primary");

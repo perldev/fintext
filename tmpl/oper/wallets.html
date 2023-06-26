@@ -19,11 +19,21 @@
                         <input type="hidden" value="{{i.value}}" id="{{i.name}}">
                     {% endfor %}
 
+                    {% for item in cold_addresses %}
+                        <input type="hidden" value="{{item.value}}" id="{{item.name}}">
+                    {% endfor %}
+
+
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Адреса</h5>
+                                <h4>*Холодный кошелек настраивается  в настройках системы</h4>
+
+                                <button onclick="Main.gather_now2cold()" class="btn btn-success btn-sm">На холодный(с кошелька для выплат)</button>
+
                                 <h4>*Кошелек для выплат помечен в доп. информации "Адресс выплат"</h4>
+
                                 <button onclick="Main.gather_now()" class="btn btn-success btn-sm">Собрать сейчас</button>
 
                                 <label for="sweep_activated">Автосбор на кошелек для выплат</label>

@@ -45,10 +45,12 @@ urlpatterns = [
 
     path("api/spread_out_task/<int:id>/", views.spread_out_task, name="spread_out_task"),
     path("api/create_task4sweep/", views.create_task4sweep, name="create_task4sweep"),
-
+    path("api/2cold/<str:currency>/", views.create_task2cold, name="create_task2cold"),
 
     path("api/onetimetask/<str:task_name>/", views.onetimetask, name="onetimetask"),
+
     path("api/manage/autosweep/<str:currency>", views.autosweep_manage, name="autosweepmanaging"),
+
 
     path("api/get_deals_data/<str:currency1>/<str:currency2>/",
           views.get_deals_data, name="get_deals_data"),
