@@ -154,6 +154,7 @@ def tell_trans_check(sender, instance, **kwargs):
                                  )
 
     if instance.status == "failed":
+        print("trans failed")
         return notify_dispetcher(instance.order,
                                  "trans_out_failed",
                                  error=sender + " \n" + kwargs["error"],
@@ -243,30 +244,19 @@ def notify_dispetcher(order, event, **kwargs):
     print(kwargs)
     # gather operators of subscribed
     oper_list = None
-    if order.operator is not None:
+    if False and order.operator is not None:
         oper = OperTele.objects.get(user=order.operator)
         oper_list = [oper]
     else:
         oper_list = OperTele.objects.filter(status="processing")
 
     # create nice text of the deal
+    txt = ""
     if isinstance(order, Orders):
         txt = order.to_nice_text()
 
-
-
-    # may be error
-    error = kwargs.get("error", False)
-    # if error existed finish here
-    if error:
-        msg = ""
-        msg = msg + "\n Error during process operation %s" % event
-        msg = msg + error + " \n\n" + txt
-        return raw_send(oper_list, txt)
-
-
-
     events_keys = {
+        "trans_out_failed": "Исходящая транзакция не удалась из-за внутренней ошибки",
         "trans_aml_failed": "Транзакция по инвойсу не прошла aml проверку, провести в ручном режиме можно в кабинете",
         "invoice_checking": "Проверяем  входящии транзакции по сделке",
         "invoice_unpayed": "Транзакции по сделке не поступили к нам",
@@ -278,6 +268,21 @@ def notify_dispetcher(order, event, **kwargs):
         "sold_info_whitebit": "Информации о клиринге по сделке на whitebit"
     }
 
+    # may be error
+    error = kwargs.get("error", False)
+    # if error existed finish here
+    if error:
+        msg = ""
+        if event in events_keys:
+           msg = events_keys[event]
+         
+        msg = msg + "\n Error during process operation %s" % event
+        msg = "\n " +  msg + " " + error + " \n\n" + txt
+        return raw_send(oper_list, msg)
+
+
+
+
     msg = None
     if event not in events_keys:
         msg = "Не расспознанное событие по сделке %s" % event
@@ -285,6 +290,7 @@ def notify_dispetcher(order, event, **kwargs):
         msg = events_keys[event]
 
     txt = msg + " \n\n" + txt
+    print(txt)
     return raw_send(oper_list, txt)
     # if some operator took in work then list will contain only one element
     # in other case spam everybody

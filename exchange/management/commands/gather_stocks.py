@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from exchange.models import rate, Currency
 from oper.models import context_vars
-
+import traceback
 import bitstamp.client
 import json
 import requests
@@ -25,8 +25,12 @@ class Command(BaseCommand):
 
         gather_bitstamp("eth", "usd")
         print("kuna btc uah")
+        try:
+            gather_kuna("btc", "uah")
 
-        gather_kuna("btc", "uah")
+        except:
+            traceback.print_exc()
+
         print("btctradeua btc uah")
 
         gather_btctradeua("btc", "uah")
@@ -90,6 +94,8 @@ def gather_btctradeua(t1, t2):
 
 def gather_kuna(t1, t2):
     resp = requests.get("https://api.kuna.io/v3/tickers?symbols=%s%s" % (t1, t2))
+    if resp.status_code != 200:
+        raise Exception(resp.text)
 
     give_currency = Currency.objects.get(title=t1)
     take_currency = Currency.objects.get(title=t2)

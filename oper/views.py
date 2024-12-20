@@ -75,7 +75,7 @@ def settings(req):
     for i in avalible_settings.keys():
         obj, created = context_vars.objects.using("security").get_or_create(name=i)
         avalible_settings[i] = obj.value
-
+    print(avalible_settings) 
     return render(req, "oper/settings.html", context={"vars": avalible_settings})
 
 
@@ -126,10 +126,12 @@ def trans_status(req, status, trans_id):
         # final status could not be reverted
         return json_500false(req)
 
-    if obj.status in ("created", "processing"):
+    if obj.status in ("created", "processing", "failed"):
         obj.status = status
         obj.save()
         tell_controller_trans_check("order_api_status_function", obj)
+    
+
 
     return json_true(req)
 

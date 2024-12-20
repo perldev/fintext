@@ -283,7 +283,6 @@ class CryptoAccountTron(object):
         return contract.functions.balanceOf(addr) / (10 ** precision)
 
     def transfer_of_contract(self, from_addr, to_addr, amnt,  private_key=None):
-        try:
             contract = self.__contract
             if self.__wallet is None and private_key is None:
                 raise Exception("private key is needed")
@@ -302,9 +301,6 @@ class CryptoAccountTron(object):
                 .broadcast()
             )
             return txn["txid"]
-        except:
-            traceback.print_exc()
-            return  None
 
     def addr2base58(self, pub):
         primitive_addr = b"\x41" + keccak256(pub)[-20:]
