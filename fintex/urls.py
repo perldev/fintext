@@ -34,6 +34,7 @@ urlpatterns = [
     path("api/set-lang/", views.set_lang, name="set_lang"),
     path('orders/<uuid:uuid>', views.order_details, name='order_details'),
     path('bot_menu', views.bot_menu, name='bot_menu'),
+    path('botmenu', views.bot_menu, name='bot_menu'),
 
     path('oper/', include('oper.urls')), #new
 #    path('admin/', admin.site.urls),
