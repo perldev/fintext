@@ -48,10 +48,13 @@ class Command(BaseCommand):
 
                 print(actual_sum)
                 print(transes)
+                
+
                 # data_from_api = get_in_trans_from(str(i.crypto_payments_details), i.block_height)
                 # TODO TO FACTORY
-                if actual_sum >= i.sum and transes:
+                if actual_sum >= i.sum and len(transes)>0:
                     # if could not save the transes that is mean that we could contact to developer
+                    print("we have transaction on this invoice")
                     try:
                         for trans in transes:
                             #PREVENT adding trans with the same txid!!!

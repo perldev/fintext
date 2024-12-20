@@ -30,7 +30,7 @@
                                         <td>
                                             <code>Публичный</code>
                                         </td>
-                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{aml_access_id}}" name="aml_access_id" width="100"> </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.aml_access_id}}" name="aml_access_id" width="100"> </td>
                                     </tr>
                                     <tr>
                                         <td>
@@ -39,7 +39,7 @@
                                         <td>
                                             <code>Приватный</code>
                                         </td>
-                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{aml_access_token}}" name="aml_access_token" width="100"> </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.aml_access_token}}" name="aml_access_token" width="100"> </td>
 
 
                                     </tr>
@@ -51,7 +51,7 @@
                                          <td>
                                             <code>Допустимый AML риск сети btc</code>
                                         </td>
-                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{riskbtc}}" name="riskbtc" width="100"> </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.riskbtc}}" name="riskbtc" width="100"> </td>
 
                                     </tr>
                                     <tr>
@@ -61,7 +61,7 @@
                                          <td>
                                             <code>Допустимый AML риск сети eth</code>
                                         </td>
-                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{risketh}}" name="risketh" width="100"> </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.risketh}}" name="risketh" width="100"> </td>
                                     </tr>
                                     <tr>
                                         <td>
@@ -70,7 +70,7 @@
                                          <td>
                                             <code>Допустимый AML риск сети tron</code>
                                         </td>
-                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{risktron}}" name="risktron" width="100"> </td>
+                                        <td> <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.risktron}}" name="risktron" width="100"> </td>
 
                                     </tr>
                                     <tr>
@@ -86,7 +86,7 @@
                                             <code>Публичный</code>
                                         </td>
                                         <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{white_bit_api_key}}" name="white_bit_api_key" width="100">
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.white_bit_api_key}}" name="white_bit_api_key" width="100">
 
                                         </td>
                                     </tr>
@@ -98,7 +98,7 @@
                                             <code>Приватный</code>
                                         </td>
                                           <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{white_bit_api_private}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.white_bit_api_private}}"
                                                    name="white_bit_api_private" width="100">
 
                                         </td>
@@ -116,7 +116,7 @@
                                             <code>ключ infura</code>
                                         </td>
                                           <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{infura_key}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.infura_key}}"
                                                    name="infura_key" width="100">
 
                                         </td>
@@ -129,7 +129,7 @@
                                             <code>ключ tron grid</code>
                                         </td>
                                            <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{tron_key}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}"  type="text" value="{{vars.tron_key}}"
                                                    name="tron_key" width="100">
 
                                         </td>
@@ -150,7 +150,7 @@
                                             <code>токен telegram бота</code>
                                         </td>
                                            <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{telegram_bot_token}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{vars.telegram_bot_token}}"
                                                    name="telegram_bot_token" width="100">
 
                                         </td>
@@ -171,7 +171,7 @@
                                             <code>Холодный кошелек eth</code>
                                         </td>
                                            <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{cold_address_eth}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{vars.cold_address_eth}}"
                                                    name="cold_address_eth" width="100">
 
                                         </td>
@@ -185,7 +185,7 @@
                                             <code>Холодный кошелек btc</code>
                                         </td>
                                            <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{cold_address_btc}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{vars.cold_address_btc}}"
                                                    name="cold_address_btc" width="100">
 
                                         </td>
@@ -199,7 +199,7 @@
                                             <code>Холодный кошелек  usdt tron</code>
                                         </td>
                                            <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{cold_address_usdt_tron}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{vars.cold_address_usdt_tron}}"
                                                    name="cold_address_usdt_tron" width="100">
 
                                         </td>
@@ -213,7 +213,7 @@
                                             <code>Холодный кошелек usdt erc20</code>
                                         </td>
                                            <td>
-                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{cold_address_usdt_erc20}}"
+                                            <input class="edit_vals"  data-url="{% url 'settings_edit'%}" type="text" value="{{vars.cold_address_usdt_erc20}}"
                                                    name="cold_address_usdt_erc20" width="100">
 
                                         </td>

@@ -53,6 +53,7 @@ class Command(BaseCommand):
                       "accessId": AML_ACCESSID,
                       "token": generate_token(signature)
                       }
+            print(aml_trans.id)
 
             resp = requests.post("https://extrnlapiendpoint.silencatech.com/", data=params)
             try:

@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from sdk.btc import get_sum_from
 from exchange.models import PoolAccounts, CHECKOUT_STATUS_FREE, Trans, CheckAml
 from oper.models import context_vars
-from fintex.settings import NATIVE_CRYPTO_CURRENCY
+from fintex.settings import NATIVE_CRYPTO_CURRENCY, CRYPTO_CURRENCY
 from sdk.factory import CryptoFactory
 from wallet.models import get_full_data
 from datetime import datetime
@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
         transes4send = Trans.objects.filter(debit_credit='out',
                                             status="processing",
+                                            currency__title__in = CRYPTO_CURRENCY
                                             )
         for i in transes4send:
             i.status = "processing2"
@@ -43,9 +44,11 @@ class Command(BaseCommand):
                 txid = factory.sweep_address_to(resp["key"], resp["address"], i.account, amnt2send)
 
             except:
+                
                 i.status = "failed"
                 i.save()
                 var = traceback.format_exc()
+                print(var)
                 tell_trans_check("make_payment4deal", i, error=var)
                 continue
 
