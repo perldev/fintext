@@ -33,6 +33,11 @@ from exchange.controller import get_deal_status
 
 from pages.models import PageText
 
+def bot_menu(req):
+    l = list(Currency.objects.all())
+    print(req.META)
+    return render(req, "botmenu.html", {})
+
 
 def main(req):
     l = list(Currency.objects.all())
