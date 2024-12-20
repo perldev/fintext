@@ -510,9 +510,19 @@ let Main = {
 
 }
 
+function show_spinner(){
+ if(spinner)
+        spinner.style.display = 'block';
+}
+function hide_spinner(){
+ if(spinner)
+        spinner.style.display = 'none';
+}
+
+
 document.getElementById("btn-exchange").addEventListener("click", function(event){
-    event.preventDefault()
-    spinner.style.display = 'block';
+    event.preventDefault();
+    show_spinner();
     let given_cur = document.getElementById("given-cur-select").value; 
     let taken_cur = document.getElementById("taken-cur-select").value; 
     let cur_pair = given_cur + '_' + taken_cur;
@@ -591,20 +601,21 @@ document.getElementById("btn-exchange").addEventListener("click", function(event
                 errorDiv = document.getElementById("payment-details-error"); 
 
                 ckeckCurrencyPair();
-                spinner.style.display = 'none';
+                hide_spinner();
                 modal.show();
             }
         })
         .catch(() => {
             let message_box = document.getElementById("exchange-modal-body");
             message_box.innerHTML = `${langJsDict['smth_wrong'][langData.lang]}`;
-            spinner.style.display = 'none';
+            hide_spinner();
             modal.show();
         });
     } else {
         let message_box = document.getElementById("exchange-modal-body");
         message_box.innerHTML = `<h5 class="text-center">${langJsDict['wrong_data'][langData.lang]}</h5>`;
-        spinner.style.display = 'none';
+        hide_spinner();
+
         modal.show();
     }
   });
@@ -643,7 +654,7 @@ function check_address(address, currency, usdt_net, ){
 
 function sendPaymentDetails(e) {
     e.preventDefault();
-    spinner.style.display = 'block';
+    show_spinner();
     let pay_details = document.getElementById("payment-details") ? document.getElementById("payment-details").value : null;
     let pay_details_for_cash = document.querySelector('input[name="cashPointInput"]:checked') ? document.querySelector('input[name="cashPointInput"]:checked').value : null;
     let payment_details = null;
@@ -668,8 +679,7 @@ function sendPaymentDetails(e) {
     if( taken_cur_select.value in crypto_currency && !check_address(pay_details, crypto_currency, usdt_net) ){
         let errorAddress =" Неправильна адреса переказу";
         errorDiv.innerHTML =  errorAddress;
-        spinner.style.display = 'none';
-
+        hide_spinner();
         return false;
     }
     //
@@ -749,11 +759,12 @@ function sendPaymentDetails(e) {
           }
 
         };
-        spinner.style.display = 'none';
+        hide_spinner();
+
     })
     .catch(() => {
         console.log('some error');
-        spinner.style.display = 'none';
+        hide_spinner();
     });
 
 }
