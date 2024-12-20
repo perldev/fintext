@@ -48,7 +48,7 @@ def bot_menu(req):
         'cur2': 'uah',
     }
     print(req.META)
-    return render(req, "botmenu.html", {})
+    return render(req, "botmenu.html", context)
 
 
 def main(req):
