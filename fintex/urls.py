@@ -33,6 +33,8 @@ urlpatterns = [
     path("api/get_order_status/<uuid:uuid>", views.order_status, name="api_order_status"),
     path("api/set-lang/", views.set_lang, name="set_lang"),
     path('orders/<uuid:uuid>', views.order_details, name='order_details'),
+    path('bot_menu', views.order_details, name='order_details'),
+
     path('oper/', include('oper.urls')), #new
     path('admin/', admin.site.urls),
 
