@@ -16,48 +16,6 @@
 
       <!-- ======= Header ======= -->
   <header id="header" class="fixed-top">
-    <div class="container d-flex align-items-center">
-
-      <h1 class="logo me-auto"><a href="/"><span>Pro</span>finef</a></h1>
-      <!-- Uncomment below if you prefer to use an image logo -->
-      <!-- <a href="index.html" class="logo me-auto me-lg-0"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
-
-      <nav id="navbar" class="navbar order-last order-lg-0">
-        <ul>
-          <li><a href="/" class="active">Главная</a></li>
-
-          <li class="dropdown"><a href="#"><span>Обмен валют</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="{% url 'exchange_pair' 'uah-to-btc' %}">Обмен гривны на Bitcoin</a></li>
-              <li><a href="{% url 'exchange_pair' 'uah-to-eth' %}">Обмен гривны на Ethereum</a></li>
-            </ul>
-          </li>
-
-          <li><a href="{% url 'about_us' %}">О нас</a></li>
-
-        </ul>
-        <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
-
-      <div class="header-social-links d-flex">
-        <a href="#"><i class="bi bi-person-circle"></i></a>
-        <a href="#"><i class="bi bi-box-arrow-in-right"></i></a>
-      </div>
-
-      <form>
-        {% csrf_token %}
-        <select class="form-lang-select" onchange="setLang()" id="lang-select">
-          {% if request.session.lang == 'ru' %}
-            <option value="uk">Ua</option>
-            <option value="ru" selected>Ru</option>
-          {% else %}
-            <option value="uk" selected>Ua</option>
-            <option value="ru">Ru</option>
-          {% endif %}
-        </select>
-      </form>
-
-    </div>
   </header><!-- End Header -->
 
   <main id="main">
@@ -74,46 +32,8 @@
       <div class="container">
         <div class="row">
 
-          <div class="col-lg-3 col-md-6 footer-contact">
-            <h3>UaTrust</h3>
-            <p>
-              A108 Some Street <br>
-              Kyiv, some index<br>
-              Ukraine <br><br>
-              <strong>Phone:</strong> +1 8888 888 88 <br>
-              <strong>Email:</strong> info@example.com<br>
-            </p>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Купить</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Купить Биткоин за гривну</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Купить Эфириум за гривну</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Купить USDT за гривну</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Купить Лайткоин за гривну</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Купить Биткоин с карты</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Продать</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Продать Биткоин</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Продать Эфириум за гривну</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Продать USDT за гривну</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Компания</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Наш обменник</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Комиссии и лимиты</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Контакты</a></li>
-            </ul>
-          </div>
-
+     
+      
         </div>
       </div>
     </div>
@@ -122,7 +42,7 @@
 
       <div class="me-md-auto text-center text-md-start">
         <div class="copyright">
-          &copy; Copyright <strong><span>Company</span></strong>. All Rights Reserved
+          &copy; Copyright <strong><span>UATrust</span></strong>. All Rights Reserved
         </div>
       </div>
     </div>
