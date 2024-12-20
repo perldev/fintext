@@ -35,6 +35,18 @@ from pages.models import PageText
 
 def bot_menu(req):
     l = list(Currency.objects.all())
+    rates4Andrey = []
+    for i in l:
+        for j in l:
+            if i != j:
+                rates4Andrey.append(i.title + "_" + j.title)
+    context = {
+        "allrates": rates4Andrey,
+        'lang_dict': lang_dict,
+        'lang_js_dict': lang_js_dict,
+        'cur1': 'usdt',
+        'cur2': 'uah',
+    }
     print(req.META)
     return render(req, "botmenu.html", {})
 
